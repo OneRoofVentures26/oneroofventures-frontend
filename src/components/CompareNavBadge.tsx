@@ -1,21 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useCompare } from "@/lib/compare-context";
+import { compareHref, useCompare } from "@/lib/compare-context";
 
 export default function CompareNavBadge() {
-  const { selectedIds } = useCompare();
+  const { items } = useCompare();
 
-  if (selectedIds.length === 0) return null;
+  if (items.length === 0) return null;
 
   return (
     <Link
-      href={`/compare?ids=${selectedIds.join(",")}`}
+      href={compareHref(items)}
       className="flex flex-shrink-0 items-center gap-1.5 rounded-md border border-accent/30 bg-accent-light px-2.5 py-1.5 text-sm font-medium text-accent-dark transition hover:bg-accent/15 sm:px-3"
     >
       <span className="hidden sm:inline">Compare</span>
       <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-accent text-[11px] font-bold text-white">
-        {selectedIds.length}
+        {items.length}
       </span>
     </Link>
   );

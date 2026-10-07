@@ -1,12 +1,14 @@
 "use client";
 
 import { useRouter, useParams } from "next/navigation";
-import { CITIES } from "@/lib/data/cities";
+import type { CityItem } from "@/lib/api/types";
 
-export default function CitySwitcher() {
+export default function CitySwitcher({ cities }: { cities: CityItem[] }) {
   const router = useRouter();
   const params = useParams<{ city?: string }>();
-  const current = typeof params?.city === "string" ? params.city : "";
+  const current = typeof params?.city === "string" && cities.some((c) => c.slug === params.city) ? params.city : "";
+
+  if (cities.length === 0) return null;
 
   return (
     <select
@@ -20,7 +22,7 @@ export default function CitySwitcher() {
       <option value="" disabled>
         Select a city
       </option>
-      {CITIES.map((city) => (
+      {cities.map((city) => (
         <option key={city.slug} value={city.slug}>
           {city.name}
         </option>

@@ -9,12 +9,23 @@ import {
   type ReactNode,
 } from "react";
 
-const STORAGE_KEY = "oneroof_compare_ids";
+// The public API has no lookup by agency id, so we keep enough to render chips,
+// build profile links and quote links without refetching.
+export interface CompareItem {
+  id: number;
+  name: string;
+  slug: string;
+  citySlug: string;
+}
+
+const STORAGE_KEY = "oneroof_compare_v2";
 export const MAX_COMPARE = 4;
+export const MIN_COMPARE = 2;
 
 let listeners: Array<() => void> = [];
 let cachedRaw: string | null = null;
-let cachedIds: string[] = [];
+let cachedItems: CompareItem[] = [];
+const EMPTY: CompareItem[] = [];
 
 function emitChange() {
   listeners.forEach((listener) => listener());
@@ -27,7 +38,7 @@ function subscribe(listener: () => void): () => void {
   };
 }
 
-function getSnapshot(): string[] {
+function getSnapshot(): CompareItem[] {
   let raw: string | null = null;
   try {
     raw = window.localStorage.getItem(STORAGE_KEY);
@@ -37,21 +48,22 @@ function getSnapshot(): string[] {
   if (raw !== cachedRaw) {
     cachedRaw = raw;
     try {
-      cachedIds = raw ? JSON.parse(raw) : [];
+      const parsed = raw ? JSON.parse(raw) : [];
+      cachedItems = Array.isArray(parsed) ? parsed : [];
     } catch {
-      cachedIds = [];
+      cachedItems = [];
     }
   }
-  return cachedIds;
+  return cachedItems;
 }
 
-function getServerSnapshot(): string[] {
-  return [];
+function getServerSnapshot(): CompareItem[] {
+  return EMPTY;
 }
 
-function writeStore(ids: string[]) {
+function writeStore(items: CompareItem[]) {
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   } catch {
     // ignore
   }
@@ -59,55 +71,73 @@ function writeStore(ids: string[]) {
 }
 
 interface CompareContextValue {
-  selectedIds: string[];
-  toggle: (id: string) => void;
-  remove: (id: string) => void;
+  items: CompareItem[];
+  /** City every selected agency belongs to (compare only works within one city). */
+  citySlug: string | null;
+  toggle: (item: CompareItem) => void;
+  remove: (id: number) => void;
   clear: () => void;
-  setAll: (ids: string[]) => void;
-  isSelected: (id: string) => boolean;
+  setAll: (items: CompareItem[]) => void;
+  isSelected: (id: number) => boolean;
+  /** Why this agency can't be added right now, or null if it can. */
+  blockReason: (item: Pick<CompareItem, "id" | "citySlug">) => string | null;
   isFull: boolean;
 }
 
 const CompareContext = createContext<CompareContextValue | null>(null);
 
 export function CompareProvider({ children }: { children: ReactNode }) {
-  const selectedIds = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const items = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const citySlug = items[0]?.citySlug ?? null;
 
-  const toggle = useCallback((id: string) => {
+  const toggle = useCallback((item: CompareItem) => {
     const current = getSnapshot();
-    if (current.includes(id)) {
-      writeStore(current.filter((x) => x !== id));
-    } else if (current.length < MAX_COMPARE) {
-      writeStore([...current, id]);
+    if (current.some((x) => x.id === item.id)) {
+      writeStore(current.filter((x) => x.id !== item.id));
+      return;
     }
+    if (current.length >= MAX_COMPARE) return;
+    if (current.length > 0 && current[0].citySlug !== item.citySlug) return;
+    writeStore([...current, item]);
   }, []);
 
-  const remove = useCallback((id: string) => {
-    writeStore(getSnapshot().filter((x) => x !== id));
+  const remove = useCallback((id: number) => {
+    writeStore(getSnapshot().filter((x) => x.id !== id));
   }, []);
 
   const clear = useCallback(() => writeStore([]), []);
 
-  const setAll = useCallback((ids: string[]) => {
-    writeStore(ids.slice(0, MAX_COMPARE));
-  }, []);
+  const setAll = useCallback((next: CompareItem[]) => writeStore(next.slice(0, MAX_COMPARE)), []);
 
-  const isSelected = useCallback(
-    (id: string) => selectedIds.includes(id),
-    [selectedIds],
+  const isSelected = useCallback((id: number) => items.some((x) => x.id === id), [items]);
+
+  const blockReason = useCallback(
+    (item: Pick<CompareItem, "id" | "citySlug">) => {
+      if (items.some((x) => x.id === item.id)) return null;
+      if (items.length >= MAX_COMPARE) {
+        return `You can compare up to ${MAX_COMPARE} agencies at a time. Remove one to add another.`;
+      }
+      if (citySlug && citySlug !== item.citySlug) {
+        return "You can only compare agencies from the same city. Clear your current list to start a new one.";
+      }
+      return null;
+    },
+    [items, citySlug],
   );
 
   const value = useMemo<CompareContextValue>(
     () => ({
-      selectedIds,
+      items,
+      citySlug,
       toggle,
       remove,
       clear,
       setAll,
       isSelected,
-      isFull: selectedIds.length >= MAX_COMPARE,
+      blockReason,
+      isFull: items.length >= MAX_COMPARE,
     }),
-    [selectedIds, toggle, remove, clear, setAll, isSelected],
+    [items, citySlug, toggle, remove, clear, setAll, isSelected, blockReason],
   );
 
   return <CompareContext.Provider value={value}>{children}</CompareContext.Provider>;
@@ -117,4 +147,11 @@ export function useCompare(): CompareContextValue {
   const ctx = useContext(CompareContext);
   if (!ctx) throw new Error("useCompare must be used within CompareProvider");
   return ctx;
+}
+
+export function compareHref(items: CompareItem[]): string {
+  const city = items[0]?.citySlug;
+  const params = new URLSearchParams({ ids: items.map((x) => x.id).join(",") });
+  if (city) params.set("city", city);
+  return `/compare?${params.toString()}`;
 }

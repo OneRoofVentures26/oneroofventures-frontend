@@ -1,32 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import type { Agency } from "@/lib/types";
+import type { AgencyListItem } from "@/lib/api/types";
 import { useCompare } from "@/lib/compare-context";
-import { formatPrice, cn } from "@/lib/utils";
-import StarRating from "@/components/StarRating";
-import ScoreBadge from "@/components/ScoreBadge";
+import { cn, formatStartingPrice, initials, TIER_LABELS } from "@/lib/utils";
+import CompareToggle from "@/components/CompareToggle";
+import VerifiedBadge from "@/components/VerifiedBadge";
 
-function initials(name: string): string {
-  return name
-    .split(" ")
-    .filter((w) => /^[A-Za-z&]/.test(w))
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase();
-}
-
-export default function AgencyCard({ agency }: { agency: Agency }) {
-  const { isSelected, toggle, isFull } = useCompare();
+export default function AgencyCard({ agency, citySlug }: { agency: AgencyListItem; citySlug: string }) {
+  const { isSelected } = useCompare();
   const selected = isSelected(agency.id);
-  const startingPrice = Math.min(...agency.packages.map((p) => p.priceMin));
-  const disabled = !selected && isFull;
+  const href = `/${citySlug}/${agency.slug}`;
+  const hasPrice = agency.startingPrice != null;
 
   return (
     <div
       className={cn(
-        "flex flex-col rounded-xl border bg-surface p-5 shadow-sm transition hover:shadow-md",
+        "flex h-full flex-col rounded-xl border bg-surface p-5 shadow-sm transition hover:shadow-md",
         selected ? "border-accent ring-1 ring-accent/30" : "border-border",
       )}
     >
@@ -36,64 +26,49 @@ export default function AgencyCard({ agency }: { agency: Agency }) {
             {initials(agency.name)}
           </span>
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              <Link
-                href={`/${agency.city}/${agency.slug}`}
-                className="text-sm font-semibold text-ink hover:text-accent"
-              >
-                {agency.name}
-              </Link>
-              {agency.premium && (
-                <span className="flex-shrink-0 rounded-full bg-gold-light px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gold">
-                  Premium
-                </span>
-              )}
-            </div>
-            <StarRating rating={agency.rating} />
-            <span className="text-xs text-ink-soft">
-              {agency.reviewCount} reviews
-            </span>
+            <Link href={href} className="block text-sm font-semibold text-ink hover:text-accent">
+              {agency.name}
+            </Link>
+            <p className="truncate text-xs text-ink-soft">
+              {[agency.locality, agency.teamSize && `${agency.teamSize} people`].filter(Boolean).join(" · ") ||
+                " "}
+            </p>
+            {agency.verified && <VerifiedBadge className="mt-1" />}
           </div>
         </div>
 
-        <label
-          className={cn(
-            "flex flex-shrink-0 items-center gap-1.5 text-xs font-medium",
-            disabled ? "cursor-not-allowed text-ink-soft/50" : "cursor-pointer text-ink-soft",
-          )}
-        >
-          <input
-            type="checkbox"
-            checked={selected}
-            disabled={disabled}
-            onChange={() => toggle(agency.id)}
-            className="h-4 w-4 accent-accent"
-          />
-          Compare
-        </label>
+        <CompareToggle item={{ id: agency.id, name: agency.name, slug: agency.slug, citySlug }} />
       </div>
 
       <div className="mt-4 flex flex-wrap gap-1.5">
         {agency.services.slice(0, 3).map((s) => (
-          <span
-            key={s}
-            className="rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-ink-soft"
-          >
-            {s}
+          <span key={s.code} className="rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-ink-soft">
+            {s.name}
           </span>
         ))}
+        {agency.services.length > 3 && (
+          <span className="px-1 py-1 text-xs text-ink-soft">+{agency.services.length - 3}</span>
+        )}
       </div>
 
-      <div className="mt-4 flex items-center justify-between">
-        <ScoreBadge score={agency.score} breakdown={agency.scoreBreakdown} size="sm" />
-        <div className="text-right">
-          <p className="text-xs text-ink-soft">Starting at</p>
-          <p className="text-sm font-bold text-ink">{formatPrice(startingPrice)}/mo</p>
+      <div className="mt-auto flex items-end justify-between gap-3 pt-4">
+        <div className="flex flex-wrap gap-1">
+          {agency.tiersAvailable.map((t) => (
+            <span key={t} className="rounded border border-border px-1.5 py-0.5 text-[10px] font-medium text-ink-soft">
+              {TIER_LABELS[t]}
+            </span>
+          ))}
+        </div>
+        <div className="flex-shrink-0 text-right">
+          <p className="text-xs text-ink-soft">{hasPrice ? "Starting at" : "Pricing"}</p>
+          <p className={cn("text-sm font-bold", hasPrice ? "text-ink" : "text-ink-soft")}>
+            {formatStartingPrice(agency.startingPrice, agency.billing)}
+          </p>
         </div>
       </div>
 
       <Link
-        href={`/${agency.city}/${agency.slug}`}
+        href={href}
         className="mt-4 block rounded-lg border border-border py-2 text-center text-sm font-medium text-ink transition hover:border-accent hover:text-accent"
       >
         View profile
