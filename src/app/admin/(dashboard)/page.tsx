@@ -50,7 +50,7 @@ export default function AdminDashboardPage() {
         title="Dashboard"
         description="Public pages pick up admin changes within about 5 minutes."
         actions={
-          <Link href="/admin/agencies/new" className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-dark">
+          <Link href="/admin/agencies/new" className="rounded-sm bg-harbor px-4 py-2 text-sm font-semibold text-paper hover:bg-harbor-dark">
             + Add Agency
           </Link>
         }
@@ -70,10 +70,10 @@ export default function AdminDashboardPage() {
             ))}
       </div>
 
-      <div className="mt-8 rounded-xl border border-border bg-surface p-5">
+      <div className="mt-8 rounded-sm border border-mist bg-surface p-5">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-bold text-ink">Latest quote requests</h2>
-          <Link href="/admin/leads" className="text-xs font-medium text-accent hover:underline">
+          <Link href="/admin/leads" className="text-xs font-medium text-harbor hover:underline">
             View all →
           </Link>
         </div>
@@ -82,7 +82,7 @@ export default function AdminDashboardPage() {
         ) : stats.recentLeads.length === 0 ? (
           <p className="mt-3 text-sm text-ink-soft">No quote requests yet.</p>
         ) : (
-          <ul className="mt-3 divide-y divide-border">
+          <ul className="mt-3 divide-y divide-mist">
             {stats.recentLeads.map((lead) => (
               <li key={lead.id} className="flex items-center justify-between gap-3 py-2.5">
                 <div className="min-w-0">

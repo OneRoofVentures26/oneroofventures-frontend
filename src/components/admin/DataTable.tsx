@@ -2,6 +2,7 @@
 
 import { useMemo, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { RefreshButton } from "@/components/admin/ui";
 
 export interface DataTableColumn<T> {
   key: string;
@@ -23,6 +24,11 @@ interface DataTableProps<T> {
   /** Set false when the server paginates; all rows are shown and no pager is rendered. */
   paginate?: boolean;
   emptyMessage?: string;
+  /** Shows a refresh button that re-fetches just this table's data. */
+  onRefresh?: () => void;
+  refreshing?: boolean;
+  /** Accessible name for the refresh button, e.g. "agencies". */
+  refreshLabel?: string;
 }
 
 type SortDirection = "asc" | "desc";
@@ -38,6 +44,9 @@ export default function DataTable<T>({
   pageSize = 10,
   paginate = true,
   emptyMessage = "No results found.",
+  onRefresh,
+  refreshing = false,
+  refreshLabel,
 }: DataTableProps<T>) {
   const [query, setQuery] = useState("");
   const [sortKey, setSortKey] = useState<string | null>(null);
@@ -80,7 +89,7 @@ export default function DataTable<T>({
 
   return (
     <div>
-      {(searchFn || filters) && (
+      {(searchFn || filters || onRefresh) && (
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         {searchFn ? (
           <input
@@ -90,25 +99,30 @@ export default function DataTable<T>({
               setPage(1);
             }}
             placeholder={searchPlaceholder}
-            className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent sm:max-w-xs"
+            className="w-full rounded-sm border border-mist bg-surface px-3 py-2 text-sm outline-none focus:border-harbor sm:max-w-xs"
           />
         ) : (
           <div />
         )}
-        {filters && <div className="flex flex-wrap items-center gap-2">{filters}</div>}
+        {(filters || onRefresh) && (
+          <div className="flex flex-wrap items-center gap-2">
+            {filters}
+            {onRefresh && <RefreshButton onRefresh={onRefresh} loading={refreshing} label={refreshLabel} />}
+          </div>
+        )}
       </div>
       )}
 
-      <div className="overflow-x-auto rounded-xl border border-border bg-surface">
+      <div className="overflow-x-auto rounded-sm border border-mist border-t-ink/80 bg-surface">
         <table className="w-full min-w-[640px] border-collapse text-sm">
           <thead>
-            <tr className="border-b border-border bg-muted/40">
+            <tr className="border-b border-mist">
               {columns.map((col) => (
                 <th
                   key={col.key}
                   onClick={() => toggleSort(col)}
                   className={cn(
-                    "whitespace-nowrap p-3 text-left text-xs font-semibold uppercase tracking-wide text-ink-soft",
+                    "whitespace-nowrap p-3 text-left text-xs font-semibold text-ink-soft",
                     col.sortValue && "cursor-pointer select-none hover:text-ink",
                     col.className,
                   )}
@@ -117,7 +131,7 @@ export default function DataTable<T>({
                   {sortKey === col.key && (sortDir === "asc" ? " ↑" : " ↓")}
                 </th>
               ))}
-              {renderActions && <th className="p-3 text-right text-xs font-semibold uppercase tracking-wide text-ink-soft">Actions</th>}
+              {renderActions && <th className="p-3 text-right text-xs font-semibold text-ink-soft">Actions</th>}
             </tr>
           </thead>
           <tbody>
@@ -129,7 +143,7 @@ export default function DataTable<T>({
               </tr>
             ) : (
               paged.map((row) => (
-                <tr key={getRowId(row)} className="border-b border-border last:border-0 hover:bg-muted/30">
+                <tr key={getRowId(row)} className="border-b border-mist last:border-0 hover:bg-muted/30">
                   {columns.map((col) => (
                     <td key={col.key} className={cn("p-3 align-middle text-ink", col.className)}>
                       {col.render(row)}
@@ -157,7 +171,7 @@ export default function DataTable<T>({
               type="button"
               disabled={currentPage === 1}
               onClick={() => setPage((p) => p - 1)}
-              className="rounded-md border border-border px-3 py-1.5 text-xs font-medium text-ink disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-sm border border-mist px-3 py-1.5 text-xs font-medium text-ink disabled:cursor-not-allowed disabled:opacity-40"
             >
               Previous
             </button>
@@ -165,7 +179,7 @@ export default function DataTable<T>({
               type="button"
               disabled={currentPage === totalPages}
               onClick={() => setPage((p) => p + 1)}
-              className="rounded-md border border-border px-3 py-1.5 text-xs font-medium text-ink disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-sm border border-mist px-3 py-1.5 text-xs font-medium text-ink disabled:cursor-not-allowed disabled:opacity-40"
             >
               Next
             </button>

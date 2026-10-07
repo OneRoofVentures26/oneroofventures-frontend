@@ -7,6 +7,7 @@ import { createLead, getLocalities, warmUpBackend } from "@/lib/api/public";
 import { ApiError, errorMessage } from "@/lib/api/http";
 import { TURNSTILE_SITE_KEY } from "@/lib/config";
 import { cn, formatPackagePrice, TIER_LABELS } from "@/lib/utils";
+import { chip, ctaButton } from "@/lib/styles";
 import Turnstile, { type TurnstileHandle } from "@/components/Turnstile";
 
 const PHONE_PATTERN = /^(\+91[\s-]?)?[6-9][0-9]{9}$/;
@@ -37,7 +38,7 @@ interface QuoteRequestFormProps {
 type Errors = Partial<Record<keyof LeadRequest | "form", string>>;
 
 const inputClass =
-  "mt-1 w-full rounded-md border bg-surface px-3 py-2 text-sm outline-none focus:border-accent disabled:bg-muted disabled:text-ink-soft";
+  "mt-1 min-h-11 w-full rounded-sm border bg-surface px-3 py-2 text-sm outline-none focus:border-harbor disabled:bg-muted disabled:text-ink-soft";
 
 function guessService(agencies: AgencyProfile[], packageId: number | null, services: ServiceItem[]): string {
   if (agencies.length === 1 && packageId) {
@@ -166,8 +167,8 @@ export default function QuoteRequestForm({
 
   if (result) {
     return (
-      <div className="rounded-xl border border-accent/30 bg-accent-light p-6 text-center">
-        <p className="text-base font-bold text-accent-dark">Quote request sent!</p>
+      <div className="border-y-2 border-harbor bg-surface px-4 py-8 text-center">
+        <p className="font-serif text-2xl font-semibold text-harbor">Quote request sent</p>
         {result.sentTo.length > 0 ? (
           <>
             <p className="mt-2 text-sm text-ink-soft">
@@ -176,7 +177,7 @@ export default function QuoteRequestForm({
             </p>
             <ul className="mt-3 flex flex-wrap justify-center gap-2">
               {result.sentTo.map((a) => (
-                <li key={a.id} className="rounded-full bg-surface px-3 py-1 text-xs font-medium text-ink">
+                <li key={a.id} className="rounded-sm bg-mist/60 px-2 py-0.5 text-xs font-medium text-ink">
                   {a.name}
                 </li>
               ))}
@@ -188,7 +189,7 @@ export default function QuoteRequestForm({
           </p>
         )}
         <p className="mt-4 text-xs text-ink-soft">Reference #{result.leadId}</p>
-        <Link href={citySlug ? `/${citySlug}` : "/"} className="mt-4 inline-block text-sm font-semibold text-accent hover:underline">
+        <Link href={citySlug ? `/${citySlug}` : "/"} className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-harbor hover:underline">
           Keep browsing agencies →
         </Link>
       </div>
@@ -197,32 +198,32 @@ export default function QuoteRequestForm({
 
   const fieldError = (key: keyof Errors) =>
     errors[key] ? <p className="mt-1 text-xs text-danger">{errors[key]}</p> : null;
-  const borderFor = (key: keyof Errors) => (errors[key] ? "border-danger" : "border-border");
+  const borderFor = (key: keyof Errors) => (errors[key] ? "border-danger" : "border-mist");
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6" noValidate>
       {missingAgencies > 0 && (
-        <p className="rounded-md bg-gold-light px-3 py-2 text-sm text-ink">
+        <p className="rounded-sm border-l-2 border-danger bg-danger/5 px-3 py-2 text-sm text-ink">
           {missingAgencies === 1 ? "One agency" : `${missingAgencies} agencies`} from your link{" "}
           {missingAgencies === 1 ? "is" : "are"} no longer listed and won&apos;t receive this request.
         </p>
       )}
 
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">Sending to</p>
+        <p className="text-sm font-medium text-ink">Sending to</p>
         {agencies.length > 0 ? (
           <ul className="mt-2 flex flex-wrap gap-2">
             {agencies.map((a) => (
               <li
                 key={a.id}
-                className="flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 text-sm font-medium text-ink"
+                className="flex items-center gap-1 rounded-sm bg-mist/60 py-0.5 pl-3 pr-0.5 text-sm font-medium text-ink"
               >
                 {a.name}
                 <button
                   type="button"
                   onClick={() => setAgencies((prev) => prev.filter((x) => x.id !== a.id))}
                   aria-label={`Remove ${a.name}`}
-                  className="text-ink-soft hover:text-danger"
+                  className="flex h-10 w-10 items-center justify-center text-ink-soft hover:text-danger"
                 >
                   ✕
                 </button>
@@ -380,12 +381,7 @@ export default function QuoteRequestForm({
               key={s.slug}
               onClick={() => setServiceSlug(s.slug)}
               aria-pressed={serviceSlug === s.slug}
-              className={cn(
-                "rounded-full border px-3 py-1.5 text-xs font-medium transition",
-                serviceSlug === s.slug
-                  ? "border-accent bg-accent-light text-accent-dark"
-                  : "border-border text-ink-soft hover:border-accent",
-              )}
+              className={chip(serviceSlug === s.slug)}
             >
               {s.name}
             </button>
@@ -438,7 +434,7 @@ export default function QuoteRequestForm({
       </div>
 
       {(errors.form || errors.agencyId || errors.agencyIds) && (
-        <p className="rounded-md bg-danger/10 px-3 py-2 text-sm text-danger">
+        <p className="rounded-sm bg-danger/10 px-3 py-2 text-sm text-danger">
           {errors.form ?? errors.agencyId ?? errors.agencyIds}
         </p>
       )}
@@ -447,7 +443,7 @@ export default function QuoteRequestForm({
         <button
           type="submit"
           disabled={status === "sending"}
-          className="w-full rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
+          className={cn(ctaButton, "w-full")}
         >
           {status === "sending"
             ? "Sending…"

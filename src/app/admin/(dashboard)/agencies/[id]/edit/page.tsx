@@ -49,7 +49,7 @@ export default function EditAgencyPage() {
       <div>
         <h1 className="text-xl font-bold text-ink">Agency not found</h1>
         <p className="mt-1 text-sm text-ink-soft">This agency may have already been deleted.</p>
-        <Link href="/admin/agencies" className="mt-4 inline-block text-sm font-medium text-accent hover:underline">
+        <Link href="/admin/agencies" className="mt-4 inline-block text-sm font-medium text-harbor hover:underline">
           ← Back to agencies
         </Link>
       </div>
@@ -60,7 +60,7 @@ export default function EditAgencyPage() {
 
   return (
     <div>
-      <Link href="/admin/agencies" className="text-sm font-medium text-ink-soft hover:text-accent">
+      <Link href="/admin/agencies" className="text-sm font-medium text-ink-soft hover:text-harbor">
         ← Agencies
       </Link>
       <div className="mt-2">
@@ -75,7 +75,7 @@ export default function EditAgencyPage() {
                     href={`/${a.citySlug}/${a.slug}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-accent hover:underline"
+                    className="text-harbor hover:underline"
                   >
                     View on site ↗
                   </a>

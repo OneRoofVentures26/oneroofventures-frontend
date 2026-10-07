@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAdminSession, logout } from "@/lib/admin-auth";
 import { cn } from "@/lib/utils";
+import Logo from "@/components/Logo";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const NAV_ITEMS = [
   { href: "/admin", label: "Dashboard" },
@@ -39,10 +41,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           href={item.href}
           onClick={() => setSidebarOpen(false)}
           className={cn(
-            "block rounded-md px-3 py-2 text-sm font-medium transition",
+            "block rounded-sm border-l-2 px-3 py-2 text-sm font-medium transition",
             isActive(item.href)
-              ? "bg-accent-light text-accent-dark"
-              : "text-ink-soft hover:bg-muted hover:text-ink",
+              ? "border-paper bg-harbor-dark text-paper"
+              : "border-transparent text-paper/75 hover:bg-harbor-dark hover:text-paper",
           )}
         >
           {item.label}
@@ -52,14 +54,14 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         href="/"
         target="_blank"
         rel="noopener noreferrer"
-        className="block rounded-md px-3 py-2 text-sm font-medium text-ink-soft transition hover:bg-muted hover:text-ink"
+        className="mt-4 block rounded-sm border-t border-paper/15 px-3 pb-2 pt-4 text-sm font-medium text-paper/75 transition hover:text-paper"
       >
         View site ↗
       </a>
       <button
         type="button"
         onClick={handleLogout}
-        className="block w-full rounded-md px-3 py-2 text-left text-sm font-medium text-ink-soft transition hover:bg-muted hover:text-ink"
+        className="block w-full rounded-sm px-3 py-2 text-left text-sm font-medium text-paper/75 transition hover:bg-harbor-dark hover:text-paper"
       >
         Logout
       </button>
@@ -73,33 +75,34 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           <button
             type="button"
             onClick={() => setSidebarOpen((v) => !v)}
-            className="rounded-md border border-border p-1.5 text-ink-soft lg:hidden"
+            className="flex h-11 w-11 items-center justify-center rounded-xl border border-border text-text lg:hidden"
             aria-label="Toggle navigation"
           >
             <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M3 5h14M3 10h14M3 15h14" strokeLinecap="round" />
+              <path d="M3 5h14M3 10h14M3 15h14" strokeLinecap="square" />
             </svg>
           </button>
-          <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md bg-accent text-xs font-bold text-white">
-            OR
-          </span>
-          <span className="hidden text-sm font-bold text-ink sm:inline">OneRoof Admin</span>
+          <Logo size={26} />
+          <span className="hidden border-l border-border pl-3 text-sm font-medium text-text-muted sm:inline">Admin</span>
         </div>
-        <span className="min-w-0 truncate text-sm text-ink-soft">{session?.username}</span>
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="min-w-0 truncate text-sm text-text-muted">{session?.username}</span>
+          <ThemeToggle />
+        </div>
       </header>
 
       <div className="flex">
-        <aside className="hidden w-56 flex-shrink-0 border-r border-border bg-surface p-4 lg:block">
+        <aside className="sticky top-14 hidden h-[calc(100dvh-3.5rem)] w-56 flex-shrink-0 self-start overflow-y-auto bg-harbor p-4 lg:block">
           {navLinks}
         </aside>
 
         {sidebarOpen && (
           <div className="fixed inset-0 z-40 lg:hidden">
             <div
-              className="absolute inset-0 bg-black/40"
+              className="absolute inset-0 bg-ink/40"
               onClick={() => setSidebarOpen(false)}
             />
-            <aside className="absolute inset-y-0 left-0 w-56 border-r border-border bg-surface p-4 shadow-xl">
+            <aside className="absolute inset-y-0 left-0 w-56 bg-harbor p-4">
               {navLinks}
             </aside>
           </div>

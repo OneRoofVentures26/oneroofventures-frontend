@@ -10,7 +10,7 @@ import ConfirmDialog from "@/components/admin/ConfirmDialog";
 import PackageForm from "@/components/admin/PackageForm";
 import PackageSuggestionsPanel from "@/components/admin/PackageSuggestionsPanel";
 import { useToast } from "@/components/admin/Toast";
-import { dangerLinkButton, ErrorBanner, linkButton, secondaryButton } from "@/components/admin/ui";
+import { dangerLinkButton, ErrorBanner, linkButton, RefreshButton, secondaryButton } from "@/components/admin/ui";
 
 export default function PackagesManager({
   agencyId,
@@ -55,13 +55,14 @@ export default function PackagesManager({
   }
 
   return (
-    <section className="rounded-xl border border-border bg-surface p-5">
+    <section className="rounded-sm border border-mist bg-surface p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h2 className="text-sm font-bold uppercase tracking-wide text-ink-soft">Packages</h2>
+          <h2 className="text-lg text-ink">Packages</h2>
           <p className="text-xs text-ink-soft">One package per service and tier (Starter, Growth, Pro).</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <RefreshButton onRefresh={packages.reload} loading={packages.loading} label="packages" />
           <button
             type="button"
             onClick={() => {
@@ -117,14 +118,14 @@ export default function PackagesManager({
         {!packages.data ? (
           !packages.error && <p className="text-sm text-ink-soft">Loading packages…</p>
         ) : packages.data.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-ink-soft">
+          <p className="rounded-sm border border-dashed border-mist p-6 text-center text-sm text-ink-soft">
             No packages yet. The agency will show as “Price on request” until you add some.
           </p>
         ) : (
           [...groups.entries()].map(([code, list]) => (
             <div key={code}>
-              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-soft">{serviceName(code)}</h3>
-              <ul className="divide-y divide-border rounded-lg border border-border">
+              <h3 className="mb-2 text-base text-ink">{serviceName(code)}</h3>
+              <ul className="divide-y divide-mist rounded-sm border border-mist">
                 {list.map((p) =>
                   editing === p.id ? (
                     <li key={p.id} className="p-2">
@@ -144,7 +145,7 @@ export default function PackagesManager({
                     <li key={p.id} className="flex flex-wrap items-center justify-between gap-3 px-3 py-2.5">
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-ink">
-                          <span className="mr-2 rounded bg-muted px-1.5 py-0.5 text-[10px] font-semibold uppercase text-ink-soft">
+                          <span className="mr-2 rounded-sm bg-muted px-1.5 py-0.5 text-[10px] font-semibold text-ink-soft">
                             {TIER_LABELS[p.tier]}
                           </span>
                           {p.name}

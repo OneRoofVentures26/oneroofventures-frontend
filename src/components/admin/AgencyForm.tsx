@@ -26,8 +26,8 @@ interface AgencyFormProps {
 
 type Errors = Record<string, string>;
 
-const sectionClass = "rounded-xl border border-border bg-surface p-5";
-const sectionTitle = "text-sm font-bold uppercase tracking-wide text-ink-soft";
+const sectionClass = "rounded-sm border border-mist bg-surface p-5";
+const sectionTitle = "text-lg text-ink";
 
 export default function AgencyForm({ initialData: a, cities, services, onSubmit, submitLabel = "Save Agency" }: AgencyFormProps) {
   const router = useRouter();
@@ -180,7 +180,7 @@ export default function AgencyForm({ initialData: a, cities, services, onSubmit,
               type="checkbox"
               checked={verified}
               onChange={(e) => setVerified(e.target.checked)}
-              className="h-4 w-4 accent-accent"
+              className="h-4 w-4 accent-harbor"
             />
             Verified (shows a “Verified” badge on the site)
           </label>
@@ -262,10 +262,8 @@ export default function AgencyForm({ initialData: a, cities, services, onSubmit,
                   onClick={() => toggleService(s.code)}
                   aria-pressed={serviceCodes.includes(s.code)}
                   className={cn(
-                    "rounded-full border px-3 py-1.5 text-xs font-medium transition",
-                    serviceCodes.includes(s.code)
-                      ? "border-accent bg-accent-light text-accent-dark"
-                      : "border-border text-ink-soft hover:border-accent",
+                    "rounded-sm px-3 py-1.5 text-xs font-medium transition",
+                    serviceCodes.includes(s.code) ? "bg-harbor text-paper" : "bg-mist/60 text-ink hover:bg-mist",
                   )}
                 >
                   {s.name}
@@ -333,7 +331,7 @@ export default function AgencyForm({ initialData: a, cities, services, onSubmit,
               .filter(([, v]) => v)
               .map(([k, v]) => (
                 <div key={k} className={k === "Notes" ? "sm:col-span-2" : undefined}>
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-ink-soft">{k}</dt>
+                  <dt className="text-xs font-semibold text-ink-soft">{k}</dt>
                   <dd className="mt-0.5 whitespace-pre-wrap text-ink">{v}</dd>
                 </div>
               ))}

@@ -9,15 +9,15 @@ import { errorMessage } from "@/lib/api/http";
 import { useAsync } from "@/lib/use-async";
 import { cn, formatDateTime, formatINR } from "@/lib/utils";
 import { useToast } from "@/components/admin/Toast";
-import { ErrorBanner, linkButton, PageHeader, Pager, selectClass, StatusBadge } from "@/components/admin/ui";
+import { ErrorBanner, linkButton, PageHeader, Pager, RefreshButton, selectClass, StatusBadge } from "@/components/admin/ui";
 
 const PAGE_SIZE = 20;
 const LEAD_STATUSES: LeadStatus[] = ["NEW", "SENT", "CONTACTED", "CLOSED", "SPAM"];
 
 const EMAIL_STATUS: Record<EmailStatus | "PENDING", { label: string; className: string }> = {
-  SENT: { label: "Email sent", className: "text-accent-dark" },
+  SENT: { label: "Email sent", className: "text-harbor-dark" },
   FAILED: { label: "Email failed", className: "text-danger" },
-  NO_EMAIL: { label: "No email on file", className: "text-gold" },
+  NO_EMAIL: { label: "No email on file", className: "text-danger" },
   PENDING: { label: "Sending…", className: "text-ink-soft" },
 };
 
@@ -102,11 +102,6 @@ function LeadsInbox() {
       <PageHeader
         title="Leads"
         description={leads.data ? `${leads.data.total} quote request${leads.data.total === 1 ? "" : "s"}` : "…"}
-        actions={
-          <button type="button" onClick={leads.reload} className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-ink hover:bg-muted">
-            Refresh
-          </button>
-        }
       />
 
       <div className="mt-5 flex flex-wrap items-end gap-2">
@@ -145,10 +140,11 @@ function LeadsInbox() {
           />
         </label>
         {filterKey && (
-          <button type="button" onClick={() => router.replace(pathname)} className="pb-2 text-xs font-medium text-accent hover:underline">
+          <button type="button" onClick={() => router.replace(pathname)} className="pb-2 text-xs font-medium text-harbor hover:underline">
             Clear filters
           </button>
         )}
+        <RefreshButton onRefresh={leads.reload} loading={leads.loading} label="leads" className="ml-auto" />
       </div>
 
       <div className="mt-4">
@@ -159,7 +155,7 @@ function LeadsInbox() {
         {!leads.data ? (
           !leads.error && <p className="text-sm text-ink-soft">Loading…</p>
         ) : leads.data.items.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-ink-soft">
+          <p className="rounded-sm border border-dashed border-mist p-8 text-center text-sm text-ink-soft">
             No quote requests match these filters.
           </p>
         ) : (
@@ -168,7 +164,7 @@ function LeadsInbox() {
               const open = expanded === lead.id;
               const failed = lead.routedAgencies.some((r) => r.emailStatus === "FAILED");
               return (
-                <li key={lead.id} className="rounded-xl border border-border bg-surface">
+                <li key={lead.id} className="rounded-sm border border-mist bg-surface">
                   <div className="flex flex-wrap items-start justify-between gap-3 p-4">
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-ink">
@@ -176,13 +172,13 @@ function LeadsInbox() {
                         {lead.businessName && <span className="font-normal text-ink-soft"> · {lead.businessName}</span>}
                       </p>
                       <p className="mt-0.5 text-xs text-ink-soft">
-                        <a href={`tel:${lead.phone}`} className="hover:text-accent">
+                        <a href={`tel:${lead.phone}`} className="hover:text-harbor">
                           {lead.phone}
                         </a>
                         {lead.email && (
                           <>
                             {" · "}
-                            <a href={`mailto:${lead.email}`} className="hover:text-accent">
+                            <a href={`mailto:${lead.email}`} className="hover:text-harbor">
                               {lead.email}
                             </a>
                           </>
@@ -194,7 +190,7 @@ function LeadsInbox() {
                         {lead.budgetMonthly != null ? ` · ${formatINR(lead.budgetMonthly)}/mo` : ""} ·{" "}
                         {formatDateTime(lead.createdAt)}
                       </p>
-                      <p className={cn("mt-1 text-xs", lead.routedAgencies.length === 0 ? "text-gold" : "text-ink-soft")}>
+                      <p className={cn("mt-1 text-xs", lead.routedAgencies.length === 0 ? "text-danger" : "text-ink-soft")}>
                         {lead.routedAgencies.length === 0
                           ? "Not routed to any agency yet"
                           : `Sent to ${lead.routedAgencies.map((r) => r.agencyName).join(", ")}`}
@@ -207,7 +203,7 @@ function LeadsInbox() {
                         value={lead.status}
                         disabled={busy === lead.id}
                         onChange={(e) => changeStatus(lead, e.target.value as LeadStatus)}
-                        className="rounded-md border border-border bg-surface px-2 py-1 text-xs outline-none focus:border-accent"
+                        className="rounded-sm border border-mist bg-surface px-2 py-1 text-xs outline-none focus:border-harbor"
                         aria-label="Change status"
                       >
                         {LEAD_STATUSES.map((s) => (
@@ -223,10 +219,10 @@ function LeadsInbox() {
                   </div>
 
                   {open && (
-                    <div className="space-y-4 border-t border-border p-4 text-sm">
+                    <div className="space-y-4 border-t border-mist p-4 text-sm">
                       {lead.message && (
                         <div>
-                          <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">Message</p>
+                          <p className="text-xs font-semibold text-ink-soft">Message</p>
                           <p className="mt-1 whitespace-pre-wrap text-ink">{lead.message}</p>
                         </div>
                       )}
@@ -238,7 +234,7 @@ function LeadsInbox() {
                             [
                               "Chosen by client",
                               lead.chosenAgencyId != null ? (
-                                <Link href={`/admin/agencies/${lead.chosenAgencyId}/edit`} className="text-accent hover:underline">
+                                <Link href={`/admin/agencies/${lead.chosenAgencyId}/edit`} className="text-harbor hover:underline">
                                   {lead.routedAgencies.find((r) => r.agencyId === lead.chosenAgencyId)?.agencyName ??
                                     `Agency #${lead.chosenAgencyId}`}
                                 </Link>
@@ -250,24 +246,24 @@ function LeadsInbox() {
                           ] as const
                         ).map(([k, v]) => (
                           <div key={k}>
-                            <dt className="font-semibold uppercase tracking-wide text-ink-soft">{k}</dt>
+                            <dt className="font-semibold text-ink-soft">{k}</dt>
                             <dd className="mt-0.5 text-ink">{v ?? "—"}</dd>
                           </div>
                         ))}
                       </dl>
 
                       <div>
-                        <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">Routed agencies</p>
+                        <p className="text-xs font-semibold text-ink-soft">Routed agencies</p>
                         {lead.routedAgencies.length === 0 ? (
                           <p className="mt-1 text-xs text-ink-soft">None — match this lead by hand or contact the client directly.</p>
                         ) : (
-                          <ul className="mt-1 divide-y divide-border rounded-lg border border-border">
+                          <ul className="mt-1 divide-y divide-mist rounded-sm border border-mist">
                             {lead.routedAgencies.map((r) => {
                               const s = EMAIL_STATUS[r.emailStatus ?? "PENDING"];
                               return (
                                 <li key={r.agencyId} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-xs">
                                   <span className="font-medium text-ink">
-                                    <Link href={`/admin/agencies/${r.agencyId}/edit`} className="hover:text-accent">
+                                    <Link href={`/admin/agencies/${r.agencyId}/edit`} className="hover:text-harbor">
                                       {r.agencyName}
                                     </Link>
                                     {r.agencyEmail && <span className="font-normal text-ink-soft"> · {r.agencyEmail}</span>}
@@ -343,7 +339,7 @@ function RateLimitReset() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-10 max-w-xl rounded-xl border border-border bg-surface p-5">
+    <form onSubmit={handleSubmit} className="mt-10 max-w-xl rounded-sm border border-mist bg-surface p-5">
       <h2 className="text-sm font-bold text-ink">Unblock an IP</h2>
       <p className="mt-1 text-xs text-ink-soft">
         Visitors can send 5 quote requests per hour. Reset the counter for someone who hit the limit.
@@ -355,7 +351,7 @@ function RateLimitReset() {
           placeholder="e.g. 1.2.3.4"
           className={cn(selectClass, "min-w-0 flex-1")}
         />
-        <button type="submit" disabled={busy || !ip.trim()} className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-dark disabled:opacity-50">
+        <button type="submit" disabled={busy || !ip.trim()} className="rounded-sm bg-harbor px-4 py-2 text-sm font-semibold text-paper hover:bg-harbor-dark disabled:opacity-50">
           Reset
         </button>
       </div>

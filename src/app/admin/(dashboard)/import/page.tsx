@@ -46,7 +46,7 @@ export default function ImportPage() {
         description="Upload the research spreadsheet saved as CSV. Rows matching an existing agency update it; the rest create new agencies."
       />
 
-      <form onSubmit={handleUpload} className="mt-6 max-w-xl space-y-4 rounded-xl border border-border bg-surface p-5">
+      <form onSubmit={handleUpload} className="mt-6 max-w-xl space-y-4 rounded-sm border border-mist bg-surface p-5">
         <div>
           <label htmlFor="csv" className="text-sm font-medium text-ink">
             CSV file (max 5 MB)
@@ -59,7 +59,7 @@ export default function ImportPage() {
               setFile(e.target.files?.[0] ?? null);
               setError(null);
             }}
-            className="mt-2 block w-full text-sm text-ink file:mr-3 file:rounded-md file:border file:border-border file:bg-muted file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-ink"
+            className="mt-2 block w-full text-sm text-ink file:mr-3 file:rounded-sm file:border file:border-mist file:bg-muted file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-ink"
           />
         </div>
         <ErrorBanner error={error} />
@@ -93,7 +93,7 @@ export default function ImportPage() {
 
           <p className="text-sm text-ink-soft">
             Next:{" "}
-            <Link href="/admin/agencies?hasPackages=false" className="font-medium text-accent hover:underline">
+            <Link href="/admin/agencies?hasPackages=false" className="font-medium text-harbor hover:underline">
               add packages to agencies that need them
             </Link>{" "}
             and publish the ones that are ready.
@@ -114,11 +114,11 @@ function ReportTable({
   rows: Array<{ row: number; text: string }>;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-surface">
-      <h2 className={`border-b border-border px-4 py-3 text-sm font-bold ${tone === "danger" ? "text-danger" : "text-gold"}`}>
+    <div className="rounded-sm border border-mist bg-surface">
+      <h2 className={`border-b border-mist px-4 py-3 text-sm font-bold ${tone === "danger" ? "text-danger" : "text-ink"}`}>
         {title}
       </h2>
-      <ul className="max-h-96 divide-y divide-border overflow-auto">
+      <ul className="max-h-96 divide-y divide-mist overflow-auto">
         {rows.map((r, i) => (
           <li key={i} className="flex gap-4 px-4 py-2 text-sm">
             <span className="w-16 flex-shrink-0 text-ink-soft">Row {r.row}</span>

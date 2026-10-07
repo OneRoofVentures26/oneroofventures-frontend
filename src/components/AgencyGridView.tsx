@@ -5,10 +5,12 @@ import type { AgencyListItem, LocalityItem, Page, ServiceItem } from "@/lib/api/
 import { DEFAULT_GRID_FILTERS, GRID_PAGE_SIZE, gridParams, type GridFilters } from "@/lib/grid";
 import { useListing } from "@/lib/use-listing";
 import { errorMessage } from "@/lib/api/http";
-import AgencyCard from "@/components/AgencyCard";
+import AgencyCard, { AgencyLedger } from "@/components/AgencyCard";
 import AgencyCardSkeleton from "@/components/AgencyCardSkeleton";
 import FilterSidebar from "@/components/FilterSidebar";
 import SortControl from "@/components/SortControl";
+import { secondaryButton } from "@/lib/styles";
+import { cn } from "@/lib/utils";
 
 interface AgencyGridViewProps {
   citySlug: string;
@@ -56,7 +58,7 @@ export default function AgencyGridView({
       <div className="mb-4 flex items-center justify-between gap-3 lg:hidden">
         <button
           onClick={() => setMobileFiltersOpen((v) => !v)}
-          className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-ink"
+          className={secondaryButton}
         >
           {mobileFiltersOpen ? "Hide filters" : "Show filters"}
         </button>
@@ -93,25 +95,25 @@ export default function AgencyGridView({
           {error ? (
             <ListingError error={error} onRetry={retry} />
           ) : loading || !data ? (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            <AgencyLedger>
               {Array.from({ length: 6 }).map((_, i) => (
                 <AgencyCardSkeleton key={i} />
               ))}
-            </div>
+            </AgencyLedger>
           ) : data.items.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border p-10 text-center">
+            <div className="border-y border-mist px-4 py-10 text-center">
               <p className="text-sm font-medium text-ink">No agencies match these filters</p>
-              <button onClick={resetFilters} className="mt-2 text-sm font-medium text-accent hover:underline">
+              <button onClick={resetFilters} className="mt-2 inline-flex min-h-11 items-center text-sm font-medium text-harbor hover:underline">
                 Reset filters
               </button>
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              <AgencyLedger>
                 {data.items.map((agency) => (
                   <AgencyCard key={agency.id} agency={agency} citySlug={citySlug} />
                 ))}
-              </div>
+              </AgencyLedger>
 
               {totalPages > 1 && (
                 <div className="mt-8 flex items-center justify-between">
@@ -123,7 +125,7 @@ export default function AgencyGridView({
                       type="button"
                       disabled={filters.page === 0}
                       onClick={() => setFilters((f) => ({ ...f, page: f.page - 1 }))}
-                      className="rounded-md border border-border px-3 py-1.5 text-xs font-medium text-ink disabled:cursor-not-allowed disabled:opacity-40"
+                      className={cn(secondaryButton, "px-4 lg:min-h-9")}
                     >
                       Previous
                     </button>
@@ -131,7 +133,7 @@ export default function AgencyGridView({
                       type="button"
                       disabled={filters.page + 1 >= totalPages}
                       onClick={() => setFilters((f) => ({ ...f, page: f.page + 1 }))}
-                      className="rounded-md border border-border px-3 py-1.5 text-xs font-medium text-ink disabled:cursor-not-allowed disabled:opacity-40"
+                      className={cn(secondaryButton, "px-4 lg:min-h-9")}
                     >
                       Next
                     </button>
@@ -148,10 +150,10 @@ export default function AgencyGridView({
 
 export function ListingError({ error, onRetry }: { error: unknown; onRetry: () => void }) {
   return (
-    <div className="rounded-xl border border-dashed border-danger/40 p-10 text-center">
+    <div className="border-y border-danger/40 px-4 py-10 text-center">
       <p className="text-sm font-medium text-ink">We couldn&apos;t load agencies right now</p>
       <p className="mt-1 text-sm text-ink-soft">{errorMessage(error)}</p>
-      <button onClick={onRetry} className="mt-3 text-sm font-medium text-accent hover:underline">
+      <button onClick={onRetry} className="mt-2 inline-flex min-h-11 items-center text-sm font-medium text-harbor hover:underline">
         Try again
       </button>
     </div>

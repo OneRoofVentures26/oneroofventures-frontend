@@ -75,12 +75,10 @@ export default async function ServicesPage() {
 
   return (
     <div>
-      <section className="border-b border-border bg-surface">
+      <section className="border-b border-mist bg-surface">
         <div className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 lg:px-8">
-          <span className="inline-block rounded-full bg-accent-light px-3 py-1 text-xs font-semibold uppercase tracking-wide text-accent-dark">
-            Managed by OneRoof Ventures
-          </span>
-          <h1 className="mt-5 text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+          <p className="text-sm font-medium text-harbor">Managed by OneRoof Ventures</p>
+          <h1 className="mt-3 text-[28px] leading-tight font-bold text-ink sm:text-[40px]">
             Everything your marketing needs, under one roof.
           </h1>
           <p className="mt-4 text-base text-ink-soft">
@@ -97,7 +95,7 @@ export default async function ServicesPage() {
           {services.map((s) => (
             <span
               key={s}
-              className="rounded-full bg-muted px-3 py-1.5 text-sm font-medium text-ink-soft"
+              className="rounded-sm bg-mist/60 px-3 py-1.5 text-sm font-medium text-ink"
             >
               {s}
             </span>
@@ -122,36 +120,36 @@ export default async function ServicesPage() {
         </div>
       </section>
 
-      <section className="border-t border-border bg-surface">
+      <section className="border-t border-mist bg-surface">
         <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
           <h2 className="text-center text-2xl font-bold text-ink">Why it&apos;s economical</h2>
           <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2">
             {COMPARISON.map((col) => (
               <div
                 key={col.title}
-                className={`rounded-xl border p-6 ${
+                className={`rounded-sm border border-t-2 p-6 ${
                   col.highlighted
-                    ? "border-accent bg-accent-light/40"
-                    : "border-border bg-paper"
+                    ? "border-harbor bg-surface"
+                    : "border-mist bg-paper"
                 }`}
               >
-                <h3 className="text-base font-bold text-ink">{col.title}</h3>
+                <h3 className="text-lg font-bold text-ink">{col.title}</h3>
                 <ul className="mt-4 space-y-2.5">
                   {col.points.map((point) => (
                     <li key={point} className="flex items-start gap-2 text-sm text-ink-soft">
                       <svg
                         viewBox="0 0 20 20"
                         className={`mt-0.5 h-4 w-4 flex-shrink-0 ${
-                          col.highlighted ? "text-accent" : "text-ink-soft"
+                          col.highlighted ? "text-harbor" : "text-ink-soft"
                         }`}
                         fill="none"
                         stroke="currentColor"
                         strokeWidth="2"
                       >
                         {col.highlighted ? (
-                          <path d="M4 10.5l4 4 8-9" strokeLinecap="round" strokeLinejoin="round" />
+                          <path d="M4 10.5l4 4 8-9" strokeLinecap="square" />
                         ) : (
-                          <path d="M6 6l8 8M14 6l-8 8" strokeLinecap="round" strokeLinejoin="round" />
+                          <path d="M6 6l8 8M14 6l-8 8" strokeLinecap="square" />
                         )}
                       </svg>
                       {point}

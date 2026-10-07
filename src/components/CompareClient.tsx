@@ -8,6 +8,7 @@ import { ApiError, errorMessage } from "@/lib/api/http";
 import type { AgencyProfile, CompareAgency, CompareResponse, ServiceItem, Tier } from "@/lib/api/types";
 import { MAX_COMPARE, MIN_COMPARE, useCompare } from "@/lib/compare-context";
 import { cn } from "@/lib/utils";
+import { chip, ctaButton, primaryButton, secondaryButton } from "@/lib/styles";
 import ComparisonTable from "@/components/ComparisonTable";
 
 interface Result {
@@ -91,7 +92,7 @@ export default function CompareClient({ services }: { services: ServiceItem[] })
 
   if (!validCount) {
     return (
-      <div className="rounded-xl border border-dashed border-border p-10 text-center">
+      <div className="border-y border-mist px-4 py-10 text-center">
         <p className="text-sm font-medium text-ink">
           {ids.length === 0 ? "No agencies selected yet" : "Add at least one more agency"}
         </p>
@@ -101,7 +102,7 @@ export default function CompareClient({ services }: { services: ServiceItem[] })
         </p>
         <Link
           href={citySlug ? `/${citySlug}` : "/"}
-          className="mt-4 inline-block rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-dark"
+          className={cn(primaryButton, "mt-4")}
         >
           {citySlug ? "Browse agencies" : "Browse cities"}
         </Link>
@@ -120,19 +121,19 @@ export default function CompareClient({ services }: { services: ServiceItem[] })
           ? (err.fields.agencyIds ?? "These agencies can't be compared together. Pick 2–4 agencies from the same city.")
           : errorMessage(err);
     return (
-      <div className="rounded-xl border border-dashed border-danger/40 p-10 text-center">
+      <div className="border-y border-danger/40 px-4 py-10 text-center">
         <p className="text-sm font-medium text-ink">We couldn&apos;t load this comparison</p>
         <p className="mt-1 text-sm text-ink-soft">{message}</p>
         <div className="mt-4 flex justify-center gap-3">
           <button
             onClick={() => setAttempt((n) => n + 1)}
-            className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-ink hover:border-accent"
+            className={secondaryButton}
           >
             Try again
           </button>
           <button
             onClick={handleClear}
-            className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-ink hover:border-danger"
+            className={cn(secondaryButton, "border-mist text-ink hover:border-danger hover:bg-transparent hover:text-danger")}
           >
             Clear selection
           </button>
@@ -170,13 +171,13 @@ export default function CompareClient({ services }: { services: ServiceItem[] })
     <div>
       <div className="mb-6 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-ink">Comparing {data.agencies.length} agencies</h1>
+          <h1 className="text-[28px] leading-tight text-ink sm:text-[32px]">Comparing {data.agencies.length} agencies</h1>
           <p className="mt-1 text-sm text-ink-soft">Packages side by side by Starter, Growth and Pro tier.</p>
         </div>
         {quoteAll && (
           <Link
             href={quoteAll}
-            className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-dark"
+            className={ctaButton}
           >
             Request quotes from these agencies
           </Link>
@@ -191,12 +192,7 @@ export default function CompareClient({ services }: { services: ServiceItem[] })
                 key={tab.code || "all"}
                 type="button"
                 onClick={() => setActiveService(tab.code)}
-                className={cn(
-                  "rounded-full border px-3 py-1.5 text-sm font-medium transition",
-                  tab.code === activeTab
-                    ? "border-accent bg-accent-light text-accent-dark"
-                    : "border-border text-ink-soft hover:border-accent",
-                )}
+                className={chip(tab.code === activeTab)}
               >
                 {tab.label}
               </button>
@@ -206,7 +202,7 @@ export default function CompareClient({ services }: { services: ServiceItem[] })
       )}
 
       {codes.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border p-10 text-center">
+        <div className="border-y border-mist px-4 py-10 text-center">
           <p className="text-sm font-medium text-ink">None of these agencies have published packages yet</p>
           <p className="mt-1 text-sm text-ink-soft">Request quotes to get their prices directly.</p>
         </div>
@@ -214,7 +210,7 @@ export default function CompareClient({ services }: { services: ServiceItem[] })
         <div className="space-y-10">
           {shownCodes.map((code) => (
             <section key={code}>
-              <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-ink-soft">
+              <h2 className="mb-3 text-2xl text-ink">
                 {serviceByCode.get(code)?.name ?? code}
               </h2>
               <ComparisonTable
@@ -235,8 +231,8 @@ export default function CompareClient({ services }: { services: ServiceItem[] })
 function CompareSkeleton() {
   return (
     <div className="animate-pulse space-y-4">
-      <div className="h-8 w-64 rounded bg-muted" />
-      <div className="h-72 rounded-xl border border-border bg-surface" />
+      <div className="h-8 w-64 rounded-sm bg-mist/70" />
+      <div className="h-72 border-y border-mist" />
     </div>
   );
 }

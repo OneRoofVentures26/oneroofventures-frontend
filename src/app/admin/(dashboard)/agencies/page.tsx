@@ -100,7 +100,7 @@ function AgenciesList() {
       header: "Name",
       render: (a) => (
         <div className="min-w-0">
-          <Link href={`/admin/agencies/${a.id}/edit`} className="font-medium text-ink hover:text-accent">
+          <Link href={`/admin/agencies/${a.id}/edit`} className="font-medium text-ink hover:text-harbor">
             {a.name}
           </Link>
           <p className="text-xs text-ink-soft">
@@ -116,7 +116,7 @@ function AgenciesList() {
       render: (a) => (
         <div className="flex flex-col items-start gap-1">
           <StatusBadge status={a.status} />
-          {a.verified && <span className="text-[11px] font-medium text-accent-dark">✓ Verified</span>}
+          {a.verified && <span className="text-[11px] font-medium text-harbor-dark">✓ Verified</span>}
         </div>
       ),
     },
@@ -128,7 +128,7 @@ function AgenciesList() {
         a.packageCount > 0 ? (
           a.packageCount
         ) : (
-          <span className="text-xs font-medium text-gold">None</span>
+          <span className="text-xs font-medium text-danger">None</span>
         ),
     },
     { key: "fit", header: "Fit", render: (a) => <span className="text-xs text-ink-soft">{a.fitForUs ?? "—"}</span> },
@@ -136,7 +136,7 @@ function AgenciesList() {
       key: "checked",
       header: "Last checked",
       render: (a) => (
-        <span className={a.lastCheckedOn ? "text-xs" : "text-xs text-gold"}>
+        <span className={a.lastCheckedOn ? "text-xs" : "text-xs text-danger"}>
           {a.lastCheckedOn ? formatDate(a.lastCheckedOn) : "Never"}
         </span>
       ),
@@ -151,10 +151,10 @@ function AgenciesList() {
         description={agencies.data ? `${agencies.data.total} matching` : "…"}
         actions={
           <>
-            <Link href="/admin/import" className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-ink hover:bg-muted">
+            <Link href="/admin/import" className="rounded-sm border border-mist px-4 py-2 text-sm font-medium text-ink hover:bg-muted">
               Import CSV
             </Link>
-            <Link href="/admin/agencies/new" className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-dark">
+            <Link href="/admin/agencies/new" className="rounded-sm bg-harbor px-4 py-2 text-sm font-semibold text-paper hover:bg-harbor-dark">
               + Add Agency
             </Link>
           </>
@@ -181,7 +181,7 @@ function AgenciesList() {
             placeholder="Fit for us (e.g. Yes)"
             className={`${selectClass} w-40`}
           />
-          <button type="submit" className="rounded-md border border-border px-3 py-2 text-sm font-medium text-ink hover:bg-muted">
+          <button type="submit" className="rounded-sm border border-mist px-3 py-2 text-sm font-medium text-ink hover:bg-muted">
             Search
           </button>
         </form>
@@ -230,7 +230,7 @@ function AgenciesList() {
               setFit("");
               router.replace(pathname);
             }}
-            className="text-xs font-medium text-accent hover:underline"
+            className="text-xs font-medium text-harbor hover:underline"
           >
             Clear filters
           </button>
@@ -252,6 +252,9 @@ function AgenciesList() {
               getRowId={(a) => String(a.id)}
               paginate={false}
               emptyMessage="No agencies match these filters."
+              onRefresh={agencies.reload}
+              refreshing={agencies.loading}
+              refreshLabel="agencies"
               renderActions={(a) => (
                 <>
                   {a.status === "PUBLISHED" ? (

@@ -11,10 +11,11 @@ export default function CompareNavBadge() {
   return (
     <Link
       href={compareHref(items)}
-      className="flex flex-shrink-0 items-center gap-1.5 rounded-md border border-accent/30 bg-accent-light px-2.5 py-1.5 text-sm font-medium text-accent-dark transition hover:bg-accent/15 sm:px-3"
+      aria-label={`Compare ${items.length} ${items.length === 1 ? "agency" : "agencies"}`}
+      className="flex h-11 flex-shrink-0 items-center gap-2 rounded-xl border border-border bg-surface px-3 text-sm font-medium text-text transition-colors duration-200 hover:border-primary/40 hover:text-primary-text"
     >
       <span className="hidden sm:inline">Compare</span>
-      <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-accent text-[11px] font-bold text-white">
+      <span className="num flex h-5 min-w-5 flex-shrink-0 items-center justify-center rounded-md bg-primary px-1 text-xs font-bold text-primary-fg">
         {items.length}
       </span>
     </Link>

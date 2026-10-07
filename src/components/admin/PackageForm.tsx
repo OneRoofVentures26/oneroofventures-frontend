@@ -79,7 +79,7 @@ export default function PackageForm({
   const input = (key: string) => cn(inputClass, errors[key] && "border-danger");
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-xl border border-accent/40 bg-paper p-4" noValidate>
+    <form onSubmit={handleSubmit} className="space-y-4 rounded-sm border border-harbor/40 bg-paper p-4" noValidate>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <Field label="Service *" error={errors.serviceCode}>
           <select value={serviceCode} onChange={(e) => setServiceCode(e.target.value)} className={input("serviceCode")}>

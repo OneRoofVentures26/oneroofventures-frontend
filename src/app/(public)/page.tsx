@@ -1,6 +1,12 @@
 import Link from "next/link";
-import HomeEntry from "@/components/HomeEntry";
+import HeroPreview from "@/components/HeroPreview";
+import { HomeEntryProvider, HomeQuiz, HomeSearch } from "@/components/HomeEntry";
+import HowItWorks from "@/components/HowItWorks";
+import CountUp from "@/components/motion/CountUp";
+import Reveal from "@/components/motion/Reveal";
 import { getCities, getServices } from "@/lib/api/public";
+import { ctaButton, eyebrow, interactiveCard, card, secondaryButton, sectionTitle, textLink } from "@/lib/styles";
+import { cn } from "@/lib/utils";
 
 export const revalidate = 300;
 
@@ -22,6 +28,19 @@ const STEPS = [
   },
 ];
 
+/** Staggered hero entrance, 80ms apart (CSS, so it runs before hydration). */
+function enterDelay(step: number) {
+  return { "--enter-delay": `${step * 80}ms` } as React.CSSProperties;
+}
+
+function ArrowRight({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 20 20" className={cn("h-4 w-4", className)} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 10h12M11 5l5 5-5 5" />
+    </svg>
+  );
+}
+
 export default async function Home() {
   const [cities, services] = await Promise.all([
     getCities().catch(() => []),
@@ -29,125 +48,176 @@ export default async function Home() {
   ]);
   const totalAgencies = cities.reduce((sum, c) => sum + c.agencyCount, 0);
 
+  const stats = [
+    { value: totalAgencies, label: totalAgencies === 1 ? "Agency listed" : "Agencies listed", highlight: true },
+    { value: cities.length, label: cities.length === 1 ? "City live" : "Cities live", highlight: false },
+    { value: services.length, label: "Services compared", highlight: false },
+  ];
+
   return (
-    <div>
-      <section className="border-b border-border bg-surface">
-        <div className="mx-auto max-w-5xl px-4 py-20 text-center sm:px-6 lg:px-8">
-          <span className="inline-block rounded-full bg-accent-light px-3 py-1 text-xs font-semibold uppercase tracking-wide text-accent-dark">
-            Free for businesses
-          </span>
-          <h1 className="mt-5 text-3xl font-bold tracking-tight text-ink sm:text-5xl">
-            Find the right marketing agency,
-            <br className="hidden sm:block" /> city by city.
-          </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-ink-soft sm:text-lg">
-            Compare agencies on real, published prices and packages — then send
-            one quote request to your shortlist.
-          </p>
-
-          <div className="mt-8">
-            <HomeEntry cities={cities} services={services} />
-          </div>
-
-          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
-            {[
-              [String(totalAgencies), totalAgencies === 1 ? "Agency listed" : "Agencies listed"],
-              [String(cities.length), cities.length === 1 ? "City live" : "Cities live"],
-              [String(services.length), "Services compared"],
-            ].map(([stat, label]) => (
-              <div key={label}>
-                <p className="text-2xl font-bold text-accent-dark">{stat}</p>
-                <p className="text-sm text-ink-soft">{label}</p>
-              </div>
-            ))}
-          </div>
+    <HomeEntryProvider cities={cities} services={services}>
+      {/* Hero */}
+      <section className="relative isolate overflow-hidden">
+        <div aria-hidden="true" className="absolute inset-0 -z-10">
+          <div className="bg-dot-grid absolute inset-0" />
+          <div className="aurora -top-24 right-[-30%] h-[22rem] w-[30rem] sm:right-[-10%] lg:-top-32 lg:right-[-6%] lg:h-[40rem] lg:w-[52rem]" />
         </div>
-      </section>
 
-      <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
-        <h2 className="text-center text-2xl font-bold text-ink">How it works</h2>
-        <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-3">
-          {STEPS.map((step, idx) => (
-            <div key={step.title} className="text-center">
-              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-accent text-sm font-bold text-white">
-                {idx + 1}
-              </div>
-              <h3 className="mt-4 text-base font-bold text-ink">{step.title}</h3>
-              <p className="mt-2 text-sm text-ink-soft">{step.description}</p>
+        <div className="container-page grid grid-cols-1 items-center gap-12 pb-16 pt-12 md:pt-16 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pb-24 lg:pt-24">
+          <div>
+            <p className={cn(eyebrow, "enter rounded-full border border-primary/20 bg-primary/8 px-3 py-1")} style={enterDelay(0)}>
+              <span className="h-1.5 w-1.5 rounded-full bg-success" aria-hidden="true" />
+              Free for businesses
+            </p>
+            <h1
+              className="enter mt-5 max-w-[16ch] font-display text-hero-sm font-bold text-text sm:text-[2.75rem] sm:leading-[1.08] lg:text-hero"
+              style={enterDelay(1)}
+            >
+              Find the right marketing agency, city by city.
+            </h1>
+            <p className="enter mt-5 max-w-[34rem] text-base text-text-muted sm:text-lg" style={enterDelay(2)}>
+              Compare agencies on real, published prices and packages — then send
+              one quote request to your shortlist.
+            </p>
+            <div className="enter mt-8" style={enterDelay(3)}>
+              <HomeSearch />
             </div>
-          ))}
+          </div>
+
+          <div className="enter mx-auto w-full max-w-md lg:max-w-none" style={enterDelay(4)}>
+            <HeroPreview />
+          </div>
         </div>
       </section>
 
-      <section className="border-t border-border bg-surface">
-        <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold text-ink">Browse by city</h2>
-          <p className="mt-1 text-sm text-ink-soft">
-            Agency prices are researched and refreshed city by city.
-          </p>
-          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Guided quiz */}
+      <section id="quiz" className="scroll-mt-20 py-16 lg:py-24">
+        <div className="container-page">
+          <Reveal className="mx-auto max-w-2xl">
+            <div className="text-center">
+              <h2 className={sectionTitle}>Not sure what to search?</h2>
+              <p className="mx-auto mt-3 max-w-[60ch] text-base text-text-muted">
+                Answer a few quick taps and we&apos;ll show your top 3 agencies.
+              </p>
+            </div>
+            <HomeQuiz className="mt-8" />
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Stats */}
+      <section aria-label="OneRoof in numbers" className="pb-16 lg:pb-24">
+        <div className="container-page">
+          <dl className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            {stats.map((stat, i) => (
+              <Reveal key={stat.label} delay={i * 0.08} className={cn(card, "flex flex-col-reverse p-6")}>
+                <dt className="mt-1 text-sm text-text-muted">{stat.label}</dt>
+                <dd className="num text-[2.5rem] font-bold leading-none lg:text-5xl">
+                  <CountUp value={stat.value} className={stat.highlight ? "text-gradient" : "text-text"} />
+                </dd>
+              </Reveal>
+            ))}
+          </dl>
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section id="how-it-works" className="scroll-mt-20 border-y border-border bg-surface py-16 lg:py-24">
+        <div className="container-page">
+          <Reveal className="max-w-2xl">
+            <h2 className={sectionTitle}>How it works</h2>
+          </Reveal>
+          <HowItWorks steps={STEPS} />
+        </div>
+      </section>
+
+      {/* Browse by city */}
+      <section className="py-16 lg:py-24">
+        <div className="container-page">
+          <Reveal>
+            <h2 className={sectionTitle}>Browse by city</h2>
+            <p className="mt-3 text-base text-text-muted">
+              Agency prices are researched and refreshed city by city.
+            </p>
+          </Reveal>
+          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {cities.length === 0 && (
-              <p className="text-sm text-ink-soft">Cities are on their way — check back soon.</p>
+              <p className="text-base text-text-muted">Cities are on their way — check back soon.</p>
             )}
-            {cities.map((city) => {
+            {cities.map((city, i) => {
               const count = city.agencyCount;
               return (
-                <Link
-                  key={city.slug}
-                  href={`/${city.slug}`}
-                  className="flex items-center justify-between rounded-xl border border-border bg-paper p-5 transition hover:border-accent hover:shadow-sm"
-                >
-                  <div>
-                    <p className="font-semibold text-ink">{city.name}</p>
-                  </div>
-                  {count > 0 ? (
-                    <span className="rounded-full bg-accent-light px-2.5 py-1 text-xs font-semibold text-accent-dark">
-                      {count} agencies
+                <Reveal key={city.slug} delay={Math.min(i, 5) * 0.05}>
+                  <Link href={`/${city.slug}`} className={cn(interactiveCard, "group flex min-h-20 items-center justify-between gap-3 p-5")}>
+                    <span>
+                      <span className="block font-display text-card font-semibold text-text">{city.name}</span>
+                      <span className="mt-0.5 block text-sm text-text-muted">
+                        {count > 0 ? `${count} agencies` : "Coming soon"}
+                      </span>
                     </span>
-                  ) : (
-                    <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-ink-soft">
-                      Coming soon
+                    <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-border text-text-muted transition-[color,border-color,transform] duration-200 group-hover:translate-x-0.5 group-hover:border-primary/40 group-hover:text-primary-text">
+                      <ArrowRight />
                     </span>
-                  )}
-                </Link>
+                  </Link>
+                </Reveal>
               );
             })}
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <div className="rounded-2xl border border-border bg-surface p-6">
-            <h2 className="text-lg font-bold text-ink">
-              Would rather skip the comparison?
-            </h2>
-            <p className="mt-2 text-sm text-ink-soft">
+      {/* Our package + founders */}
+      <section className="pb-16 lg:pb-24">
+        <div className="container-page grid grid-cols-1 gap-4 md:grid-cols-2">
+          <Reveal className={cn(card, "p-6 sm:p-8")}>
+            <h2 className="text-xl font-semibold text-text sm:text-2xl">Would rather skip the comparison?</h2>
+            <p className="mt-3 text-base text-text-muted">
               OneRoof Ventures also runs a managed marketing package of our
               own — see what&apos;s included and why it&apos;s economical.
             </p>
-            <Link
-              href="/services"
-              className="mt-4 inline-block text-sm font-semibold text-accent hover:underline"
-            >
-              View our marketing package →
+            <Link href="/services" className={cn(textLink, "mt-4 inline-flex min-h-11 items-center gap-1.5 text-sm")}>
+              View our marketing package <ArrowRight />
             </Link>
-          </div>
+          </Reveal>
 
-          <div className="rounded-2xl border border-border bg-surface p-6">
-            <h2 className="text-lg font-bold text-ink">Who&apos;s behind this?</h2>
-            <p className="mt-2 text-sm text-ink-soft">
+          <Reveal delay={0.08} className={cn(card, "p-6 sm:p-8")}>
+            <h2 className="text-xl font-semibold text-text sm:text-2xl">Who&apos;s behind this?</h2>
+            <p className="mt-3 text-base text-text-muted">
               Meet the founders and the story behind OneRoof Ventures.
             </p>
-            <Link
-              href="/about"
-              className="mt-4 inline-block text-sm font-semibold text-accent hover:underline"
-            >
-              Meet the team →
+            <Link href="/about" className={cn(textLink, "mt-4 inline-flex min-h-11 items-center gap-1.5 text-sm")}>
+              Meet the team <ArrowRight />
             </Link>
-          </div>
+          </Reveal>
         </div>
       </section>
-    </div>
+
+      {/* Final CTA */}
+      <section>
+        <div className="container-page">
+          <Reveal className="relative isolate overflow-hidden rounded-3xl border border-border bg-surface px-6 py-12 text-center shadow-raised sm:px-12 lg:py-16">
+            <div aria-hidden="true" className="absolute inset-0 -z-10">
+              <div className="bg-dot-grid absolute inset-0" />
+              <div className="aurora -bottom-40 left-[calc(50%-18rem)] h-80 w-[36rem] opacity-30" />
+            </div>
+            <h2 className={cn(sectionTitle, "mx-auto max-w-[22ch]")}>
+              Your shortlist is a minute away.
+            </h2>
+            <p className="mx-auto mt-3 max-w-[52ch] text-base text-text-muted">
+              Compare real prices from agencies in your city, then send one quote
+              request to all of them. Free for businesses, always.
+            </p>
+            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+              <Link href="#quiz" className={ctaButton}>
+                Find my top 3
+              </Link>
+              <Link href="/quote" className={secondaryButton}>
+                Get quotes
+              </Link>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+    </HomeEntryProvider>
   );
 }

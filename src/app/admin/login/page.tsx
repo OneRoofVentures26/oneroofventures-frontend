@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { login, useAdminSession } from "@/lib/admin-auth";
 import { warmUpBackend } from "@/lib/api/public";
+import Logo from "@/components/Logo";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -36,15 +37,13 @@ export default function AdminLoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-paper px-4">
       <div className="w-full max-w-sm">
-        <div className="mb-6 flex items-center justify-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-accent text-sm font-bold text-white">
-            OR
-          </span>
-          <span className="text-base font-bold text-ink">OneRoof Admin</span>
+        <div className="mb-6 flex flex-col items-center gap-2">
+          <Logo size={36} />
+          <span className="text-xs font-medium text-ink-soft">Admin</span>
         </div>
 
-        <form onSubmit={handleSubmit} className="rounded-xl border border-border bg-surface p-6 shadow-sm">
-          <h1 className="text-lg font-bold text-ink">Sign in</h1>
+        <form onSubmit={handleSubmit} className="rounded-sm border border-mist bg-surface p-6">
+          <h1 className="text-2xl text-ink">Sign in</h1>
           <p className="mt-1 text-sm text-ink-soft">Manage agencies, packages and leads.</p>
 
           <div className="mt-5 space-y-4">
@@ -59,7 +58,7 @@ export default function AdminLoginPage() {
                 autoComplete="username"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
+                className="mt-1 min-h-11 w-full rounded-sm border border-mist bg-surface px-3 py-2 text-sm outline-none focus:border-harbor"
               />
             </div>
             <div>
@@ -73,17 +72,17 @@ export default function AdminLoginPage() {
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
+                className="mt-1 min-h-11 w-full rounded-sm border border-mist bg-surface px-3 py-2 text-sm outline-none focus:border-harbor"
               />
             </div>
           </div>
 
-          {error && <p className="mt-4 rounded-md bg-danger/10 px-3 py-2 text-sm text-danger">{error}</p>}
+          {error && <p className="mt-4 rounded-sm bg-danger/10 px-3 py-2 text-sm text-danger">{error}</p>}
 
           <button
             type="submit"
             disabled={submitting}
-            className="mt-5 w-full rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-5 min-h-11 w-full rounded-sm bg-harbor px-4 py-2.5 text-sm font-semibold text-paper transition hover:bg-harbor-dark disabled:cursor-not-allowed disabled:opacity-50"
           >
             {submitting ? "Signing in…" : "Sign in"}
           </button>

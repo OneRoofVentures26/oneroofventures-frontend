@@ -22,7 +22,7 @@ export default function SortControl({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value as ListingSort)}
-        className="rounded-md border border-border bg-surface px-2.5 py-1.5 text-sm font-medium text-ink outline-none focus:border-accent"
+        className="h-11 rounded-sm border border-mist bg-surface px-2.5 text-sm font-medium text-ink outline-none focus:border-harbor lg:h-9"
       >
         {OPTIONS.map((o) => (
           <option key={o.key} value={o.key}>

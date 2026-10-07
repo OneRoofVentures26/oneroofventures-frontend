@@ -18,23 +18,23 @@ const MAX_INCLUSIONS = 5;
 
 export default function ComparisonTable({ agencies, grid, citySlug, quoteHref, onRemove }: ComparisonTableProps) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-border bg-surface">
+    <div className="overflow-x-auto border-t-2 border-ink/80">
       <table className="w-full min-w-[640px] border-collapse text-sm">
         <thead>
           <tr>
-            <th className="w-28 border-b border-border p-4 text-left text-xs font-semibold uppercase tracking-wide text-ink-soft">
+            <th className="w-28 border-b border-mist p-4 pl-0 text-left text-xs font-medium text-ink-soft">
               Tier
             </th>
             {agencies.map((a) => (
-              <th key={a.id} className="min-w-[200px] border-b border-border p-4 text-left align-top">
+              <th key={a.id} className="min-w-[200px] border-b border-mist p-4 text-left align-top">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     {citySlug ? (
-                      <Link href={`/${citySlug}/${a.slug}`} className="font-bold text-ink hover:text-accent">
+                      <Link href={`/${citySlug}/${a.slug}`} className="font-serif text-lg font-semibold text-ink hover:text-harbor">
                         {a.name}
                       </Link>
                     ) : (
-                      <span className="font-bold text-ink">{a.name}</span>
+                      <span className="font-serif text-lg font-semibold text-ink">{a.name}</span>
                     )}
                     <div className="mt-1 flex flex-wrap items-center gap-1.5">
                       {a.verified && <VerifiedBadge />}
@@ -45,7 +45,7 @@ export default function ComparisonTable({ agencies, grid, citySlug, quoteHref, o
                     <button
                       onClick={() => onRemove(a.id)}
                       aria-label={`Remove ${a.name} from comparison`}
-                      className="text-xs font-medium text-ink-soft hover:text-danger"
+                      className="flex h-11 w-11 items-center justify-center text-xs font-medium text-ink-soft hover:text-danger lg:h-8 lg:w-8"
                     >
                       ✕
                     </button>
@@ -57,15 +57,15 @@ export default function ComparisonTable({ agencies, grid, citySlug, quoteHref, o
         </thead>
         <tbody>
           {TIERS.map((tier, idx) => (
-            <tr key={tier} className={idx % 2 === 0 ? "bg-paper/50" : ""}>
-              <td className="border-b border-border p-4 align-top text-xs font-semibold uppercase tracking-wide text-ink-soft">
+            <tr key={tier} className={idx % 2 === 0 ? "bg-surface" : ""}>
+              <td className="border-b border-mist p-4 pl-0 align-top font-serif text-base font-semibold text-ink">
                 {TIER_LABELS[tier]}
               </td>
               {agencies.map((a) => {
                 const cell = grid[tier]?.[String(a.id)] ?? null;
                 if (!cell) {
                   return (
-                    <td key={a.id} className="border-b border-border p-4 align-top text-ink-soft">
+                    <td key={a.id} className="border-b border-mist p-4 align-top text-ink-soft">
                       —
                     </td>
                   );
@@ -73,9 +73,9 @@ export default function ComparisonTable({ agencies, grid, citySlug, quoteHref, o
                 const href = quoteHref?.(a, tier);
                 const extra = cell.inclusions.length - MAX_INCLUSIONS;
                 return (
-                  <td key={a.id} className="border-b border-border p-4 align-top text-ink">
+                  <td key={a.id} className="border-b border-mist p-4 align-top text-ink">
                     <p className="font-semibold">{cell.name}</p>
-                    <p className="mt-0.5 font-bold text-accent-dark">
+                    <p className="mt-0.5 font-serif text-lg font-semibold text-harbor">
                       {formatPackagePrice(cell.priceMin, cell.priceMax, cell.billing)}
                     </p>
                     {cell.inclusions.length > 0 && (
@@ -87,7 +87,7 @@ export default function ComparisonTable({ agencies, grid, citySlug, quoteHref, o
                       </ul>
                     )}
                     {href && (
-                      <Link href={href} className="mt-3 inline-block text-xs font-semibold text-accent hover:underline">
+                      <Link href={href} className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold text-harbor hover:underline lg:min-h-0">
                         Get a quote →
                       </Link>
                     )}

@@ -28,7 +28,7 @@ export default function BulletListEditor({
             value={item}
             onChange={(e) => updateItem(idx, e.target.value)}
             placeholder="e.g. Monthly performance report"
-            className="min-w-0 flex-1 rounded-md border border-border bg-surface px-3 py-1.5 text-sm outline-none focus:border-accent"
+            className="min-w-0 flex-1 rounded-sm border border-mist bg-surface px-3 py-1.5 text-sm outline-none focus:border-harbor"
           />
           <button
             type="button"
@@ -43,7 +43,7 @@ export default function BulletListEditor({
       <button
         type="button"
         onClick={addItem}
-        className="text-xs font-medium text-accent hover:underline"
+        className="text-xs font-medium text-harbor hover:underline"
       >
         + Add line
       </button>

@@ -104,6 +104,9 @@ export default function AdminServicesPage() {
             data={services.data}
             getRowId={(s) => String(s.id)}
             searchPlaceholder="Search services…"
+            onRefresh={services.reload}
+            refreshing={services.loading}
+            refreshLabel="services"
             searchFn={(s, q) => `${s.name} ${s.code} ${s.slug}`.toLowerCase().includes(q)}
             renderActions={(s) => (
               <>
@@ -186,7 +189,7 @@ function ServiceForm({
   const input = (key: string) => cn(inputClass, errors[key] && "border-danger");
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 rounded-xl border border-border bg-surface p-5" noValidate>
+    <form onSubmit={handleSubmit} className="space-y-3 rounded-sm border border-mist bg-surface p-5" noValidate>
       <h2 className="text-sm font-bold text-ink">{initial ? `Edit ${initial.name}` : "Add a service"}</h2>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <Field label="Code *" error={errors.code} hint={initial ? "Can't be changed" : undefined}>

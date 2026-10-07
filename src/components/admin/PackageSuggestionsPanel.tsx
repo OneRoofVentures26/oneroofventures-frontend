@@ -5,7 +5,7 @@ import { TIERS, type Billing, type PackageRequest, type ServiceResponse, type Su
 import { bulkCreatePackages, getPackageSuggestions } from "@/lib/api/admin";
 import { ApiError, errorMessage } from "@/lib/api/http";
 import { useAsync } from "@/lib/use-async";
-import { cn, TIER_LABELS } from "@/lib/utils";
+import { cn, sentenceCase, TIER_LABELS } from "@/lib/utils";
 import { validatePackage } from "@/components/admin/PackageForm";
 import { ErrorBanner, primaryButton, secondaryButton } from "@/components/admin/ui";
 
@@ -17,12 +17,12 @@ interface Row extends SuggestedPackage {
 }
 
 const CONFIDENCE_STYLES: Record<string, string> = {
-  HIGH: "bg-accent-light text-accent-dark",
-  MEDIUM: "bg-gold-light text-gold",
+  HIGH: "bg-harbor-light text-harbor-dark",
+  MEDIUM: "bg-mist text-ink",
   LOW: "bg-danger/10 text-danger",
 };
 
-const cellInput = "w-full rounded border border-border bg-surface px-2 py-1 text-xs outline-none focus:border-accent";
+const cellInput = "w-full rounded-sm border border-mist bg-surface px-2 py-1 text-xs outline-none focus:border-harbor";
 
 function toRows(suggestions: SuggestedPackage[]): Row[] {
   return suggestions.map((s) => ({
@@ -118,7 +118,7 @@ export default function PackageSuggestionsPanel({
   }
 
   return (
-    <div className="space-y-4 rounded-xl border border-accent/40 bg-paper p-4">
+    <div className="space-y-4 rounded-sm border border-harbor/40 bg-paper p-4">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <h3 className="text-sm font-bold text-ink">Suggested packages</h3>
@@ -138,7 +138,7 @@ export default function PackageSuggestionsPanel({
       ) : (
         <>
           {suggestions.data.rawPrices ? (
-            <pre className="max-h-32 overflow-auto whitespace-pre-wrap rounded-md bg-muted p-3 text-xs text-ink-soft">
+            <pre className="max-h-32 overflow-auto whitespace-pre-wrap rounded-sm bg-muted p-3 text-xs text-ink-soft">
               {suggestions.data.rawPrices}
             </pre>
           ) : (
@@ -164,8 +164,8 @@ export default function PackageSuggestionsPanel({
                 <div
                   key={idx}
                   className={cn(
-                    "rounded-lg border bg-surface p-3",
-                    r.alreadyExists ? "border-border opacity-60" : r.selected ? "border-accent/50" : "border-border",
+                    "rounded-sm border bg-surface p-3",
+                    r.alreadyExists ? "border-mist opacity-60" : r.selected ? "border-harbor/50" : "border-mist",
                   )}
                 >
                   <div className="flex flex-wrap items-center gap-2">
@@ -174,16 +174,16 @@ export default function PackageSuggestionsPanel({
                       checked={r.selected && !r.alreadyExists}
                       disabled={r.alreadyExists}
                       onChange={(e) => update(idx, { selected: e.target.checked })}
-                      className="h-4 w-4 accent-accent"
+                      className="h-4 w-4 accent-harbor"
                       aria-label={`Include ${r.name}`}
                     />
                     <span
                       className={cn(
-                        "rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase",
+                        "rounded-sm px-2 py-0.5 text-[10px] font-semibold",
                         CONFIDENCE_STYLES[r.confidence] ?? "bg-muted text-ink-soft",
                       )}
                     >
-                      {r.confidence} confidence
+                      {sentenceCase(r.confidence)} confidence
                     </span>
                     {r.alreadyExists && <span className="text-xs font-medium text-ink-soft">Already exists</span>}
                   </div>

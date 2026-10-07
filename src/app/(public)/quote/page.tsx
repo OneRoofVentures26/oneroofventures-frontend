@@ -41,7 +41,7 @@ export default async function QuotePage({ searchParams }: PageProps<"/quote">) {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
-      <h1 className="text-2xl font-bold text-ink">
+      <h1 className="text-[28px] leading-tight text-ink sm:text-[32px]">
         {agencies.length > 0 ? "Request a quote" : "Get matched with agencies"}
       </h1>
       <p className="mb-6 mt-1 text-sm text-ink-soft">

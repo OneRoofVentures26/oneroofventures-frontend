@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ctaButton } from "@/lib/styles";
+import { cn } from "@/lib/utils";
 import FounderCard, { type Founder } from "@/components/FounderCard";
 
 export const metadata: Metadata = {
@@ -38,12 +40,10 @@ const VALUES = [
 export default function AboutPage() {
   return (
     <div>
-      <section className="border-b border-border bg-surface">
+      <section className="border-b border-mist bg-surface">
         <div className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 lg:px-8">
-          <span className="inline-block rounded-full bg-accent-light px-3 py-1 text-xs font-semibold uppercase tracking-wide text-accent-dark">
-            Our story
-          </span>
-          <h1 className="mt-5 text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+          <p className="text-sm font-medium text-harbor">Our story</p>
+          <h1 className="mt-3 text-[28px] leading-tight font-bold text-ink sm:text-[40px]">
             The people behind OneRoof Ventures
           </h1>
           <p className="mt-4 text-base text-ink-soft">
@@ -70,13 +70,13 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="border-t border-border bg-surface">
+      <section className="border-t border-mist bg-surface">
         <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
           <h2 className="text-center text-2xl font-bold text-ink">What we stand for</h2>
           <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-3">
             {VALUES.map((value) => (
-              <div key={value.title} className="text-center">
-                <h3 className="text-base font-bold text-ink">{value.title}</h3>
+              <div key={value.title} className="border-t-2 border-harbor pt-4">
+                <h3 className="text-lg font-bold text-ink">{value.title}</h3>
                 <p className="mt-2 text-sm text-ink-soft">{value.description}</p>
               </div>
             ))}
@@ -93,7 +93,7 @@ export default function AboutPage() {
         </p>
         <Link
           href="/services"
-          className="mt-5 inline-block rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-dark"
+          className={cn(ctaButton, "mt-5")}
         >
           View our marketing package
         </Link>

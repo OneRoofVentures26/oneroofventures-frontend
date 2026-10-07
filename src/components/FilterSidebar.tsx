@@ -29,8 +29,8 @@ export interface FilterSidebarProps {
   className?: string;
 }
 
-const legendClass = "text-xs font-semibold uppercase tracking-wide text-ink-soft";
-const optionClass = "flex items-center gap-2 text-sm text-ink";
+const legendClass = "font-serif text-base font-semibold text-ink";
+const optionClass = "flex min-h-11 items-center gap-2.5 text-sm text-ink lg:min-h-8";
 
 export default function FilterSidebar({
   services,
@@ -49,17 +49,17 @@ export default function FilterSidebar({
   className,
 }: FilterSidebarProps) {
   return (
-    <div className={cn("space-y-6", className)}>
+    <div className={cn("space-y-6 [&>fieldset]:border-t [&>fieldset]:border-mist [&>fieldset]:pt-5", className)}>
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-bold text-ink">Filters</h2>
-        <button onClick={onReset} className="text-xs font-medium text-accent hover:underline">
+        <h2 className="text-xl text-ink">Filters</h2>
+        <button onClick={onReset} className="inline-flex min-h-11 items-center text-sm font-medium text-harbor hover:underline lg:min-h-0">
           Reset
         </button>
       </div>
 
       <fieldset>
         <legend className={legendClass}>Service</legend>
-        <div className="mt-3 space-y-2">
+        <div className="mt-2 space-y-0.5">
           {[{ slug: "", name: "All services" }, ...services].map((s) => (
             <label key={s.slug || "all"} className={optionClass}>
               <input
@@ -67,7 +67,7 @@ export default function FilterSidebar({
                 name="service"
                 checked={service === s.slug}
                 onChange={() => onServiceChange(s.slug)}
-                className="h-4 w-4 accent-accent"
+                className="h-4 w-4 accent-harbor"
               />
               {s.name}
             </label>
@@ -77,7 +77,7 @@ export default function FilterSidebar({
 
       <fieldset>
         <legend className={legendClass}>Budget</legend>
-        <div className="mt-3 space-y-2">
+        <div className="mt-2 space-y-0.5">
           {BUDGET_BANDS.map((band) => (
             <label key={band.label} className={optionClass}>
               <input
@@ -85,7 +85,7 @@ export default function FilterSidebar({
                 name="budget"
                 checked={budgetMax === band.max}
                 onChange={() => onBudgetMaxChange(band.max)}
-                className="h-4 w-4 accent-accent"
+                className="h-4 w-4 accent-harbor"
               />
               {band.label}
             </label>
@@ -102,7 +102,7 @@ export default function FilterSidebar({
           <select
             value={locality}
             onChange={(e) => onLocalityChange(e.target.value)}
-            className="mt-3 w-full rounded-md border border-border bg-surface px-2.5 py-2 text-sm text-ink outline-none focus:border-accent"
+            className="mt-3 h-11 w-full rounded-sm border border-mist bg-surface px-2.5 text-sm text-ink outline-none focus:border-harbor lg:h-9"
           >
             <option value="">All localities</option>
             {localities.map((l) => (
@@ -116,13 +116,13 @@ export default function FilterSidebar({
 
       <fieldset>
         <legend className={legendClass}>Show only</legend>
-        <div className="mt-3 space-y-2">
+        <div className="mt-2 space-y-0.5">
           <label className={optionClass}>
             <input
               type="checkbox"
               checked={verifiedOnly}
               onChange={(e) => onVerifiedOnlyChange(e.target.checked)}
-              className="h-4 w-4 accent-accent"
+              className="h-4 w-4 accent-harbor"
             />
             Verified agencies
           </label>
@@ -131,7 +131,7 @@ export default function FilterSidebar({
               type="checkbox"
               checked={pricesOnly}
               onChange={(e) => onPricesOnlyChange(e.target.checked)}
-              className="h-4 w-4 accent-accent"
+              className="h-4 w-4 accent-harbor"
             />
             Agencies that show prices
           </label>

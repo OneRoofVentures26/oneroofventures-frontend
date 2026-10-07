@@ -1,47 +1,272 @@
 @import "tailwindcss";
 
-:root {
-  --color-ink: #16181d;
-  --color-ink-soft: #4b5059;
-  --color-paper: #fbfaf8;
-  --color-surface: #ffffff;
-  --color-muted: #f2f0ea;
-  --color-border: #e3e0d8;
+/* next-themes puts `light` or `dark` on <html>; components should rarely need
+   this because every colour below is a token that already switches. */
+@custom-variant dark (&:where(.dark, .dark *));
 
-  --color-accent: #0f6e63;
-  --color-accent-dark: #0a4f47;
-  --color-accent-light: #e4f2ef;
+/*
+ * OneRoof design tokens. Every colour in a component comes from here.
+ *
+ * - primary (iris) is for fills; primary-text is the AA-safe version for text
+ *   and links (lighter in dark theme).
+ * - accent (saffron) is for ratings, stars and the OneRoof Score only;
+ *   accent-text is its AA-safe text colour.
+ * - success (mint) is for Verified and positive states.
+ * - The signature gradient is used sparingly: logo mark, hero glow, primary
+ *   CTA hover border, one highlighted number.
+ */
+:root,
+.light {
+  color-scheme: light;
 
-  --color-gold: #b5892f;
-  --color-gold-light: #f6ecd8;
+  --bg: #f6f7fc;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --border: #e3e6f2;
+  --text: #0f1222;
+  --text-muted: #5b6180;
 
-  --color-danger: #c0433d;
+  --primary: #5b5bf0;
+  --primary-hover: #4a48e0;
+  --primary-text: #4a48e0;
+  --primary-fg: #ffffff;
+
+  --accent: #ffb020;
+  --accent-text: #9a5800;
+  --success: #19c6a0;
+  --success-text: #0a7a60;
+  --danger: #d93a4a;
+  --ring: #5b5bf0;
+
+  --gradient: linear-gradient(135deg, #5b5bf0 0%, #8b5cf6 50%, #22d3ee 100%);
+  /* Same hues, darker cyan end so gradient text holds 3:1 on light backgrounds. */
+  --gradient-text: linear-gradient(135deg, #5b5bf0 0%, #8b5cf6 50%, #0891b2 100%);
+
+  --shadow-card: 0 1px 2px rgb(15 18 34 / 0.04), 0 4px 12px -2px rgb(15 18 34 / 0.06);
+  --shadow-card-hover: 0 2px 4px rgb(15 18 34 / 0.05), 0 16px 32px -8px rgb(15 18 34 / 0.12);
+  --shadow-raised: 0 1px 2px rgb(15 18 34 / 0.05), 0 12px 32px -8px rgb(15 18 34 / 0.14);
+
+  --glass: rgb(255 255 255 / 0.72);
+  --dot: rgb(15 18 34 / 0.12);
+  --aurora-opacity: 0.45;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --bg: #0b0d17;
+  --surface: #121528;
+  --surface-raised: #191d36;
+  --border: rgb(255 255 255 / 0.08);
+  --text: #eef0fa;
+  --text-muted: #9aa1bd;
+
+  --primary: #5b5bf0;
+  --primary-hover: #4a48e0;
+  --primary-text: #7c7cff;
+  --primary-fg: #ffffff;
+
+  --accent: #ffb020;
+  --accent-text: #ffb020;
+  --success: #19c6a0;
+  --success-text: #19c6a0;
+  --danger: #ff6b7a;
+  --ring: #7c7cff;
+
+  --gradient: linear-gradient(135deg, #5b5bf0 0%, #8b5cf6 50%, #22d3ee 100%);
+  --gradient-text: linear-gradient(135deg, #7c7cff 0%, #a78bfa 50%, #22d3ee 100%);
+
+  --shadow-card: inset 0 1px 0 rgb(255 255 255 / 0.06);
+  --shadow-card-hover: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 16px 40px -12px rgb(0 0 0 / 0.6);
+  --shadow-raised: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 16px 40px -12px rgb(0 0 0 / 0.55);
+
+  --glass: rgb(18 21 40 / 0.65);
+  --dot: rgb(255 255 255 / 0.1);
+  --aurora-opacity: 0.5;
 }
 
 @theme inline {
-  --color-ink: var(--color-ink);
-  --color-ink-soft: var(--color-ink-soft);
-  --color-paper: var(--color-paper);
-  --color-surface: var(--color-surface);
-  --color-muted: var(--color-muted);
-  --color-border: var(--color-border);
-  --color-accent: var(--color-accent);
-  --color-accent-dark: var(--color-accent-dark);
-  --color-accent-light: var(--color-accent-light);
-  --color-gold: var(--color-gold);
-  --color-gold-light: var(--color-gold-light);
-  --color-danger: var(--color-danger);
-  --font-sans: var(--font-inter);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-text: var(--primary-text);
+  --color-primary-fg: var(--primary-fg);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-success: var(--success);
+  --color-success-text: var(--success-text);
+  --color-danger: var(--danger);
+  --color-ring: var(--ring);
+
+  /*
+   * Legacy names still used by pages that haven't been restyled yet. They point
+   * at the new tokens so those pages follow the new palette and both themes.
+   * Remove each alias once nothing references it.
+   */
+  --color-ink: var(--text);
+  --color-ink-soft: var(--text-muted);
+  --color-paper: var(--bg);
+  --color-muted: var(--surface-raised);
+  --color-mist: var(--border);
+  --color-harbor: var(--primary-text);
+  --color-harbor-dark: var(--primary-hover);
+  --color-harbor-light: color-mix(in oklab, var(--primary) 12%, transparent);
+  --color-brass: var(--accent);
+  --color-brass-dark: var(--accent-text);
+  --color-brass-light: color-mix(in oklab, var(--accent) 16%, transparent);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-space-grotesk), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  /* Legacy: there is no serif any more. */
+  --font-serif: var(--font-space-grotesk), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Type scale: hero 56/34, section 32/24, card 18, body 16, small 14. */
+  --text-hero: 3.5rem;
+  --text-hero--line-height: 1.05;
+  --text-hero--letter-spacing: -0.02em;
+  --text-hero-sm: 2.125rem;
+  --text-hero-sm--line-height: 1.12;
+  --text-hero-sm--letter-spacing: -0.02em;
+  --text-section: 2rem;
+  --text-section--line-height: 1.15;
+  --text-section--letter-spacing: -0.02em;
+  --text-section-sm: 1.5rem;
+  --text-section-sm--line-height: 1.2;
+  --text-section-sm--letter-spacing: -0.015em;
+  --text-card: 1.125rem;
+  --text-card--line-height: 1.35;
+
+  --ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-body {
-  background: var(--color-paper);
-  color: var(--color-ink);
-  font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.6;
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--primary) 28%, transparent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
 }
 
-* {
-  border-color: var(--color-border);
+/* Content column: 1200px max, 16 / 24 / 32px side padding. */
+@utility container-page {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 16px;
+
+  @media (width >= 48rem) {
+    padding-inline: 24px;
+  }
+  @media (width >= 64rem) {
+    padding-inline: 32px;
+  }
+}
+
+/* Prices, scores and stats. */
+@utility num {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+@utility shadow-card {
+  box-shadow: var(--shadow-card);
+}
+
+@utility shadow-card-hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+@utility shadow-raised {
+  box-shadow: var(--shadow-raised);
+}
+
+@utility glass {
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(150%);
+}
+
+@utility bg-gradient-brand {
+  background-image: var(--gradient);
+}
+
+@utility text-gradient {
+  background-image: var(--gradient-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* 1px gradient border that fades in on hover (primary CTA). */
+@utility gradient-ring {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    padding: 2px;
+    background: var(--gradient);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 200ms var(--ease-brand);
+    pointer-events: none;
+  }
+
+  &:hover::before,
+  &:focus-visible::before {
+    opacity: 1;
+  }
+}
+
+/* Faint dot grid that fades out towards the edges. */
+@utility bg-dot-grid {
+  background-image: radial-gradient(var(--dot) 1px, transparent 1px);
+  background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 20%, transparent 75%);
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 20%, transparent 75%);
 }
 
 .scrollbar-thin::-webkit-scrollbar {
@@ -50,6 +275,125 @@ body {
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: var(--color-border);
+  background: var(--border);
   border-radius: 999px;
+}
+
+/* ---------------------------------------------------------------------------
+ * Motion. Keyframes animate transform and opacity only.
+ * ------------------------------------------------------------------------- */
+
+@keyframes enter-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes aurora-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(4%, -3%, 0) scale(1.08);
+  }
+}
+
+@keyframes icon-in {
+  from {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@layer components {
+  /*
+   * Hero entrance. Runs in CSS so the headline paints before hydration (keeps
+   * LCP fast); stagger with `style={{ "--enter-delay": "80ms" }}`.
+   */
+  .enter {
+    animation: enter-rise 600ms var(--ease-brand) both;
+    animation-delay: var(--enter-delay, 0ms);
+  }
+
+  /* Theme toggle icon: replays whenever the icon is shown. */
+  .icon-swap {
+    animation: icon-in 320ms var(--ease-brand) both;
+  }
+
+  /* Route change: a short fade on each new page. */
+  .page-enter {
+    animation: fade-in 220ms var(--ease-brand) both;
+  }
+
+  /* Soft aurora behind the hero. Pre-blurred radial gradients, no filter. */
+  .aurora {
+    position: absolute;
+    pointer-events: none;
+    border-radius: 9999px;
+    opacity: var(--aurora-opacity);
+    background:
+      radial-gradient(closest-side, rgb(91 91 240 / 0.55), transparent),
+      radial-gradient(closest-side at 70% 60%, rgb(139 92 246 / 0.45), transparent),
+      radial-gradient(closest-side at 30% 70%, rgb(34 211 238 / 0.35), transparent);
+  }
+
+  @media (width >= 64rem) {
+    .aurora {
+      animation: aurora-drift 18s ease-in-out infinite;
+    }
+  }
+
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+    background: var(--surface-raised);
+  }
+
+  .shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--text) 6%, transparent), transparent);
+    animation: shimmer 1.4s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { getCities, getLocalities, getServices } from "@/lib/api/public";
 import CityPageClient from "@/components/CityPageClient";
 import CityLinks from "@/components/CityLinks";
+import { ctaButton, secondaryButton } from "@/lib/styles";
 
 export const revalidate = 300;
 
@@ -39,7 +40,7 @@ export default async function CityPage({ params }: PageProps<"/[city]">) {
   if (city.agencyCount === 0) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6">
-        <h1 className="text-2xl font-bold text-ink">Agencies in {city.name} are coming soon</h1>
+        <h1 className="text-[28px] leading-tight text-ink sm:text-[32px]">Agencies in {city.name} are coming soon</h1>
         <p className="mt-3 text-sm text-ink-soft">
           We&apos;re researching our first batch of agencies in {city.name}. Tell us what you need and
           we&apos;ll match you with agencies as soon as they&apos;re listed.
@@ -47,13 +48,13 @@ export default async function CityPage({ params }: PageProps<"/[city]">) {
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Link
             href={`/quote?city=${city.slug}`}
-            className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-dark"
+            className={ctaButton}
           >
             Get matched quotes
           </Link>
           <Link
             href="/"
-            className="rounded-lg border border-border px-5 py-2.5 text-sm font-medium text-ink transition hover:border-accent"
+            className={secondaryButton}
           >
             Back to home
           </Link>
@@ -75,7 +76,7 @@ export default async function CityPage({ params }: PageProps<"/[city]">) {
 function CityPageSkeleton() {
   return (
     <div className="mx-auto max-w-2xl animate-pulse px-4 py-12 sm:px-6 lg:px-8">
-      <div className="h-64 rounded-2xl border border-border bg-surface" />
+      <div className="h-64 rounded-sm border border-mist bg-surface" />
     </div>
   );
 }

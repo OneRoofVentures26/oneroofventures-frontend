@@ -78,14 +78,14 @@ export default function CityPageClient({
             <button
               type="button"
               onClick={() => setExpanded(false)}
-              className="text-sm font-medium text-ink-soft hover:text-accent"
+              className="inline-flex min-h-11 items-center text-sm font-medium text-ink-soft hover:text-harbor"
             >
               {service ? "← Back to top picks" : "← Back to quiz"}
             </button>
-            <h1 className="mt-2 text-2xl font-bold text-ink sm:text-3xl">All marketing agencies in {city.name}</h1>
+            <h1 className="mt-1 text-[28px] leading-tight text-ink sm:text-[32px]">All marketing agencies in {city.name}</h1>
           </div>
           {service && (
-            <button type="button" onClick={retakeQuiz} className="text-sm font-medium text-accent hover:underline">
+            <button type="button" onClick={retakeQuiz} className="inline-flex min-h-11 items-center text-sm font-medium text-harbor hover:underline">
               Retake quiz
             </button>
           )}
@@ -114,7 +114,7 @@ export default function CityPageClient({
         />
         <p className="mt-4 text-center text-sm text-ink-soft">
           or{" "}
-          <button type="button" onClick={() => setExpanded(true)} className="font-medium text-accent hover:underline">
+          <button type="button" onClick={() => setExpanded(true)} className="min-h-11 font-medium text-harbor underline-offset-2 hover:underline">
             browse all {city.agencyCount > 0 ? `${city.agencyCount} ` : ""}agencies in {city.name}
           </button>
         </p>

@@ -34,10 +34,10 @@ export default function CityListingLanding({
         initialData={initialData}
         header={
           <div>
-            <Link href={`/${city.slug}`} className="text-sm font-medium text-ink-soft hover:text-accent">
+            <Link href={`/${city.slug}`} className="inline-flex min-h-11 items-center text-sm font-medium text-ink-soft hover:text-harbor">
               ← All agencies in {city.name}
             </Link>
-            <h1 className="mt-2 text-2xl font-bold text-ink sm:text-3xl">{title}</h1>
+            <h1 className="mt-1 text-[28px] leading-tight text-ink sm:text-[32px]">{title}</h1>
             <p className="mt-1 max-w-3xl text-sm text-ink-soft">{intro}</p>
           </div>
         }

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { chip, ctaButton } from "@/lib/styles";
+import { cn } from "@/lib/utils";
 
 const BUDGET_OPTIONS = [
   "Under ₹50,000/mo",
@@ -32,8 +34,8 @@ export default function ServiceInquiryForm({ services }: { services: string[] })
 
   if (status === "sent") {
     return (
-      <div className="rounded-xl border border-accent/30 bg-accent-light p-6 text-center">
-        <p className="text-base font-bold text-accent-dark">Thanks, {name || "there"}!</p>
+      <div className="border-y-2 border-harbor bg-surface px-4 py-8 text-center">
+        <p className="font-serif text-2xl font-semibold text-harbor">Thanks, {name || "there"}!</p>
         <p className="mt-2 text-sm text-ink-soft">
           Our team will reach out within one business day to talk through the
           right package for you.
@@ -51,7 +53,7 @@ export default function ServiceInquiryForm({ services }: { services: string[] })
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
+            className="mt-1 min-h-11 w-full rounded-sm border border-mist bg-surface px-3 py-2 text-sm outline-none focus:border-harbor"
           />
         </div>
         <div>
@@ -59,7 +61,7 @@ export default function ServiceInquiryForm({ services }: { services: string[] })
           <input
             value={company}
             onChange={(e) => setCompany(e.target.value)}
-            className="mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
+            className="mt-1 min-h-11 w-full rounded-sm border border-mist bg-surface px-3 py-2 text-sm outline-none focus:border-harbor"
           />
         </div>
         <div>
@@ -69,7 +71,7 @@ export default function ServiceInquiryForm({ services }: { services: string[] })
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
+            className="mt-1 min-h-11 w-full rounded-sm border border-mist bg-surface px-3 py-2 text-sm outline-none focus:border-harbor"
           />
         </div>
         <div>
@@ -77,7 +79,7 @@ export default function ServiceInquiryForm({ services }: { services: string[] })
           <select
             value={budget}
             onChange={(e) => setBudget(e.target.value)}
-            className="mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
+            className="mt-1 min-h-11 w-full rounded-sm border border-mist bg-surface px-3 py-2 text-sm outline-none focus:border-harbor"
           >
             {BUDGET_OPTIONS.map((b) => (
               <option key={b} value={b}>
@@ -96,11 +98,7 @@ export default function ServiceInquiryForm({ services }: { services: string[] })
               type="button"
               key={s}
               onClick={() => toggleService(s)}
-              className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
-                servicesNeeded.includes(s)
-                  ? "border-accent bg-accent-light text-accent-dark"
-                  : "border-border text-ink-soft hover:border-accent"
-              }`}
+              className={chip(servicesNeeded.includes(s))}
             >
               {s}
             </button>
@@ -115,14 +113,14 @@ export default function ServiceInquiryForm({ services }: { services: string[] })
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="What are you trying to achieve this quarter?"
-          className="mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
+          className="mt-1 min-h-11 w-full rounded-sm border border-mist bg-surface px-3 py-2 text-sm outline-none focus:border-harbor"
         />
       </div>
 
       <button
         type="submit"
         disabled={status === "sending"}
-        className="w-full rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
+        className={cn(ctaButton, "w-full")}
       >
         {status === "sending" ? "Sending…" : "Talk to our team"}
       </button>

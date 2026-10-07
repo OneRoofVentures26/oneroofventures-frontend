@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { CityItem, LocalityItem, ServiceItem } from "@/lib/api/types";
-import { cn } from "@/lib/utils";
+import { chip } from "@/lib/styles";
 
 /** Internal links to the city + service and city + locality landing pages. */
 export default function CityLinks({
@@ -16,20 +16,12 @@ export default function CityLinks({
   activeService?: string;
   activeLocality?: string;
 }) {
-  const chip = (active: boolean) =>
-    cn(
-      "rounded-full border px-3 py-1.5 text-sm font-medium transition",
-      active
-        ? "border-accent bg-accent-light text-accent-dark"
-        : "border-border text-ink-soft hover:border-accent hover:text-accent-dark",
-    );
-
   return (
-    <section className="border-t border-border bg-surface">
+    <section className="border-t border-mist bg-surface">
       <div className="mx-auto max-w-7xl space-y-8 px-4 py-10 sm:px-6 lg:px-8">
         {services.length > 0 && (
           <div>
-            <h2 className="text-sm font-bold text-ink">Agencies in {city.name} by service</h2>
+            <h2 className="text-lg text-ink">Agencies in {city.name} by service</h2>
             <div className="mt-3 flex flex-wrap gap-2">
               {services.map((s) => (
                 <Link
@@ -45,7 +37,7 @@ export default function CityLinks({
         )}
         {localities.length > 0 && (
           <div>
-            <h2 className="text-sm font-bold text-ink">Agencies in {city.name} by area</h2>
+            <h2 className="text-lg text-ink">Agencies in {city.name} by area</h2>
             <div className="mt-3 flex flex-wrap gap-2">
               {localities.map((l) => (
                 <Link

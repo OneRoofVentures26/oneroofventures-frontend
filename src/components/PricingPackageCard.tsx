@@ -21,32 +21,32 @@ export default function PricingPackageCard({
   return (
     <div
       className={cn(
-        "flex flex-col rounded-xl border p-6",
-        highlighted ? "border-accent bg-accent-light/40 shadow-md" : "border-border bg-surface",
+        "flex flex-col rounded-sm border border-t-2 bg-surface p-6",
+        highlighted ? "border-harbor" : "border-mist border-t-mist",
       )}
     >
       {badge && (
-        <span className="mb-3 inline-block w-fit rounded-full bg-accent px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-white">
+        <span className="mb-3 inline-block w-fit rounded-sm bg-harbor px-2.5 py-0.5 text-[11px] font-semibold text-paper">
           {badge}
         </span>
       )}
       {eyebrow && (
-        <p className="text-xs font-semibold uppercase tracking-wide text-accent-dark">{eyebrow}</p>
+        <p className="text-sm font-medium text-harbor">{eyebrow}</p>
       )}
-      <h3 className="text-base font-bold text-ink">{title}</h3>
-      <p className="mt-1 text-xl font-bold text-ink">{price}</p>
+      <h3 className="text-lg text-ink">{title}</h3>
+      <p className="mt-2 font-serif text-2xl font-semibold text-ink">{price}</p>
       {inclusions.length > 0 && (
-        <ul className="mt-4 space-y-2">
+        <ul className="mt-4 space-y-2 border-t border-mist pt-4">
           {inclusions.map((item, idx) => (
             <li key={`${idx}-${item}`} className="flex items-start gap-2 text-sm text-ink-soft">
               <svg
                 viewBox="0 0 20 20"
-                className="mt-0.5 h-4 w-4 flex-shrink-0 text-accent"
+                className="mt-0.5 h-4 w-4 flex-shrink-0 text-harbor"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
               >
-                <path d="M4 10.5l4 4 8-9" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M4 10.5l4 4 8-9" strokeLinecap="square" />
               </svg>
               {item}
             </li>

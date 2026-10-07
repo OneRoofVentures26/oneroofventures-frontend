@@ -3,21 +3,21 @@
 import type { ReactNode } from "react";
 import type { AgencyStatus, LeadStatus } from "@/lib/api/types";
 import { errorMessage } from "@/lib/api/http";
-import { cn } from "@/lib/utils";
+import { cn, sentenceCase } from "@/lib/utils";
 
 export const inputClass =
-  "mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent disabled:bg-muted disabled:text-ink-soft";
+  "mt-1 w-full rounded-sm border border-mist bg-surface px-3 py-2 text-sm outline-none focus:border-harbor disabled:bg-muted disabled:text-ink-soft";
 
 export const selectClass =
-  "rounded-md border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent";
+  "rounded-sm border border-mist bg-surface px-3 py-2 text-sm outline-none focus:border-harbor";
 
 export const primaryButton =
-  "rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50";
+  "rounded-sm bg-harbor px-4 py-2 text-sm font-semibold text-paper transition hover:bg-harbor-dark disabled:cursor-not-allowed disabled:opacity-50";
 
 export const secondaryButton =
-  "rounded-lg border border-border px-4 py-2 text-sm font-medium text-ink transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50";
+  "rounded-sm border border-harbor px-4 py-2 text-sm font-medium text-harbor transition hover:bg-harbor-light disabled:cursor-not-allowed disabled:opacity-50";
 
-export const linkButton = "text-xs font-medium text-accent hover:underline disabled:opacity-50";
+export const linkButton = "text-xs font-medium text-harbor hover:underline disabled:opacity-50";
 export const dangerLinkButton = "text-xs font-medium text-danger hover:underline disabled:opacity-50";
 
 export function Field({
@@ -54,7 +54,7 @@ export function PageHeader({ title, description, actions }: { title: string; des
   return (
     <div className="flex flex-wrap items-start justify-between gap-3">
       <div>
-        <h1 className="text-xl font-bold text-ink">{title}</h1>
+        <h1 className="text-2xl text-ink">{title}</h1>
         {description && <p className="mt-1 text-sm text-ink-soft">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
@@ -65,7 +65,7 @@ export function PageHeader({ title, description, actions }: { title: string; des
 export function ErrorBanner({ error, onRetry }: { error: unknown; onRetry?: () => void }) {
   if (!error) return null;
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 rounded-md bg-danger/10 px-3 py-2 text-sm text-danger">
+    <div className="flex flex-wrap items-center justify-between gap-2 rounded-sm bg-danger/10 px-3 py-2 text-sm text-danger">
       <span>{typeof error === "string" ? error : errorMessage(error)}</span>
       {onRetry && (
         <button type="button" onClick={onRetry} className="font-medium underline">
@@ -81,15 +81,15 @@ export function Loading({ label = "Loading…" }: { label?: string }) {
 }
 
 const AGENCY_STATUS_STYLES: Record<AgencyStatus, string> = {
-  PUBLISHED: "bg-accent-light text-accent-dark",
+  PUBLISHED: "bg-harbor-light text-harbor-dark",
   DRAFT: "bg-muted text-ink-soft",
-  HIDDEN: "bg-gold-light text-gold",
+  HIDDEN: "bg-mist text-ink-soft",
 };
 
 const LEAD_STATUS_STYLES: Record<LeadStatus, string> = {
-  NEW: "bg-gold-light text-gold",
-  SENT: "bg-accent-light text-accent-dark",
-  CONTACTED: "bg-accent-light text-accent-dark",
+  NEW: "bg-harbor text-paper",
+  SENT: "bg-harbor-light text-harbor-dark",
+  CONTACTED: "bg-harbor-light text-harbor-dark",
   CLOSED: "bg-muted text-ink-soft",
   SPAM: "bg-danger/10 text-danger",
 };
@@ -98,8 +98,8 @@ export function StatusBadge({ status }: { status: AgencyStatus | LeadStatus }) {
   const style =
     (AGENCY_STATUS_STYLES as Record<string, string>)[status] ?? (LEAD_STATUS_STYLES as Record<string, string>)[status];
   return (
-    <span className={cn("inline-block rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide", style)}>
-      {status.toLowerCase()}
+    <span className={cn("inline-block rounded-sm px-2 py-0.5 text-[11px] font-semibold", style)}>
+      {sentenceCase(status)}
     </span>
   );
 }
@@ -127,7 +127,7 @@ export function Pager({
             type="button"
             disabled={page === 0}
             onClick={() => onPageChange(page - 1)}
-            className="rounded-md border border-border px-3 py-1.5 text-xs font-medium text-ink disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-sm border border-harbor px-3 py-1.5 text-xs font-medium text-harbor hover:bg-harbor-light disabled:cursor-not-allowed disabled:opacity-40"
           >
             Previous
           </button>
@@ -135,7 +135,7 @@ export function Pager({
             type="button"
             disabled={page + 1 >= totalPages}
             onClick={() => onPageChange(page + 1)}
-            className="rounded-md border border-border px-3 py-1.5 text-xs font-medium text-ink disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-sm border border-harbor px-3 py-1.5 text-xs font-medium text-harbor hover:bg-harbor-light disabled:cursor-not-allowed disabled:opacity-40"
           >
             Next
           </button>
@@ -149,4 +149,52 @@ export function Pager({
 export function orNull(value: string): string | null {
   const trimmed = value.trim();
   return trimmed ? trimmed : null;
+}
+
+/**
+ * Small icon button that re-fetches one table's data in place (no page reload).
+ * Pass the `reload` and `loading` from that table's `useAsync`.
+ */
+export function RefreshButton({
+  onRefresh,
+  loading = false,
+  label = "table",
+  className,
+}: {
+  onRefresh: () => void;
+  loading?: boolean;
+  /** What is being refreshed, for the accessible name, e.g. "agencies". */
+  label?: string;
+  className?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onRefresh}
+      disabled={loading}
+      aria-label={`Refresh ${label}`}
+      title={`Refresh ${label}`}
+      className={cn(
+        "inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl border border-border bg-surface text-text-muted transition-colors duration-200 hover:border-primary/40 hover:text-primary-text disabled:cursor-wait lg:h-9 lg:w-9",
+        className,
+      )}
+    >
+      <svg
+        viewBox="0 0 20 20"
+        className={cn("h-4 w-4", loading && "animate-spin")}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M16.5 10a6.5 6.5 0 1 1-1.9-4.6" />
+        <path d="M16.5 3.5v3.6h-3.6" />
+      </svg>
+      <span className="sr-only" aria-live="polite">
+        {loading ? "Refreshing" : ""}
+      </span>
+    </button>
+  );
 }

@@ -37,8 +37,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             key={t.id}
             role="status"
             className={cn(
-              "rounded-lg px-4 py-3 text-sm font-medium text-white shadow-lg",
-              t.type === "success" ? "bg-accent" : "bg-danger",
+              "rounded-sm px-4 py-3 text-sm font-medium text-paper shadow-lg",
+              t.type === "success" ? "bg-harbor" : "bg-danger",
             )}
           >
             {t.message}

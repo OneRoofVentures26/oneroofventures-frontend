@@ -25,6 +25,7 @@ import {
   orNull,
   PageHeader,
   primaryButton,
+  RefreshButton,
   secondaryButton,
 } from "@/components/admin/ui";
 
@@ -72,8 +73,11 @@ export default function CitiesPage() {
       />
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <section className="rounded-xl border border-border bg-surface p-5">
-          <h2 className="text-sm font-bold uppercase tracking-wide text-ink-soft">Cities</h2>
+        <section className="rounded-sm border border-mist bg-surface p-5">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-lg text-ink">Cities</h2>
+            <RefreshButton onRefresh={cities.reload} loading={cities.loading} label="cities" />
+          </div>
           <div className="mt-4">
             <CityForm
               key="new-city"
@@ -90,7 +94,7 @@ export default function CitiesPage() {
             {!cities.data ? (
               !cities.error && <p className="text-sm text-ink-soft">Loading…</p>
             ) : (
-              <ul className="divide-y divide-border rounded-lg border border-border">
+              <ul className="divide-y divide-mist rounded-sm border border-mist">
                 {cities.data.length === 0 && <li className="p-4 text-sm text-ink-soft">No cities yet.</li>}
                 {cities.data.map((c) => (
                   <CityRow
@@ -111,10 +115,15 @@ export default function CitiesPage() {
           </div>
         </section>
 
-        <section className="rounded-xl border border-border bg-surface p-5">
-          <h2 className="text-sm font-bold uppercase tracking-wide text-ink-soft">
-            Localities {selected ? `in ${selected.name}` : ""}
-          </h2>
+        <section className="rounded-sm border border-mist bg-surface p-5">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-lg text-ink">
+              Localities {selected ? `in ${selected.name}` : ""}
+            </h2>
+            {selected && (
+              <RefreshButton onRefresh={localities.reload} loading={localities.loading} label="localities" />
+            )}
+          </div>
           {!selected ? (
             <p className="mt-4 text-sm text-ink-soft">Add a city first.</p>
           ) : (
@@ -134,7 +143,7 @@ export default function CitiesPage() {
                 {!localities.data ? (
                   !localities.error && <p className="text-sm text-ink-soft">Loading…</p>
                 ) : (
-                  <ul className="divide-y divide-border rounded-lg border border-border">
+                  <ul className="divide-y divide-mist rounded-sm border border-mist">
                     {localities.data.length === 0 && (
                       <li className="p-4 text-sm text-ink-soft">No localities in {selected.name} yet.</li>
                     )}
@@ -213,7 +222,7 @@ function CityForm({
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <label className="flex items-center gap-2 text-sm text-ink">
-          <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} className="h-4 w-4 accent-accent" />
+          <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} className="h-4 w-4 accent-harbor" />
           Active (shown on site)
         </label>
         <button type="submit" disabled={saving} className={primaryButton}>
@@ -259,11 +268,11 @@ function CityRow({
     );
   }
   return (
-    <li className={cn("flex items-center justify-between gap-3 px-3 py-2.5", selected && "bg-accent-light/40")}>
+    <li className={cn("flex items-center justify-between gap-3 px-3 py-2.5", selected && "bg-harbor-light/40")}>
       <button type="button" onClick={onSelect} className="min-w-0 text-left">
         <p className="text-sm font-medium text-ink">
           {city.name}
-          {!city.active && <span className="ml-2 text-xs font-normal text-gold">inactive</span>}
+          {!city.active && <span className="ml-2 text-xs font-normal text-ink-soft">(inactive)</span>}
         </p>
         <p className="text-xs text-ink-soft">/{city.slug}</p>
       </button>

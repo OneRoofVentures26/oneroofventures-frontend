@@ -4,7 +4,8 @@ import type { Metadata } from "next";
 import { getAgencyProfile, getSitemapEntries } from "@/lib/api/public";
 import { isNotFound } from "@/lib/api/http";
 import { TIERS, type AgencyProfile } from "@/lib/api/types";
-import { formatDate, formatPackagePrice, initials, PRICING_TYPE_LABELS, TIER_LABELS } from "@/lib/utils";
+import { cn, formatDate, formatPackagePrice, initials, PRICING_TYPE_LABELS, TIER_LABELS } from "@/lib/utils";
+import { chip, ctaButton, primaryButton } from "@/lib/styles";
 import PricingPackageCard from "@/components/PricingPackageCard";
 import CompareToggle from "@/components/CompareToggle";
 import CompareBar from "@/components/CompareBar";
@@ -73,34 +74,34 @@ export default async function AgencyProfilePage({ params }: PageProps<"/[city]/[
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-      <Link href={`/${agency.city.slug}`} className="text-sm font-medium text-ink-soft hover:text-accent">
+      <Link href={`/${agency.city.slug}`} className="inline-flex min-h-11 items-center text-sm font-medium text-ink-soft hover:text-harbor">
         ← {agency.city.name} agencies
       </Link>
 
-      <div className="mt-4 flex flex-col gap-6 rounded-2xl border border-border bg-surface p-6 sm:flex-row sm:items-start sm:justify-between">
+      <div className="mt-2 flex flex-col gap-6 border-b border-mist pb-8 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 gap-4">
-          <span className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-xl bg-accent-light text-lg font-bold text-accent-dark">
+          <span className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-sm bg-harbor text-lg font-semibold text-paper">
             {initials(agency.name)}
           </span>
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              <h1 className="text-xl font-bold text-ink sm:text-2xl">{agency.name}</h1>
+              <h1 className="text-[28px] leading-tight text-ink sm:text-[36px]">{agency.name}</h1>
               {agency.verified && <VerifiedBadge />}
             </div>
-            {agency.description && <p className="mt-1 text-sm text-ink-soft">{agency.description}</p>}
-            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+            {agency.description && <p className="mt-2 max-w-2xl text-[15px] text-ink-soft">{agency.description}</p>}
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 text-sm [&>a]:inline-flex [&>a]:min-h-11 [&>a]:items-center">
               {agency.website && (
                 <a
                   href={agency.website}
                   target="_blank"
                   rel="noopener noreferrer nofollow"
-                  className="font-medium text-accent hover:underline"
+                  className="font-medium text-harbor hover:underline"
                 >
                   {hostname(agency.website)} ↗
                 </a>
               )}
               {agency.phone && (
-                <a href={`tel:${agency.phone.replace(/\s+/g, "")}`} className="text-ink-soft hover:text-accent">
+                <a href={`tel:${agency.phone.replace(/\s+/g, "")}`} className="text-ink-soft hover:text-harbor">
                   {agency.phone}
                 </a>
               )}
@@ -112,10 +113,7 @@ export default async function AgencyProfilePage({ params }: PageProps<"/[city]/[
         </div>
 
         <div className="flex flex-shrink-0 flex-row items-center gap-3 sm:flex-col sm:items-end">
-          <Link
-            href={quoteBase}
-            className="rounded-lg bg-accent px-5 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-accent-dark"
-          >
+          <Link href={quoteBase} className={ctaButton}>
             Request a quote
           </Link>
           <CompareToggle
@@ -124,24 +122,32 @@ export default async function AgencyProfilePage({ params }: PageProps<"/[city]/[
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        {facts.map(([label, value]) => (
-          <div key={label} className="rounded-xl border border-border bg-surface p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">{label}</p>
-            <p className="mt-1 text-sm font-semibold text-ink">{value}</p>
+      <dl className="grid grid-cols-2 border-b border-mist sm:grid-cols-4">
+        {facts.map(([label, value], idx) => (
+          <div
+            key={label}
+            className={cn(
+              "border-mist py-4 pr-4",
+              idx % 2 === 1 && "border-l pl-4",
+              idx >= 2 && "border-t sm:border-t-0",
+              idx === 2 && "sm:border-l sm:pl-4",
+            )}
+          >
+            <dt className="text-xs font-medium text-ink-soft">{label}</dt>
+            <dd className="mt-1 text-sm font-semibold text-ink">{value}</dd>
           </div>
         ))}
-      </div>
+      </dl>
 
       {agency.services.length > 0 && (
         <section className="mt-10">
-          <h2 className="text-lg font-bold text-ink">Services</h2>
+          <h2 className="text-2xl text-ink">Services</h2>
           <div className="mt-3 flex flex-wrap gap-2">
             {agency.services.map((s) => (
               <Link
                 key={s.code}
                 href={`/${agency.city.slug}/services/${s.slug}`}
-                className="rounded-full bg-muted px-3 py-1.5 text-sm font-medium text-ink-soft transition hover:text-accent-dark"
+                className={chip(false)}
               >
                 {s.name}
               </Link>
@@ -152,13 +158,13 @@ export default async function AgencyProfilePage({ params }: PageProps<"/[city]/[
 
       <section className="mt-10">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="text-lg font-bold text-ink">Packages &amp; pricing</h2>
+          <h2 className="text-2xl text-ink">Packages &amp; pricing</h2>
           {agency.pricingPageUrl && (
             <a
               href={agency.pricingPageUrl}
               target="_blank"
               rel="noopener noreferrer nofollow"
-              className="text-sm font-medium text-accent hover:underline"
+              className="text-sm font-medium text-harbor hover:underline"
             >
               Agency&apos;s pricing page ↗
             </a>
@@ -166,10 +172,10 @@ export default async function AgencyProfilePage({ params }: PageProps<"/[city]/[
         </div>
 
         {packageGroups.length === 0 ? (
-          <div className="mt-4 rounded-xl border border-dashed border-border p-8 text-center">
+          <div className="mt-4 border-y border-mist px-4 py-8 text-center">
             <p className="text-sm font-medium text-ink">{agency.name} shares prices on request</p>
             <p className="mt-1 text-sm text-ink-soft">Send a quick brief and they&apos;ll reply with a tailored quote.</p>
-            <Link href={quoteBase} className="mt-3 inline-block text-sm font-semibold text-accent hover:underline">
+            <Link href={quoteBase} className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold text-harbor hover:underline">
               Request a quote →
             </Link>
           </div>
@@ -178,7 +184,7 @@ export default async function AgencyProfilePage({ params }: PageProps<"/[city]/[
             {packageGroups.map(({ code, service, packages }) => (
               <div key={code}>
                 {packageGroups.length > 1 && (
-                  <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-ink-soft">
+                  <h3 className="mb-3 text-lg text-ink">
                     {service?.name ?? code}
                   </h3>
                 )}
@@ -195,7 +201,7 @@ export default async function AgencyProfilePage({ params }: PageProps<"/[city]/[
                         <div className="flex items-center justify-between gap-3">
                           <Link
                             href={`${quoteBase}&package=${pkg.id}${service ? `&service=${service.slug}` : ""}`}
-                            className="text-sm font-semibold text-accent hover:underline"
+                            className="inline-flex min-h-11 items-center text-sm font-semibold text-harbor hover:underline"
                           >
                             Get a quote for this →
                           </Link>
@@ -204,7 +210,7 @@ export default async function AgencyProfilePage({ params }: PageProps<"/[city]/[
                               href={pkg.sourceUrl}
                               target="_blank"
                               rel="noopener noreferrer nofollow"
-                              className="text-xs text-ink-soft hover:text-accent"
+                              className="inline-flex min-h-11 items-center text-xs text-ink-soft hover:text-harbor"
                             >
                               Source ↗
                             </a>
@@ -225,15 +231,12 @@ export default async function AgencyProfilePage({ params }: PageProps<"/[city]/[
         )}
       </section>
 
-      <div className="mt-12 flex flex-col items-center justify-between gap-4 rounded-2xl border border-border bg-accent-light/50 p-6 sm:flex-row">
+      <div className="mt-12 flex flex-col items-start justify-between gap-4 border-y border-mist py-6 sm:flex-row sm:items-center">
         <div>
-          <p className="text-sm font-bold text-ink">Ready to work with {agency.name}?</p>
+          <p className="font-serif text-xl font-semibold text-ink">Ready to work with {agency.name}?</p>
           <p className="text-sm text-ink-soft">Get a tailored quote, free of charge.</p>
         </div>
-        <Link
-          href={quoteBase}
-          className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-dark"
-        >
+        <Link href={quoteBase} className={primaryButton}>
           Request a quote
         </Link>
       </div>

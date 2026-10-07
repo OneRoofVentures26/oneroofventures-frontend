@@ -86,3 +86,9 @@ export function initials(name: string): string {
 export function cn(...classes: Array<string | false | null | undefined>): string {
   return classes.filter(Boolean).join(" ");
 }
+
+/** API enum → sentence case, e.g. "PUBLISHED" → "Published", "NO_EMAIL" → "No email". */
+export function sentenceCase(value: string): string {
+  const s = value.replace(/_/g, " ").toLowerCase();
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
