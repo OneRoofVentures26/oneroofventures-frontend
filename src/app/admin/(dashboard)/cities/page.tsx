@@ -272,9 +272,9 @@ function CityRow({
       <button type="button" onClick={onSelect} className="min-w-0 text-left">
         <p className="text-sm font-medium text-ink">
           {city.name}
-          {!city.active && <span className="ml-2 text-xs font-normal text-ink-soft">(inactive)</span>}
+          {!city.active && <span className="ml-2 text-[13px] font-normal text-ink-soft">(inactive)</span>}
         </p>
-        <p className="text-xs text-ink-soft">/{city.slug}</p>
+        <p className="text-[13px] text-ink-soft">/{city.slug}</p>
       </button>
       <div className="flex flex-shrink-0 gap-3">
         <button type="button" onClick={() => setEditing(true)} className={linkButton}>
@@ -367,7 +367,7 @@ function LocalityRow({
     <li className="flex items-center justify-between gap-3 px-3 py-2.5">
       <div className="min-w-0">
         <p className="text-sm font-medium text-ink">{locality.name}</p>
-        <p className="text-xs text-ink-soft">{locality.slug}</p>
+        <p className="text-[13px] text-ink-soft">{locality.slug}</p>
       </div>
       <div className="flex flex-shrink-0 gap-3">
         <button type="button" onClick={() => setEditing(true)} className={linkButton}>

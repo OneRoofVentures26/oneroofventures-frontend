@@ -92,3 +92,22 @@ export function sentenceCase(value: string): string {
   const s = value.replace(/_/g, " ").toLowerCase();
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
+
+/**
+ * Shortens free text (e.g. an agency's "works with") to one short sentence for
+ * display: drops parenthesised notes such as source labels "(GoodFirms)",
+ * keeps the first sentence, and cuts at a word boundary near `max` characters.
+ */
+export function shortSentence(text: string, max = 90): string {
+  const clean = text
+    .replace(/\s*[([][^)\]]*[)\]]/g, "")
+    .replace(/\s*(?:source|via)\s*:.*$/i, "")
+    .replace(/\s*\|\s*/g, ", ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const first = clean.split(/(?<=[.!?;])\s+/)[0].replace(/[.;,\s]+$/, "");
+  if (first.length <= max) return first;
+  const cut = first.slice(0, max);
+  const at = Math.max(cut.lastIndexOf(", "), cut.lastIndexOf(" "));
+  return `${cut.slice(0, at > max * 0.5 ? at : max).replace(/[,;\s]+$/, "")}…`;
+}

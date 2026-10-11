@@ -59,7 +59,7 @@ export default function PackagesManager({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 className="text-lg text-ink">Packages</h2>
-          <p className="text-xs text-ink-soft">One package per service and tier (Starter, Growth, Pro).</p>
+          <p className="text-[13px] text-ink-soft">One package per service and tier (Starter, Growth, Pro).</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <RefreshButton onRefresh={packages.reload} loading={packages.loading} label="packages" />
@@ -145,12 +145,12 @@ export default function PackagesManager({
                     <li key={p.id} className="flex flex-wrap items-center justify-between gap-3 px-3 py-2.5">
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-ink">
-                          <span className="mr-2 rounded-sm bg-muted px-1.5 py-0.5 text-[10px] font-semibold text-ink-soft">
+                          <span className="mr-2 rounded-sm bg-muted px-1.5 py-0.5 text-[13px] font-semibold text-ink-soft">
                             {TIER_LABELS[p.tier]}
                           </span>
                           {p.name}
                         </p>
-                        <p className="text-xs text-ink-soft">
+                        <p className="text-[13px] text-ink-soft">
                           {formatPackagePrice(p.priceMin, p.priceMax, p.billing)} · {p.inclusions.length} inclusion
                           {p.inclusions.length === 1 ? "" : "s"}
                         </p>

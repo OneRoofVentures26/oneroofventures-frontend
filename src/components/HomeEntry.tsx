@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useRef, useState } from "react";
+import { createContext, useContext, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import type { CityItem, ServiceItem } from "@/lib/api/types";
 import { useLocalStore } from "@/lib/local-store";
@@ -77,10 +77,28 @@ export function HomeEntryProvider({
   );
 }
 
+const WIDE_QUERY = "(min-width: 640px)";
+
+function subscribeWide(onChange: () => void) {
+  const mq = window.matchMedia(WIDE_QUERY);
+  mq.addEventListener("change", onChange);
+  return () => mq.removeEventListener("change", onChange);
+}
+
+/** True from 640px. The server assumes a phone, so the short placeholder is the default. */
+function useWideScreen() {
+  return useSyncExternalStore(
+    subscribeWide,
+    () => window.matchMedia(WIDE_QUERY).matches,
+    () => false,
+  );
+}
+
 export function HomeSearch() {
   const { cities, services, go, handOffToQuiz } = useHomeEntry();
   const stored = useLocalStore(quizStore);
   const [query, setQuery] = useState("");
+  const wide = useWideScreen();
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -121,7 +139,7 @@ export function HomeSearch() {
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder={`Try "affordable SEO agency in ${exampleCity}"`}
+          placeholder={wide ? `Try "affordable SEO agency in ${exampleCity}"` : `Try: SEO agency in ${exampleCity}`}
           aria-label="Search for an agency"
           className="min-h-11 w-full min-w-0 bg-transparent py-2 text-base text-text outline-none placeholder:text-text-muted focus-visible:outline-none"
         />

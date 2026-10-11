@@ -121,7 +121,7 @@ function LeadsInbox() {
             </option>
           ))}
         </select>
-        <label className="text-xs text-ink-soft">
+        <label className="text-[13px] text-ink-soft">
           From
           <input
             type="date"
@@ -130,7 +130,7 @@ function LeadsInbox() {
             className={cn(selectClass, "ml-1")}
           />
         </label>
-        <label className="text-xs text-ink-soft">
+        <label className="text-[13px] text-ink-soft">
           To
           <input
             type="date"
@@ -140,7 +140,7 @@ function LeadsInbox() {
           />
         </label>
         {filterKey && (
-          <button type="button" onClick={() => router.replace(pathname)} className="pb-2 text-xs font-medium text-harbor hover:underline">
+          <button type="button" onClick={() => router.replace(pathname)} className="pb-2 text-[13px] font-medium text-harbor hover:underline">
             Clear filters
           </button>
         )}
@@ -171,7 +171,7 @@ function LeadsInbox() {
                         {lead.name}
                         {lead.businessName && <span className="font-normal text-ink-soft"> · {lead.businessName}</span>}
                       </p>
-                      <p className="mt-0.5 text-xs text-ink-soft">
+                      <p className="mt-0.5 text-[13px] text-ink-soft">
                         <a href={`tel:${lead.phone}`} className="hover:text-harbor">
                           {lead.phone}
                         </a>
@@ -184,13 +184,13 @@ function LeadsInbox() {
                           </>
                         )}
                       </p>
-                      <p className="mt-1 text-xs text-ink-soft">
+                      <p className="mt-1 text-[13px] text-ink-soft">
                         <span className="font-medium text-ink">{lead.serviceSlug}</span> · {lead.citySlug}
                         {lead.localitySlug ? ` / ${lead.localitySlug}` : ""}
                         {lead.budgetMonthly != null ? ` · ${formatINR(lead.budgetMonthly)}/mo` : ""} ·{" "}
                         {formatDateTime(lead.createdAt)}
                       </p>
-                      <p className={cn("mt-1 text-xs", lead.routedAgencies.length === 0 ? "text-danger" : "text-ink-soft")}>
+                      <p className={cn("mt-1 text-[13px]", lead.routedAgencies.length === 0 ? "text-danger" : "text-ink-soft")}>
                         {lead.routedAgencies.length === 0
                           ? "Not routed to any agency yet"
                           : `Sent to ${lead.routedAgencies.map((r) => r.agencyName).join(", ")}`}
@@ -203,7 +203,7 @@ function LeadsInbox() {
                         value={lead.status}
                         disabled={busy === lead.id}
                         onChange={(e) => changeStatus(lead, e.target.value as LeadStatus)}
-                        className="rounded-sm border border-mist bg-surface px-2 py-1 text-xs outline-none focus:border-harbor"
+                        className="rounded-sm border border-mist bg-surface px-2 py-1 text-[13px] outline-none focus:border-harbor"
                         aria-label="Change status"
                       >
                         {LEAD_STATUSES.map((s) => (
@@ -222,11 +222,11 @@ function LeadsInbox() {
                     <div className="space-y-4 border-t border-mist p-4 text-sm">
                       {lead.message && (
                         <div>
-                          <p className="text-xs font-semibold text-ink-soft">Message</p>
+                          <p className="text-[13px] font-semibold text-ink-soft">Message</p>
                           <p className="mt-1 whitespace-pre-wrap text-ink">{lead.message}</p>
                         </div>
                       )}
-                      <dl className="grid grid-cols-2 gap-3 text-xs sm:grid-cols-4">
+                      <dl className="grid grid-cols-2 gap-3 text-[13px] sm:grid-cols-4">
                         {(
                           [
                             ["Lead", `#${lead.id}`],
@@ -253,15 +253,15 @@ function LeadsInbox() {
                       </dl>
 
                       <div>
-                        <p className="text-xs font-semibold text-ink-soft">Routed agencies</p>
+                        <p className="text-[13px] font-semibold text-ink-soft">Routed agencies</p>
                         {lead.routedAgencies.length === 0 ? (
-                          <p className="mt-1 text-xs text-ink-soft">None — match this lead by hand or contact the client directly.</p>
+                          <p className="mt-1 text-[13px] text-ink-soft">None — match this lead by hand or contact the client directly.</p>
                         ) : (
                           <ul className="mt-1 divide-y divide-mist rounded-sm border border-mist">
                             {lead.routedAgencies.map((r) => {
                               const s = EMAIL_STATUS[r.emailStatus ?? "PENDING"];
                               return (
-                                <li key={r.agencyId} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-xs">
+                                <li key={r.agencyId} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-[13px]">
                                   <span className="font-medium text-ink">
                                     <Link href={`/admin/agencies/${r.agencyId}/edit`} className="hover:text-harbor">
                                       {r.agencyName}
@@ -279,7 +279,7 @@ function LeadsInbox() {
                         )}
                       </div>
 
-                      <p className="break-all text-xs text-ink-soft">
+                      <p className="break-all text-[13px] text-ink-soft">
                         IP {lead.ipAddress ?? "unknown"}
                         {lead.userAgent ? ` · ${lead.userAgent}` : ""}
                       </p>
@@ -341,7 +341,7 @@ function RateLimitReset() {
   return (
     <form onSubmit={handleSubmit} className="mt-10 max-w-xl rounded-sm border border-mist bg-surface p-5">
       <h2 className="text-sm font-bold text-ink">Unblock an IP</h2>
-      <p className="mt-1 text-xs text-ink-soft">
+      <p className="mt-1 text-[13px] text-ink-soft">
         Visitors can send 5 quote requests per hour. Reset the counter for someone who hit the limit.
       </p>
       <div className="mt-3 flex gap-2">

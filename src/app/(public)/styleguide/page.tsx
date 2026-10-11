@@ -84,7 +84,7 @@ function ThemePanel({ theme }: { theme: "light" | "dark" }) {
             <div className="h-11 w-24 rounded-xl bg-gradient-brand" />
             <div>
               <p className="font-mono text-sm font-medium">gradient</p>
-              <p className="text-xs text-text-muted">Logo, hero glow, CTA hover border, one number</p>
+              <p className="text-[13px] text-text-muted">Logo, hero glow, CTA hover border, one number</p>
             </div>
           </div>
         </Block>
@@ -93,12 +93,12 @@ function ThemePanel({ theme }: { theme: "light" | "dark" }) {
           <div className="space-y-5">
             {TYPE_SCALE.map((t) => (
               <div key={t.label}>
-                <p className="text-xs text-text-muted">{t.label}</p>
+                <p className="text-[13px] text-text-muted">{t.label}</p>
                 <p className={cn("mt-1", t.className)}>{t.sample}</p>
               </div>
             ))}
             <div>
-              <p className="text-xs text-text-muted">Highlighted number</p>
+              <p className="text-[13px] text-text-muted">Highlighted number</p>
               <p className="num mt-1 text-5xl font-bold">
                 <span className="text-gradient">248</span>
               </p>

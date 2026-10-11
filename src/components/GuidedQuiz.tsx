@@ -85,7 +85,7 @@ export default function GuidedQuiz({
   };
 
   return (
-    <div className={cn(glassPanel, "overflow-hidden p-6 text-left sm:p-8", className)}>
+    <div className={cn(glassPanel, "overflow-hidden p-5 text-left sm:p-8", className)}>
       {skipCity && cityName && (
         <p className="mb-3 text-sm text-text-muted">
           Showing results for <span className="font-semibold text-text">{cityName}</span>
@@ -120,7 +120,7 @@ export default function GuidedQuiz({
           animate="center"
           exit="exit"
           transition={{ duration: DURATION.ui, ease: EASE }}
-          className="mt-5"
+          className="mt-4 sm:mt-5"
         >
           {step === 1 && (
             <div>
@@ -128,14 +128,14 @@ export default function GuidedQuiz({
               {services.length === 0 ? (
                 <p className="mt-4 text-sm text-text-muted">Services are loading — please refresh in a moment.</p>
               ) : (
-                <div className="mt-4 flex flex-wrap gap-2">
+                <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {services.map((s) => (
                     <button
                       key={s.slug}
                       type="button"
                       onClick={() => chooseService(s.slug)}
                       aria-pressed={service === s.slug}
-                      className={chip(service === s.slug)}
+                      className={chip(service === s.slug, true)}
                     >
                       {s.name}
                     </button>
@@ -151,14 +151,14 @@ export default function GuidedQuiz({
                 <span aria-hidden="true">←</span> Back
               </button>
               <h2 className="mt-1 text-card font-semibold text-text sm:text-xl">What&apos;s your monthly budget?</h2>
-              <div className="mt-4 flex flex-wrap gap-2">
+              <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {QUIZ_BUDGET_BANDS.map((b) => (
                   <button
                     key={b.key}
                     type="button"
                     onClick={() => chooseBudget(b.key)}
                     aria-pressed={budgetBand === b.key}
-                    className={chip(budgetBand === b.key)}
+                    className={chip(budgetBand === b.key, true)}
                   >
                     {b.label}
                   </button>
@@ -183,7 +183,7 @@ export default function GuidedQuiz({
                       type="button"
                       onClick={() => chooseCity(c.slug)}
                       aria-pressed={pendingCity === c.slug}
-                      className={chip(pendingCity === c.slug)}
+                      className={chip(pendingCity === c.slug, true)}
                     >
                       {c.name}
                     </button>

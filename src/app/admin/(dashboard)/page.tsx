@@ -73,7 +73,7 @@ export default function AdminDashboardPage() {
       <div className="mt-8 rounded-sm border border-mist bg-surface p-5">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-bold text-ink">Latest quote requests</h2>
-          <Link href="/admin/leads" className="text-xs font-medium text-harbor hover:underline">
+          <Link href="/admin/leads" className="text-[13px] font-medium text-harbor hover:underline">
             View all →
           </Link>
         </div>
@@ -90,7 +90,7 @@ export default function AdminDashboardPage() {
                     {lead.name}
                     {lead.businessName && <span className="font-normal text-ink-soft"> · {lead.businessName}</span>}
                   </p>
-                  <p className="text-xs text-ink-soft">
+                  <p className="text-[13px] text-ink-soft">
                     {lead.serviceSlug} · {lead.citySlug} · {formatDateTime(lead.createdAt)}
                   </p>
                 </div>

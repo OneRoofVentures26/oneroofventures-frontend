@@ -69,7 +69,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   );
 
   return (
-    <div className="min-h-screen bg-paper">
+    <div className="admin-shell min-h-screen bg-paper">
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-surface px-4 sm:px-6">
         <div className="flex items-center gap-3">
           <button

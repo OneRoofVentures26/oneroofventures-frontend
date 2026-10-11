@@ -35,11 +35,11 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-paper px-4">
+    <div className="admin-shell flex min-h-screen items-center justify-center bg-paper px-4">
       <div className="w-full max-w-sm">
         <div className="mb-6 flex flex-col items-center gap-2">
           <Logo size={36} />
-          <span className="text-xs font-medium text-ink-soft">Admin</span>
+          <span className="text-[13px] font-medium text-ink-soft">Admin</span>
         </div>
 
         <form onSubmit={handleSubmit} className="rounded-sm border border-mist bg-surface p-6">
@@ -87,7 +87,7 @@ export default function AdminLoginPage() {
             {submitting ? "Signing in…" : "Sign in"}
           </button>
           {submitting && (
-            <p className="mt-2 text-center text-xs text-ink-soft">
+            <p className="mt-2 text-center text-[13px] text-ink-soft">
               The server may take up to a minute to wake up.
             </p>
           )}

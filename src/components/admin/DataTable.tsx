@@ -122,7 +122,7 @@ export default function DataTable<T>({
                   key={col.key}
                   onClick={() => toggleSort(col)}
                   className={cn(
-                    "whitespace-nowrap p-3 text-left text-xs font-semibold text-ink-soft",
+                    "whitespace-nowrap p-3 text-left text-[13px] font-semibold text-ink-soft",
                     col.sortValue && "cursor-pointer select-none hover:text-ink",
                     col.className,
                   )}
@@ -131,7 +131,7 @@ export default function DataTable<T>({
                   {sortKey === col.key && (sortDir === "asc" ? " ↑" : " ↓")}
                 </th>
               ))}
-              {renderActions && <th className="p-3 text-right text-xs font-semibold text-ink-soft">Actions</th>}
+              {renderActions && <th className="p-3 text-right text-[13px] font-semibold text-ink-soft">Actions</th>}
             </tr>
           </thead>
           <tbody>
@@ -163,7 +163,7 @@ export default function DataTable<T>({
 
       {totalPages > 1 && (
         <div className="mt-4 flex items-center justify-between">
-          <p className="text-xs text-ink-soft">
+          <p className="text-[13px] text-ink-soft">
             Page {currentPage} of {totalPages} · {sorted.length} total
           </p>
           <div className="flex items-center gap-2">
@@ -171,7 +171,7 @@ export default function DataTable<T>({
               type="button"
               disabled={currentPage === 1}
               onClick={() => setPage((p) => p - 1)}
-              className="rounded-sm border border-mist px-3 py-1.5 text-xs font-medium text-ink disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-sm border border-mist px-3 py-1.5 text-[13px] font-medium text-ink disabled:cursor-not-allowed disabled:opacity-40"
             >
               Previous
             </button>
@@ -179,7 +179,7 @@ export default function DataTable<T>({
               type="button"
               disabled={currentPage === totalPages}
               onClick={() => setPage((p) => p + 1)}
-              className="rounded-sm border border-mist px-3 py-1.5 text-xs font-medium text-ink disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-sm border border-mist px-3 py-1.5 text-[13px] font-medium text-ink disabled:cursor-not-allowed disabled:opacity-40"
             >
               Next
             </button>

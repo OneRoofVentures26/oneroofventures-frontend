@@ -22,7 +22,7 @@ const CONFIDENCE_STYLES: Record<string, string> = {
   LOW: "bg-danger/10 text-danger",
 };
 
-const cellInput = "w-full rounded-sm border border-mist bg-surface px-2 py-1 text-xs outline-none focus:border-harbor";
+const cellInput = "w-full rounded-sm border border-mist bg-surface px-2 py-1 text-[13px] outline-none focus:border-harbor";
 
 function toRows(suggestions: SuggestedPackage[]): Row[] {
   return suggestions.map((s) => ({
@@ -122,11 +122,11 @@ export default function PackageSuggestionsPanel({
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <h3 className="text-sm font-bold text-ink">Suggested packages</h3>
-          <p className="text-xs text-ink-soft">
+          <p className="text-[13px] text-ink-soft">
             Built from the researched price text. Nothing is saved until you click save. Review prices before saving.
           </p>
         </div>
-        <button type="button" onClick={onClose} className="text-xs font-medium text-ink-soft hover:text-ink">
+        <button type="button" onClick={onClose} className="text-[13px] font-medium text-ink-soft hover:text-ink">
           Close
         </button>
       </div>
@@ -138,7 +138,7 @@ export default function PackageSuggestionsPanel({
       ) : (
         <>
           {suggestions.data.rawPrices ? (
-            <pre className="max-h-32 overflow-auto whitespace-pre-wrap rounded-sm bg-muted p-3 text-xs text-ink-soft">
+            <pre className="max-h-32 overflow-auto whitespace-pre-wrap rounded-sm bg-muted p-3 text-[13px] text-ink-soft">
               {suggestions.data.rawPrices}
             </pre>
           ) : (
@@ -148,7 +148,7 @@ export default function PackageSuggestionsPanel({
           )}
 
           {suggestions.data.existingPackages.length > 0 && (
-            <p className="text-xs text-ink-soft">
+            <p className="text-[13px] text-ink-soft">
               <span className="font-semibold">Already saved:</span>{" "}
               {suggestions.data.existingPackages
                 .map((p) => `${services.find((s) => s.code === p.serviceCode)?.name ?? p.serviceCode} ${TIER_LABELS[p.tier]}`)
@@ -179,13 +179,13 @@ export default function PackageSuggestionsPanel({
                     />
                     <span
                       className={cn(
-                        "rounded-sm px-2 py-0.5 text-[10px] font-semibold",
+                        "rounded-sm px-2 py-0.5 text-[13px] font-semibold",
                         CONFIDENCE_STYLES[r.confidence] ?? "bg-muted text-ink-soft",
                       )}
                     >
                       {sentenceCase(r.confidence)} confidence
                     </span>
-                    {r.alreadyExists && <span className="text-xs font-medium text-ink-soft">Already exists</span>}
+                    {r.alreadyExists && <span className="text-[13px] font-medium text-ink-soft">Already exists</span>}
                   </div>
                   <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-6">
                     <select
@@ -261,7 +261,7 @@ export default function PackageSuggestionsPanel({
                     />
                   </div>
                   {(r.evidence || (r.notes && r.notes.length > 0)) && (
-                    <div className="mt-2 space-y-1 text-xs text-ink-soft">
+                    <div className="mt-2 space-y-1 text-[13px] text-ink-soft">
                       {r.evidence && (
                         <p>
                           <span className="font-semibold">Evidence:</span> “{r.evidence}”
@@ -278,7 +278,7 @@ export default function PackageSuggestionsPanel({
           )}
 
           {suggestions.data.ignored.length > 0 && (
-            <details className="text-xs text-ink-soft">
+            <details className="text-[13px] text-ink-soft">
               <summary className="cursor-pointer font-medium">
                 {suggestions.data.ignored.length} amount{suggestions.data.ignored.length === 1 ? "" : "s"} ignored
               </summary>

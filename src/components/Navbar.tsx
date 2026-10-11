@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import CitySwitcher from "@/components/CitySwitcher";
+import { Container } from "@/components/Container";
 import CompareNavBadge from "@/components/CompareNavBadge";
 import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -64,7 +65,7 @@ export default function Navbar({ cities }: { cities: CityItem[] }) {
         scrolled ? "border-border" : "border-transparent",
       )}
     >
-      <div className="container-page flex h-16 items-center justify-between gap-3">
+      <Container className="flex h-16 items-center justify-between gap-3">
         <Link
           href="/"
           className="flex min-h-11 min-w-0 items-center rounded-lg max-[399px]:[&_.logo-sub]:hidden"
@@ -108,7 +109,7 @@ export default function Navbar({ cities }: { cities: CityItem[] }) {
             </svg>
           </button>
         </div>
-      </div>
+      </Container>
 
       <AnimatePresence>
         {menuOpen && (

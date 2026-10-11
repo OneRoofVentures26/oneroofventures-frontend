@@ -93,7 +93,7 @@ export default function HeroPreview({ className }: { className?: string }) {
       <div aria-hidden="true">
         <div className="flex items-center justify-between gap-3">
           <p className="font-display text-sm font-semibold text-text">Your top 3 in Bangalore</p>
-          <span className="text-xs text-text-muted">Example</span>
+          <span className="text-[13px] text-text-muted">Example</span>
         </div>
 
         <div className="mt-3 flex flex-wrap gap-1.5">
@@ -103,7 +103,7 @@ export default function HeroPreview({ className }: { className?: string }) {
               <span
                 key={s.key}
                 className={cn(
-                  "relative inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium transition-colors duration-200",
+                  "relative inline-flex h-8 items-center rounded-full border px-3 text-[13px] font-medium transition-colors duration-200",
                   selected ? "border-primary text-primary-fg" : "border-border text-text-muted",
                 )}
               >
@@ -133,7 +133,7 @@ export default function HeroPreview({ className }: { className?: string }) {
             >
               <span
                 className={cn(
-                  "num flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md text-xs font-bold",
+                  "num flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md text-[13px] font-bold",
                   i === 0 ? "bg-primary text-primary-fg" : "bg-surface-raised text-text-muted ring-1 ring-inset ring-border",
                 )}
               >
@@ -143,11 +143,11 @@ export default function HeroPreview({ className }: { className?: string }) {
                 {agency.initials}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="flex items-center gap-1.5">
-                  <span className="truncate text-sm font-semibold text-text">{agency.name}</span>
-                  {agency.verified && <span className={cn(successBadge, "px-1.5 text-[11px] max-sm:hidden")}>Verified</span>}
+                <span className="flex flex-wrap items-center gap-x-1.5">
+                  <span className="text-sm font-semibold leading-snug text-text">{agency.name}</span>
+                  {agency.verified && <span className={cn(successBadge, "px-1.5 max-sm:hidden")}>Verified</span>}
                 </span>
-                <span className="mt-0.5 block truncate text-xs text-text-muted">
+                <span className="mt-0.5 block text-[13px] text-text-muted">
                   {agency.area} · from{" "}
                   <span className="num font-semibold text-text">{formatINR(agency.price[active])}</span>/mo
                 </span>

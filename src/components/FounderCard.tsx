@@ -18,7 +18,7 @@ export default function FounderCard({ founder }: { founder: Founder }) {
       <p className="mt-3 text-sm text-ink-soft">{founder.bio}</p>
       <a
         href={founder.linkedinUrl ?? "#"}
-        className="mt-2 inline-flex min-h-11 items-center text-xs font-medium text-ink-soft underline-offset-2 hover:text-harbor hover:underline"
+        className="mt-2 inline-flex min-h-11 items-center text-[13px] font-medium text-ink-soft underline-offset-2 hover:text-harbor hover:underline"
       >
         Add LinkedIn / social link
       </a>

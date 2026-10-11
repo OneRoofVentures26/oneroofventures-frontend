@@ -43,7 +43,7 @@ export default function BulletListEditor({
       <button
         type="button"
         onClick={addItem}
-        className="text-xs font-medium text-harbor hover:underline"
+        className="text-[13px] font-medium text-harbor hover:underline"
       >
         + Add line
       </button>

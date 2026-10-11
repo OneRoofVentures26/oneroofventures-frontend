@@ -31,10 +31,15 @@ export const ctaButton = cn(primaryButton, "gradient-ring");
 export const textLink =
   "font-semibold text-primary-text underline-offset-4 transition-colors duration-200 hover:underline";
 
-/** Selectable filter / answer chip. Selected chips fill with iris and grow slightly. */
-export function chip(selected = false) {
+/**
+ * Selectable filter / answer chip. Selected chips fill with iris and grow
+ * slightly. `block` makes an equal-width grid cell (quiz answers) that can wrap
+ * to two lines instead of a pill sized to its text.
+ */
+export function chip(selected = false, block = false) {
   return cn(
-    "inline-flex min-h-11 items-center justify-center rounded-full border px-4 text-sm font-medium transition-[color,background-color,border-color,transform] duration-200 ease-brand active:scale-[0.98] lg:min-h-10",
+    "inline-flex min-h-11 items-center justify-center border text-sm font-medium transition-[color,background-color,border-color,transform] duration-200 ease-brand active:scale-[0.98]",
+    block ? "w-full rounded-xl px-3 py-2 text-center leading-snug" : "rounded-full px-4 lg:min-h-10",
     selected
       ? "scale-[1.03] border-primary bg-primary text-primary-fg"
       : "border-border bg-surface text-text hover:border-primary/50 hover:text-primary-text",
@@ -43,10 +48,10 @@ export function chip(selected = false) {
 
 /** Static, non-interactive label (e.g. an agency's services). */
 export const tag =
-  "inline-flex items-center rounded-full border border-border bg-surface-raised px-2.5 py-0.5 text-xs font-medium text-text-muted";
+  "inline-flex items-center rounded-full border border-border bg-surface-raised px-2.5 py-0.5 text-[13px] font-medium text-text-muted";
 
 /** Small status badge, 8px radius. */
-export const badge = "inline-flex flex-shrink-0 items-center gap-1 rounded-lg px-2 py-0.5 text-xs font-semibold";
+export const badge = "inline-flex flex-shrink-0 items-center gap-1 rounded-lg px-2 py-0.5 text-[13px] font-semibold";
 
 /** Mint — Verified and positive states. */
 export const successBadge = cn(badge, "bg-success/12 text-success-text ring-1 ring-inset ring-success/25");

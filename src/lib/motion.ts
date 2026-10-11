@@ -10,15 +10,11 @@ export const DURATION = {
   enter: 0.5,
 } as const;
 
-/** Fade-and-rise used the first time a section scrolls into view. `custom` is a delay in seconds. */
-export const reveal = {
-  hidden: { opacity: 0, y: 16 },
-  visible: (delay: number = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: DURATION.enter, ease: EASE, delay },
-  }),
-};
+/**
+ * Scroll reveal: starts as soon as an element enters the viewport (8% above the
+ * bottom edge), rises 8px over 350ms. Used by <Reveal>.
+ */
+export const REVEAL_VIEWPORT = { once: true, amount: 0, margin: "0px 0px -8% 0px" } as const;
 
 /** Spring for things that slide in from an edge (compare bar, mobile menu). */
 export const SPRING = { type: "spring", stiffness: 380, damping: 34, mass: 0.9 } as const;

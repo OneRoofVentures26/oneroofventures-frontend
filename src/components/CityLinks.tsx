@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { CityItem, LocalityItem, ServiceItem } from "@/lib/api/types";
+import { Container } from "@/components/Container";
 import { chip } from "@/lib/styles";
 
 /** Internal links to the city + service and city + locality landing pages. */
@@ -17,11 +18,11 @@ export default function CityLinks({
   activeLocality?: string;
 }) {
   return (
-    <section className="border-t border-mist bg-surface">
-      <div className="mx-auto max-w-7xl space-y-8 px-4 py-10 sm:px-6 lg:px-8">
+    <section className="section-y border-t border-border bg-surface">
+      <Container className="space-y-8">
         {services.length > 0 && (
           <div>
-            <h2 className="text-lg text-ink">Agencies in {city.name} by service</h2>
+            <h2 className="text-lg font-semibold text-text">Agencies in {city.name} by service</h2>
             <div className="mt-3 flex flex-wrap gap-2">
               {services.map((s) => (
                 <Link
@@ -37,7 +38,7 @@ export default function CityLinks({
         )}
         {localities.length > 0 && (
           <div>
-            <h2 className="text-lg text-ink">Agencies in {city.name} by area</h2>
+            <h2 className="text-lg font-semibold text-text">Agencies in {city.name} by area</h2>
             <div className="mt-3 flex flex-wrap gap-2">
               {localities.map((l) => (
                 <Link
@@ -51,7 +52,7 @@ export default function CityLinks({
             </div>
           </div>
         )}
-      </div>
+      </Container>
     </section>
   );
 }

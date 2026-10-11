@@ -17,8 +17,8 @@ export const primaryButton =
 export const secondaryButton =
   "rounded-sm border border-harbor px-4 py-2 text-sm font-medium text-harbor transition hover:bg-harbor-light disabled:cursor-not-allowed disabled:opacity-50";
 
-export const linkButton = "text-xs font-medium text-harbor hover:underline disabled:opacity-50";
-export const dangerLinkButton = "text-xs font-medium text-danger hover:underline disabled:opacity-50";
+export const linkButton = "text-[13px] font-medium text-harbor hover:underline disabled:opacity-50";
+export const dangerLinkButton = "text-[13px] font-medium text-danger hover:underline disabled:opacity-50";
 
 export function Field({
   label,
@@ -42,9 +42,9 @@ export function Field({
       </label>
       {children}
       {error ? (
-        <p className="mt-1 text-xs text-danger">{error}</p>
+        <p className="mt-1 text-[13px] text-danger">{error}</p>
       ) : hint ? (
-        <p className="mt-1 text-xs text-ink-soft">{hint}</p>
+        <p className="mt-1 text-[13px] text-ink-soft">{hint}</p>
       ) : null}
     </div>
   );
@@ -68,7 +68,7 @@ export function ErrorBanner({ error, onRetry }: { error: unknown; onRetry?: () =
     <div className="flex flex-wrap items-center justify-between gap-2 rounded-sm bg-danger/10 px-3 py-2 text-sm text-danger">
       <span>{typeof error === "string" ? error : errorMessage(error)}</span>
       {onRetry && (
-        <button type="button" onClick={onRetry} className="font-medium underline">
+        <button type="button" onClick={onRetry} className="-my-2 inline-flex min-h-11 items-center px-1 font-medium underline">
           Retry
         </button>
       )}
@@ -98,7 +98,7 @@ export function StatusBadge({ status }: { status: AgencyStatus | LeadStatus }) {
   const style =
     (AGENCY_STATUS_STYLES as Record<string, string>)[status] ?? (LEAD_STATUS_STYLES as Record<string, string>)[status];
   return (
-    <span className={cn("inline-block rounded-sm px-2 py-0.5 text-[11px] font-semibold", style)}>
+    <span className={cn("inline-block rounded-sm px-2 py-0.5 text-[13px] font-semibold", style)}>
       {sentenceCase(status)}
     </span>
   );
@@ -118,7 +118,7 @@ export function Pager({
   const totalPages = Math.max(1, Math.ceil(total / size));
   return (
     <div className="mt-4 flex items-center justify-between">
-      <p className="text-xs text-ink-soft">
+      <p className="text-[13px] text-ink-soft">
         Page {Math.min(page + 1, totalPages)} of {totalPages} · {total} total
       </p>
       {totalPages > 1 && (
@@ -127,7 +127,7 @@ export function Pager({
             type="button"
             disabled={page === 0}
             onClick={() => onPageChange(page - 1)}
-            className="rounded-sm border border-harbor px-3 py-1.5 text-xs font-medium text-harbor hover:bg-harbor-light disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-sm border border-harbor px-3 py-1.5 text-[13px] font-medium text-harbor hover:bg-harbor-light disabled:cursor-not-allowed disabled:opacity-40"
           >
             Previous
           </button>
@@ -135,7 +135,7 @@ export function Pager({
             type="button"
             disabled={page + 1 >= totalPages}
             onClick={() => onPageChange(page + 1)}
-            className="rounded-sm border border-harbor px-3 py-1.5 text-xs font-medium text-harbor hover:bg-harbor-light disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-sm border border-harbor px-3 py-1.5 text-[13px] font-medium text-harbor hover:bg-harbor-light disabled:cursor-not-allowed disabled:opacity-40"
           >
             Next
           </button>

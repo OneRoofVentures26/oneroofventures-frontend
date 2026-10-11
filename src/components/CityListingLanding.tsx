@@ -4,6 +4,8 @@ import type { GridFilters } from "@/lib/grid";
 import AgencyGridView from "@/components/AgencyGridView";
 import CityLinks from "@/components/CityLinks";
 import CompareBar from "@/components/CompareBar";
+import StickyActionBar from "@/components/StickyActionBar";
+import { ctaButton, secondaryButton, sectionTitle } from "@/lib/styles";
 
 /** Server-rendered city + service / city + locality landing page (SEO entry points). */
 export default function CityListingLanding({
@@ -34,11 +36,11 @@ export default function CityListingLanding({
         initialData={initialData}
         header={
           <div>
-            <Link href={`/${city.slug}`} className="inline-flex min-h-11 items-center text-sm font-medium text-ink-soft hover:text-harbor">
+            <Link href={`/${city.slug}`} className="inline-flex min-h-11 items-center text-sm font-medium text-text-muted hover:text-primary-text">
               ← All agencies in {city.name}
             </Link>
-            <h1 className="mt-1 text-[28px] leading-tight text-ink sm:text-[32px]">{title}</h1>
-            <p className="mt-1 max-w-3xl text-sm text-ink-soft">{intro}</p>
+            <h1 className={sectionTitle}>{title}</h1>
+            <p className="mt-2 max-w-3xl text-base text-text-muted">{intro}</p>
           </div>
         }
       />
@@ -50,6 +52,17 @@ export default function CityListingLanding({
         activeLocality={filters.locality}
       />
       <CompareBar />
+      <StickyActionBar>
+        <Link href={`/${city.slug}`} className={secondaryButton}>
+          Find my top 3
+        </Link>
+        <Link
+          href={`/quote?city=${city.slug}${filters.service ? `&service=${filters.service}` : ""}`}
+          className={ctaButton}
+        >
+          Request a quote
+        </Link>
+      </StickyActionBar>
     </>
   );
 }

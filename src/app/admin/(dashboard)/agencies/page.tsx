@@ -103,7 +103,7 @@ function AgenciesList() {
           <Link href={`/admin/agencies/${a.id}/edit`} className="font-medium text-ink hover:text-harbor">
             {a.name}
           </Link>
-          <p className="text-xs text-ink-soft">
+          <p className="text-[13px] text-ink-soft">
             {cityName(a.citySlug)}
             {a.localitySlug ? ` · ${a.localitySlug}` : ""}
           </p>
@@ -116,11 +116,11 @@ function AgenciesList() {
       render: (a) => (
         <div className="flex flex-col items-start gap-1">
           <StatusBadge status={a.status} />
-          {a.verified && <span className="text-[11px] font-medium text-harbor-dark">✓ Verified</span>}
+          {a.verified && <span className="text-[13px] font-medium text-harbor-dark">✓ Verified</span>}
         </div>
       ),
     },
-    { key: "pricing", header: "Pricing", render: (a) => <span className="text-xs">{PRICING_TYPE_LABELS[a.pricingType]}</span> },
+    { key: "pricing", header: "Pricing", render: (a) => <span className="text-[13px]">{PRICING_TYPE_LABELS[a.pricingType]}</span> },
     {
       key: "packages",
       header: "Packages",
@@ -128,20 +128,20 @@ function AgenciesList() {
         a.packageCount > 0 ? (
           a.packageCount
         ) : (
-          <span className="text-xs font-medium text-danger">None</span>
+          <span className="text-[13px] font-medium text-danger">None</span>
         ),
     },
-    { key: "fit", header: "Fit", render: (a) => <span className="text-xs text-ink-soft">{a.fitForUs ?? "—"}</span> },
+    { key: "fit", header: "Fit", render: (a) => <span className="text-[13px] text-ink-soft">{a.fitForUs ?? "—"}</span> },
     {
       key: "checked",
       header: "Last checked",
       render: (a) => (
-        <span className={a.lastCheckedOn ? "text-xs" : "text-xs text-danger"}>
+        <span className={a.lastCheckedOn ? "text-[13px]" : "text-[13px] text-danger"}>
           {a.lastCheckedOn ? formatDate(a.lastCheckedOn) : "Never"}
         </span>
       ),
     },
-    { key: "updated", header: "Updated", render: (a) => <span className="text-xs">{formatDate(a.updatedAt)}</span> },
+    { key: "updated", header: "Updated", render: (a) => <span className="text-[13px]">{formatDate(a.updatedAt)}</span> },
   ];
 
   return (
@@ -230,7 +230,7 @@ function AgenciesList() {
               setFit("");
               router.replace(pathname);
             }}
-            className="text-xs font-medium text-harbor hover:underline"
+            className="text-[13px] font-medium text-harbor hover:underline"
           >
             Clear filters
           </button>

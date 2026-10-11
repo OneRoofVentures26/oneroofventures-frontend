@@ -105,7 +105,7 @@ export default function Turnstile({
     <div>
       <div ref={containerRef} className="min-h-[65px]" />
       {loadError && (
-        <p className="text-xs text-danger">
+        <p className="text-[13px] text-danger">
           The captcha couldn&apos;t load. Disable any content blockers for this site and refresh.
         </p>
       )}

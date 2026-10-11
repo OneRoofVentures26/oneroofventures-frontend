@@ -262,7 +262,7 @@ export default function AgencyForm({ initialData: a, cities, services, onSubmit,
                   onClick={() => toggleService(s.code)}
                   aria-pressed={serviceCodes.includes(s.code)}
                   className={cn(
-                    "rounded-sm px-3 py-1.5 text-xs font-medium transition",
+                    "rounded-sm px-3 py-1.5 text-[13px] font-medium transition",
                     serviceCodes.includes(s.code) ? "bg-harbor text-paper" : "bg-mist/60 text-ink hover:bg-mist",
                   )}
                 >
@@ -309,7 +309,7 @@ export default function AgencyForm({ initialData: a, cities, services, onSubmit,
               rows={4}
               value={rawPrices}
               onChange={(e) => setRawPrices(e.target.value)}
-              className={cn(input("rawPrices"), "font-mono text-xs")}
+              className={cn(input("rawPrices"), "font-mono text-[13px]")}
             />
           </Field>
         </div>
@@ -331,7 +331,7 @@ export default function AgencyForm({ initialData: a, cities, services, onSubmit,
               .filter(([, v]) => v)
               .map(([k, v]) => (
                 <div key={k} className={k === "Notes" ? "sm:col-span-2" : undefined}>
-                  <dt className="text-xs font-semibold text-ink-soft">{k}</dt>
+                  <dt className="text-[13px] font-semibold text-ink-soft">{k}</dt>
                   <dd className="mt-0.5 whitespace-pre-wrap text-ink">{v}</dd>
                 </div>
               ))}
@@ -340,7 +340,7 @@ export default function AgencyForm({ initialData: a, cities, services, onSubmit,
       )}
 
       {a && (
-        <p className="text-xs text-ink-soft">
+        <p className="text-[13px] text-ink-soft">
           Created {formatDateTime(a.createdAt)} · Updated {formatDateTime(a.updatedAt)}
         </p>
       )}

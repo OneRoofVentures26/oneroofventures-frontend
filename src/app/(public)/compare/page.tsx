@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getServices } from "@/lib/api/public";
 import CompareClient from "@/components/CompareClient";
+import { Container } from "@/components/Container";
 
 export const revalidate = 300;
 
@@ -14,10 +15,10 @@ export default async function ComparePage() {
   const services = await getServices().catch(() => []);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+    <Container className="pb-12 pt-6 md:pb-16 md:pt-10 lg:pb-20">
       <Suspense fallback={null}>
         <CompareClient services={services} />
       </Suspense>
-    </div>
+    </Container>
   );
 }

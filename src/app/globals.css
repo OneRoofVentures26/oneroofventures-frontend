@@ -149,8 +149,15 @@
     border-color: var(--border);
   }
 
+  /*
+   * Clip sideways overflow on the root too, not just <body>: on phones a single
+   * element wider than the screen otherwise widens the whole layout viewport
+   * and cuts off the right edge of every section. `clip` (not `hidden`) keeps
+   * the sticky header working.
+   */
   html {
     -webkit-text-size-adjust: 100%;
+    overflow-x: clip;
   }
 
   body {
@@ -172,6 +179,20 @@
     line-height: 1.2;
   }
 
+  /* Admin on phones and tablets: every control is a 44px tap target. */
+  @media (width < 64rem) {
+    .admin-shell :is(input:not([type="checkbox"], [type="radio"], [type="file"]), select, button) {
+      min-height: 44px;
+    }
+  }
+
+  /* Keep the footer clear of the mobile sticky action bar (<StickyActionBar>). */
+  @media (width < 64rem) {
+    body:has([data-action-bar]) {
+      padding-bottom: calc(68px + env(safe-area-inset-bottom));
+    }
+  }
+
   ::selection {
     background: color-mix(in oklab, var(--primary) 28%, transparent);
   }
@@ -182,19 +203,51 @@
   }
 }
 
-/* Content column: 1200px max, 16 / 24 / 32px side padding. */
+/*
+ * The one content column (used through <Container>): 1200px max, side padding
+ * 16px, 24px from 640px, 32px from 1024px. Nothing inside a section adds its
+ * own horizontal padding, so every section shares the same left/right edge.
+ */
 @utility container-page {
   width: 100%;
   max-width: 1200px;
   margin-inline: auto;
   padding-inline: 16px;
 
-  @media (width >= 48rem) {
+  @media (width >= 40rem) {
     padding-inline: 24px;
   }
   @media (width >= 64rem) {
     padding-inline: 32px;
   }
+}
+
+/* Section rhythm: 48 / 64 / 80px, applied once per section (see <Section>). */
+@utility section-y {
+  padding-block: 48px;
+
+  @media (width >= 48rem) {
+    padding-block: 64px;
+  }
+  @media (width >= 64rem) {
+    padding-block: 80px;
+  }
+}
+
+@utility section-b {
+  padding-bottom: 48px;
+
+  @media (width >= 48rem) {
+    padding-bottom: 64px;
+  }
+  @media (width >= 64rem) {
+    padding-bottom: 80px;
+  }
+}
+
+/* Room for the mobile sticky action bar, including the iPhone home indicator. */
+@utility pb-safe {
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
 }
 
 /* Prices, scores and stats. */
@@ -341,6 +394,25 @@
   .enter {
     animation: enter-rise 600ms var(--ease-brand) both;
     animation-delay: var(--enter-delay, 0ms);
+  }
+
+  /*
+   * Scroll reveal (<Reveal>). Server HTML has no data-reveal, so content is
+   * visible without JS; after hydration only elements still below the fold are
+   * hidden, then shown as soon as they enter the viewport.
+   */
+  [data-reveal="hidden"] {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+
+  [data-reveal="shown"] {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 350ms var(--ease-brand),
+      transform 350ms var(--ease-brand);
+    transition-delay: var(--reveal-delay, 0ms);
   }
 
   /* Theme toggle icon: replays whenever the icon is shown. */

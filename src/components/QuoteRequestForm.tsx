@@ -177,7 +177,7 @@ export default function QuoteRequestForm({
             </p>
             <ul className="mt-3 flex flex-wrap justify-center gap-2">
               {result.sentTo.map((a) => (
-                <li key={a.id} className="rounded-sm bg-mist/60 px-2 py-0.5 text-xs font-medium text-ink">
+                <li key={a.id} className="rounded-sm bg-mist/60 px-2 py-0.5 text-[13px] font-medium text-ink">
                   {a.name}
                 </li>
               ))}
@@ -188,7 +188,7 @@ export default function QuoteRequestForm({
             We&apos;ve received your request and will match you with agencies shortly.
           </p>
         )}
-        <p className="mt-4 text-xs text-ink-soft">Reference #{result.leadId}</p>
+        <p className="mt-4 text-[13px] text-ink-soft">Reference #{result.leadId}</p>
         <Link href={citySlug ? `/${citySlug}` : "/"} className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-harbor hover:underline">
           Keep browsing agencies →
         </Link>
@@ -197,7 +197,7 @@ export default function QuoteRequestForm({
   }
 
   const fieldError = (key: keyof Errors) =>
-    errors[key] ? <p className="mt-1 text-xs text-danger">{errors[key]}</p> : null;
+    errors[key] ? <p className="mt-1 text-[13px] text-danger">{errors[key]}</p> : null;
   const borderFor = (key: keyof Errors) => (errors[key] ? "border-danger" : "border-mist");
 
   return (
@@ -452,7 +452,7 @@ export default function QuoteRequestForm({
               : "Get matched quotes"}
         </button>
         {status === "sending" && (
-          <p className="mt-2 text-center text-xs text-ink-soft">This can take up to a minute if our server is waking up.</p>
+          <p className="mt-2 text-center text-[13px] text-ink-soft">This can take up to a minute if our server is waking up.</p>
         )}
       </div>
     </form>

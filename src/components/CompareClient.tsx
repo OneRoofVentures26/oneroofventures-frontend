@@ -8,7 +8,7 @@ import { ApiError, errorMessage } from "@/lib/api/http";
 import type { AgencyProfile, CompareAgency, CompareResponse, ServiceItem, Tier } from "@/lib/api/types";
 import { MAX_COMPARE, MIN_COMPARE, useCompare } from "@/lib/compare-context";
 import { cn } from "@/lib/utils";
-import { chip, ctaButton, primaryButton, secondaryButton } from "@/lib/styles";
+import { chip, ctaButton, primaryButton, secondaryButton, sectionTitle } from "@/lib/styles";
 import ComparisonTable from "@/components/ComparisonTable";
 
 interface Result {
@@ -92,11 +92,11 @@ export default function CompareClient({ services }: { services: ServiceItem[] })
 
   if (!validCount) {
     return (
-      <div className="border-y border-mist px-4 py-10 text-center">
-        <p className="text-sm font-medium text-ink">
+      <div className="rounded-2xl border border-dashed border-border px-4 py-10 text-center">
+        <p className="text-sm font-medium text-text">
           {ids.length === 0 ? "No agencies selected yet" : "Add at least one more agency"}
         </p>
-        <p className="mt-1 text-sm text-ink-soft">
+        <p className="mx-auto mt-1 max-w-[60ch] text-sm text-text-muted">
           Browse a city and tick &quot;Compare&quot; on {MIN_COMPARE}–{MAX_COMPARE} agencies from the same city to
           see their packages side by side.
         </p>
@@ -121,9 +121,9 @@ export default function CompareClient({ services }: { services: ServiceItem[] })
           ? (err.fields.agencyIds ?? "These agencies can't be compared together. Pick 2–4 agencies from the same city.")
           : errorMessage(err);
     return (
-      <div className="border-y border-danger/40 px-4 py-10 text-center">
-        <p className="text-sm font-medium text-ink">We couldn&apos;t load this comparison</p>
-        <p className="mt-1 text-sm text-ink-soft">{message}</p>
+      <div className="rounded-2xl border border-danger/40 px-4 py-10 text-center">
+        <p className="text-sm font-medium text-text">We couldn&apos;t load this comparison</p>
+        <p className="mt-1 text-sm text-text-muted">{message}</p>
         <div className="mt-4 flex justify-center gap-3">
           <button
             onClick={() => setAttempt((n) => n + 1)}
@@ -133,7 +133,7 @@ export default function CompareClient({ services }: { services: ServiceItem[] })
           </button>
           <button
             onClick={handleClear}
-            className={cn(secondaryButton, "border-mist text-ink hover:border-danger hover:bg-transparent hover:text-danger")}
+            className={cn(secondaryButton, "hover:border-danger hover:text-danger")}
           >
             Clear selection
           </button>
@@ -171,8 +171,8 @@ export default function CompareClient({ services }: { services: ServiceItem[] })
     <div>
       <div className="mb-6 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-[28px] leading-tight text-ink sm:text-[32px]">Comparing {data.agencies.length} agencies</h1>
-          <p className="mt-1 text-sm text-ink-soft">Packages side by side by Starter, Growth and Pro tier.</p>
+          <h1 className={sectionTitle}>Comparing {data.agencies.length} agencies</h1>
+          <p className="mt-2 text-base text-text-muted">Packages side by side by Starter, Growth and Pro tier.</p>
         </div>
         {quoteAll && (
           <Link
@@ -202,15 +202,15 @@ export default function CompareClient({ services }: { services: ServiceItem[] })
       )}
 
       {codes.length === 0 ? (
-        <div className="border-y border-mist px-4 py-10 text-center">
-          <p className="text-sm font-medium text-ink">None of these agencies have published packages yet</p>
-          <p className="mt-1 text-sm text-ink-soft">Request quotes to get their prices directly.</p>
+        <div className="rounded-2xl border border-dashed border-border px-4 py-10 text-center">
+          <p className="text-sm font-medium text-text">None of these agencies have published packages yet</p>
+          <p className="mt-1 text-sm text-text-muted">Request quotes to get their prices directly.</p>
         </div>
       ) : (
         <div className="space-y-10">
           {shownCodes.map((code) => (
             <section key={code}>
-              <h2 className="mb-3 text-2xl text-ink">
+              <h2 className="mb-3 text-xl font-semibold text-text sm:text-2xl">
                 {serviceByCode.get(code)?.name ?? code}
               </h2>
               <ComparisonTable
@@ -231,8 +231,8 @@ export default function CompareClient({ services }: { services: ServiceItem[] })
 function CompareSkeleton() {
   return (
     <div className="animate-pulse space-y-4">
-      <div className="h-8 w-64 rounded-sm bg-mist/70" />
-      <div className="h-72 border-y border-mist" />
+      <div className="h-8 w-64 max-w-full rounded-lg bg-border" />
+      <div className="h-72 rounded-2xl border border-border bg-surface" />
     </div>
   );
 }

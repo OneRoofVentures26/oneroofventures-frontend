@@ -54,7 +54,7 @@ export default function AdminServicesPage() {
       render: (s) => (
         <div>
           <p className="font-medium text-ink">{s.name}</p>
-          <p className="text-xs text-ink-soft">
+          <p className="text-[13px] text-ink-soft">
             {s.code} · /{s.slug}
           </p>
         </div>
@@ -64,7 +64,7 @@ export default function AdminServicesPage() {
     {
       key: "keywords",
       header: "Keywords",
-      render: (s) => <span className="text-xs text-ink-soft">{s.keywords.join(", ") || "—"}</span>,
+      render: (s) => <span className="text-[13px] text-ink-soft">{s.keywords.join(", ") || "—"}</span>,
     },
   ];
 

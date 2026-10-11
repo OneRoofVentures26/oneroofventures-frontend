@@ -91,7 +91,7 @@ export default function FilterSidebar({
             </label>
           ))}
         </div>
-        <p className="mt-2 text-xs text-ink-soft">
+        <p className="mt-2 text-[13px] text-ink-soft">
           Shows agencies with at least one package in budget. Quote-only agencies are hidden.
         </p>
       </fieldset>
@@ -102,7 +102,7 @@ export default function FilterSidebar({
           <select
             value={locality}
             onChange={(e) => onLocalityChange(e.target.value)}
-            className="mt-3 h-11 w-full rounded-sm border border-mist bg-surface px-2.5 text-sm text-ink outline-none focus:border-harbor lg:h-9"
+            className="mt-3 h-11 w-full rounded-xl border border-border bg-surface px-3 text-sm text-text outline-none focus:border-primary lg:h-10"
           >
             <option value="">All localities</option>
             {localities.map((l) => (

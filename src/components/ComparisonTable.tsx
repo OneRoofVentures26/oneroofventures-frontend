@@ -22,7 +22,7 @@ export default function ComparisonTable({ agencies, grid, citySlug, quoteHref, o
       <table className="w-full min-w-[640px] border-collapse text-sm">
         <thead>
           <tr>
-            <th className="w-28 border-b border-mist p-4 pl-0 text-left text-xs font-medium text-ink-soft">
+            <th className="w-28 border-b border-mist p-4 pl-0 text-left text-[13px] font-medium text-ink-soft">
               Tier
             </th>
             {agencies.map((a) => (
@@ -38,14 +38,14 @@ export default function ComparisonTable({ agencies, grid, citySlug, quoteHref, o
                     )}
                     <div className="mt-1 flex flex-wrap items-center gap-1.5">
                       {a.verified && <VerifiedBadge />}
-                      <span className="text-xs font-normal text-ink-soft">{PRICING_TYPE_LABELS[a.pricingType]}</span>
+                      <span className="text-[13px] font-normal text-ink-soft">{PRICING_TYPE_LABELS[a.pricingType]}</span>
                     </div>
                   </div>
                   {onRemove && (
                     <button
                       onClick={() => onRemove(a.id)}
                       aria-label={`Remove ${a.name} from comparison`}
-                      className="flex h-11 w-11 items-center justify-center text-xs font-medium text-ink-soft hover:text-danger lg:h-8 lg:w-8"
+                      className="flex h-11 w-11 items-center justify-center text-[13px] font-medium text-ink-soft hover:text-danger lg:h-8 lg:w-8"
                     >
                       ✕
                     </button>
@@ -79,7 +79,7 @@ export default function ComparisonTable({ agencies, grid, citySlug, quoteHref, o
                       {formatPackagePrice(cell.priceMin, cell.priceMax, cell.billing)}
                     </p>
                     {cell.inclusions.length > 0 && (
-                      <ul className="mt-2 space-y-1 text-xs text-ink-soft">
+                      <ul className="mt-2 space-y-1 text-[13px] text-ink-soft">
                         {cell.inclusions.slice(0, MAX_INCLUSIONS).map((item, i) => (
                           <li key={`${i}-${item}`}>• {item}</li>
                         ))}

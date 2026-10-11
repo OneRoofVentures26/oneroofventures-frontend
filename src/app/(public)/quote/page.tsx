@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { getAgencyProfile, getCities, getLocalities, getServices } from "@/lib/api/public";
 import type { AgencyProfile } from "@/lib/api/types";
 import QuoteRequestForm from "@/components/QuoteRequestForm";
+import { Container } from "@/components/Container";
+import { sectionTitle } from "@/lib/styles";
 
 export const metadata: Metadata = {
   title: "Request a Quote | OneRoof Ventures",
@@ -9,6 +11,12 @@ export const metadata: Metadata = {
 };
 
 const MAX_AGENCIES = 5;
+
+const NEXT_STEPS = [
+  "Fill in the short form — about a minute.",
+  "We send your brief to the agencies you picked (or the best matches).",
+  "They reply to you directly with a quote.",
+];
 
 function param(value: string | string[] | undefined): string | null {
   return typeof value === "string" && value.trim() ? value.trim() : null;
@@ -40,15 +48,28 @@ export default async function QuotePage({ searchParams }: PageProps<"/quote">) {
   const serviceSlug = param(sp.service);
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
-      <h1 className="text-[28px] leading-tight text-ink sm:text-[32px]">
-        {agencies.length > 0 ? "Request a quote" : "Get matched with agencies"}
-      </h1>
-      <p className="mb-6 mt-1 text-sm text-ink-soft">
-        {agencies.length > 0
-          ? "One short form, sent to every agency you've picked. It's free, always."
-          : "Tell us what you need and we'll send your brief to up to 3 agencies that fit. It's free, always."}
-      </p>
+    <Container className="grid grid-cols-1 gap-6 pb-12 pt-6 md:pb-16 md:pt-10 lg:pb-20 lg:grid-cols-12 lg:gap-12">
+      <div className="lg:col-span-4">
+        <h1 className={sectionTitle}>
+          {agencies.length > 0 ? "Request a quote" : "Get matched with agencies"}
+        </h1>
+        <p className="mt-2 text-base text-text-muted">
+          {agencies.length > 0
+            ? "One short form, sent to every agency you've picked. It's free, always."
+            : "Tell us what you need and we'll send your brief to up to 3 agencies that fit. It's free, always."}
+        </p>
+        <ol className="mt-6 hidden space-y-3 text-sm text-text-muted lg:block">
+          {NEXT_STEPS.map((step, i) => (
+            <li key={step} className="flex gap-3">
+              <span className="num flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md border border-border bg-surface text-[13px] font-bold text-primary-text">
+                {i + 1}
+              </span>
+              {step}
+            </li>
+          ))}
+        </ol>
+      </div>
+      <div className="min-w-0 lg:col-span-8">
       <QuoteRequestForm
         cities={cities}
         services={services}
@@ -59,6 +80,7 @@ export default async function QuotePage({ searchParams }: PageProps<"/quote">) {
         initialServiceSlug={serviceSlug && services.some((s) => s.slug === serviceSlug) ? serviceSlug : ""}
         missingAgencies={agencySlugs.length - agencies.length}
       />
-    </div>
+      </div>
+    </Container>
   );
 }

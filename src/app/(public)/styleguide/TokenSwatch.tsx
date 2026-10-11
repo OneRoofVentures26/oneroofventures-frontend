@@ -23,7 +23,7 @@ export default function TokenSwatch({ token, role, className }: { token: string;
       <div className={`h-11 w-11 flex-shrink-0 rounded-xl border border-border ${className}`} />
       <div className="min-w-0">
         <p className="font-mono text-sm font-medium text-text">{token}</p>
-        <p className="truncate text-xs text-text-muted">
+        <p className="truncate text-[13px] text-text-muted">
           {role}
           {value && <span className="font-mono"> · {value}</span>}
         </p>
