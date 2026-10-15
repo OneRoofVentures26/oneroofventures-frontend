@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { TIERS, type Billing, type PackageRequest, type ServiceResponse, type SuggestedPackage, type Tier } from "@/lib/api/types";
-import { bulkCreatePackages, getPackageSuggestions } from "@/lib/api/admin";
+import { bulkCreatePackages, getPackageSuggestions, refreshPublic } from "@/lib/api/admin";
 import { ApiError, errorMessage } from "@/lib/api/http";
 import { useAsync } from "@/lib/use-async";
 import { cn, sentenceCase, TIER_LABELS } from "@/lib/utils";
@@ -96,6 +96,7 @@ export default function PackageSuggestionsPanel({
     setSaving(true);
     try {
       await bulkCreatePackages(agencyId, requests);
+      void refreshPublic({ agencyIds: [agencyId] });
       onSaved(requests.length);
     } catch (err) {
       if (err instanceof ApiError && Object.keys(err.fields).length > 0) {

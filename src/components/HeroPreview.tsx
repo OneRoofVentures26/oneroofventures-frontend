@@ -152,7 +152,7 @@ export default function HeroPreview({ className }: { className?: string }) {
                   <span className="num font-semibold text-text">{formatINR(agency.price[active])}</span>/mo
                 </span>
               </span>
-              <span className={cn(accentBadge, "num gap-1 px-2 py-1 text-sm")}>
+              <span className={cn(accentBadge, "num relative gap-1 overflow-hidden px-2 py-1 text-sm")}>
                 <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" fill="currentColor" aria-hidden="true">
                   <path d="M10 1.8l2.5 5.2 5.7.7-4.2 3.9 1.1 5.6L10 14.5l-5.1 2.7 1.1-5.6L1.8 7.7l5.7-.7L10 1.8z" />
                 </svg>

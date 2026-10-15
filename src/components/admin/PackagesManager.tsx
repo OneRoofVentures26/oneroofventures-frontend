@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { TIERS, type PackageResponse, type ServiceResponse } from "@/lib/api/types";
-import { createPackage, deletePackage, listPackages, updatePackage } from "@/lib/api/admin";
+import { createPackage, deletePackage, listPackages, refreshPublic, updatePackage } from "@/lib/api/admin";
 import { errorMessage } from "@/lib/api/http";
 import { useAsync } from "@/lib/use-async";
 import { formatPackagePrice, TIER_LABELS } from "@/lib/utils";
@@ -47,6 +47,7 @@ export default function PackagesManager({
     setPendingDelete(null);
     try {
       await deletePackage(agencyId, target.id);
+      void refreshPublic({ agencyIds: [agencyId] });
       toast.show(`“${target.name}” deleted`);
       refresh();
     } catch (err) {
@@ -108,6 +109,7 @@ export default function PackagesManager({
             onCancel={() => setEditing(null)}
             onSubmit={async (body) => {
               await createPackage(agencyId, body);
+              void refreshPublic({ agencyIds: [agencyId] });
               toast.show(`“${body.name}” added`);
               setEditing(null);
               refresh();
@@ -135,6 +137,7 @@ export default function PackagesManager({
                         onCancel={() => setEditing(null)}
                         onSubmit={async (body) => {
                           await updatePackage(agencyId, p.id, body);
+                          void refreshPublic({ agencyIds: [agencyId] });
                           toast.show(`“${body.name}” saved`);
                           setEditing(null);
                           refresh();

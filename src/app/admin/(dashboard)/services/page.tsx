@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { ServiceRequest, ServiceResponse } from "@/lib/api/types";
-import { createService, deleteService, listServices, updateService } from "@/lib/api/admin";
+import { createService, deleteService, listServices, refreshPublic, updateService } from "@/lib/api/admin";
 import { ApiError, errorMessage } from "@/lib/api/http";
 import { useAsync } from "@/lib/use-async";
 import { cn } from "@/lib/utils";
@@ -35,6 +35,7 @@ export default function AdminServicesPage() {
     setPendingDelete(null);
     try {
       await deleteService(target.id);
+      void refreshPublic({ tags: ["services"], allCities: true });
       toast.show(`“${target.name}” removed`);
       services.reload();
     } catch (err) {
@@ -83,10 +84,12 @@ export default function AdminServicesPage() {
           onSubmit={async (body) => {
             if (editing) {
               const updated = await updateService(editing.id, body);
+              void refreshPublic({ tags: ["services"], allCities: true });
               toast.show(`“${updated.name}” saved`);
               setEditing(null);
             } else {
               const created = await createService(body);
+              void refreshPublic({ tags: ["services"], allCities: true });
               toast.show(`“${created.name}” added`);
             }
             services.reload();

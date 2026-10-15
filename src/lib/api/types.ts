@@ -217,8 +217,28 @@ export interface AgencyResponse {
   researchSource: string | null;
   rawLocation: string | null;
   rawTeamSize: string | null;
+  /** Admin only. Always present; every field is null until a quality sheet has been imported. */
+  quality: AgencyQuality;
   createdAt: string;
   updatedAt: string;
+}
+
+/** Read-only: set only by the quality CSV import (POST /admin/import/agency-quality). */
+export interface AgencyQuality {
+  siteLive: boolean | null;
+  googleRating: number | null;
+  googleReviews: number | null;
+  clutchRating: number | null;
+  clutchReviews: number | null;
+  goodFirmsRating: number | null;
+  goodFirmsReviews: number | null;
+  caseStudies: number | null;
+  caseStudyUrl: string | null;
+  resultsShown: boolean | null;
+  foundedYear: number | null;
+  address: string | null;
+  excludeReason: string | null;
+  qualityNotes: string | null;
 }
 
 export interface AdminAgencyFilters {

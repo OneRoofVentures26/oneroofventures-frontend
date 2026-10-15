@@ -2,6 +2,7 @@
 
 import { getSession, logout } from "@/lib/admin-auth";
 import { ApiError, buildUrl, readJson, toApiError } from "@/lib/api/http";
+import { refreshPublicCache, type RefreshRequest } from "@/app/admin/actions";
 import type {
   AdminAgencyFilters,
   AdminLeadFilters,
@@ -71,6 +72,36 @@ async function request<T>(method: Method, path: string, { query, json, form }: R
 }
 
 // ---------------------------------------------------------------------------
+// Public cache refresh
+// ---------------------------------------------------------------------------
+
+/**
+ * Refreshes the public pages that show data changed by an admin write. Call only after the
+ * write succeeds. Never throws: a missed refresh only delays the public site.
+ */
+export function refreshPublic(req: RefreshRequest): Promise<void> {
+  const session = getSession();
+  if (!session) return Promise.resolve();
+  return refreshPublicCache(session.token, req).catch((err) => console.warn("Public cache refresh failed", err));
+}
+
+/** Tags for an agency write. Pass the stored agency before and after the change (or one of them for create/delete). */
+export function agencyTags(
+  before: Pick<AgencyResponse, "slug" | "citySlug" | "status"> | null,
+  after: Pick<AgencyResponse, "slug" | "citySlug" | "status"> | null,
+): string[] {
+  const tags = new Set<string>();
+  for (const a of [before, after]) {
+    if (!a) continue;
+    tags.add(`agency:${a.slug}`);
+    tags.add(`city:${a.citySlug}`);
+  }
+  // Added, deleted, moved city, or published/hidden: city list and homepage stats change too.
+  if (!before || !after || before.citySlug !== after.citySlug || before.status !== after.status) tags.add("cities");
+  return [...tags];
+}
+
+// ---------------------------------------------------------------------------
 // Agencies & packages
 // ---------------------------------------------------------------------------
 
@@ -128,6 +159,13 @@ export function importAgenciesCsv(file: File): Promise<ImportReport> {
   const form = new FormData();
   form.append("file", file);
   return request("POST", "/import/agencies", { form });
+}
+
+/** Updates quality data on existing agencies only; `created` is always 0. Excluded or not-live rows become HIDDEN. */
+export function importAgencyQualityCsv(file: File): Promise<ImportReport> {
+  const form = new FormData();
+  form.append("file", file);
+  return request("POST", "/import/agency-quality", { form });
 }
 
 // ---------------------------------------------------------------------------

@@ -13,5 +13,6 @@ export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.oneroo
   "",
 );
 
-// Public API responses are cached for 5 minutes by the backend; match it for ISR.
-export const PUBLIC_REVALIDATE_SECONDS = 300;
+// Backup lifetime for cached public API data. Admin edits refresh the affected cache tags
+// right away (see src/app/admin/actions.ts), so this only matters if a refresh is missed.
+export const PUBLIC_REVALIDATE_SECONDS = 86400;

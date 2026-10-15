@@ -19,69 +19,74 @@
 .light {
   color-scheme: light;
 
-  --bg: #f6f7fc;
-  --surface: #ffffff;
-  --surface-raised: #ffffff;
-  --border: #e3e6f2;
-  --text: #0f1222;
-  --text-muted: #5b6180;
+  /* Soft ivory rather than pure white: warm enough to feel softer, neutral
+     enough that the cool iris primary stays clean on it. */
+  --bg: #f8f6f1;
+  --surface: #fffefb;
+  --surface-raised: #f0ede6;
+  --band: #f1eee7;
+  --border: #e5e1d8;
+  --text: #1c1828;
+  --text-muted: #5f5b6e;
 
   --primary: #5b5bf0;
   --primary-hover: #4a48e0;
-  --primary-text: #4a48e0;
+  --primary-text: #4643d6;
   --primary-fg: #ffffff;
 
-  --accent: #ffb020;
-  --accent-text: #9a5800;
-  --success: #19c6a0;
-  --success-text: #0a7a60;
-  --danger: #d93a4a;
+  --accent: #f5a623;
+  --accent-text: #8f5200;
+  --success: #17b892;
+  --success-text: #0a7158;
+  --danger: #c9343f;
   --ring: #5b5bf0;
 
   --gradient: linear-gradient(135deg, #5b5bf0 0%, #8b5cf6 50%, #22d3ee 100%);
   /* Same hues, darker cyan end so gradient text holds 3:1 on light backgrounds. */
   --gradient-text: linear-gradient(135deg, #5b5bf0 0%, #8b5cf6 50%, #0891b2 100%);
 
-  --shadow-card: 0 1px 2px rgb(15 18 34 / 0.04), 0 4px 12px -2px rgb(15 18 34 / 0.06);
-  --shadow-card-hover: 0 2px 4px rgb(15 18 34 / 0.05), 0 16px 32px -8px rgb(15 18 34 / 0.12);
-  --shadow-raised: 0 1px 2px rgb(15 18 34 / 0.05), 0 12px 32px -8px rgb(15 18 34 / 0.14);
+  /* Warm-tinted shadows so cards sit on the cream instead of looking grey. */
+  --shadow-card: 0 1px 2px rgb(48 40 28 / 0.05), 0 4px 12px -2px rgb(48 40 28 / 0.07);
+  --shadow-card-hover: 0 2px 4px rgb(48 40 28 / 0.06), 0 16px 32px -8px rgb(48 40 28 / 0.14);
+  --shadow-raised: 0 1px 2px rgb(48 40 28 / 0.06), 0 12px 32px -8px rgb(48 40 28 / 0.16);
 
-  --glass: rgb(255 255 255 / 0.72);
-  --dot: rgb(15 18 34 / 0.12);
-  --aurora-opacity: 0.45;
+  --glass: rgb(250 248 243 / 0.8);
+  --dot: rgb(48 40 28 / 0.13);
+  --aurora-opacity: 0.28;
 }
 
 .dark {
   color-scheme: dark;
 
-  --bg: #0b0d17;
-  --surface: #121528;
-  --surface-raised: #191d36;
-  --border: rgb(255 255 255 / 0.08);
+  --bg: #0a0b14;
+  --surface: #12142a;
+  --surface-raised: #1a1d38;
+  --band: #0f1123;
+  --border: rgb(255 255 255 / 0.09);
   --text: #eef0fa;
-  --text-muted: #9aa1bd;
+  --text-muted: #a3a9c4;
 
-  --primary: #5b5bf0;
-  --primary-hover: #4a48e0;
-  --primary-text: #7c7cff;
+  --primary: #6363f2;
+  --primary-hover: #5252e6;
+  --primary-text: #8b8bff;
   --primary-fg: #ffffff;
 
   --accent: #ffb020;
-  --accent-text: #ffb020;
-  --success: #19c6a0;
-  --success-text: #19c6a0;
+  --accent-text: #ffbe45;
+  --success: #22d3a6;
+  --success-text: #3ddbb2;
   --danger: #ff6b7a;
-  --ring: #7c7cff;
+  --ring: #8b8bff;
 
   --gradient: linear-gradient(135deg, #5b5bf0 0%, #8b5cf6 50%, #22d3ee 100%);
-  --gradient-text: linear-gradient(135deg, #7c7cff 0%, #a78bfa 50%, #22d3ee 100%);
+  --gradient-text: linear-gradient(135deg, #8b8bff 0%, #b197fc 50%, #22d3ee 100%);
 
-  --shadow-card: inset 0 1px 0 rgb(255 255 255 / 0.06);
-  --shadow-card-hover: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 16px 40px -12px rgb(0 0 0 / 0.6);
-  --shadow-raised: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 16px 40px -12px rgb(0 0 0 / 0.55);
+  --shadow-card: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-card-hover: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 16px 40px -12px rgb(0 0 0 / 0.65);
+  --shadow-raised: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 16px 40px -12px rgb(0 0 0 / 0.6);
 
-  --glass: rgb(18 21 40 / 0.65);
-  --dot: rgb(255 255 255 / 0.1);
+  --glass: rgb(14 16 32 / 0.7);
+  --dot: rgb(255 255 255 / 0.09);
   --aurora-opacity: 0.5;
 }
 
@@ -89,6 +94,7 @@
   --color-bg: var(--bg);
   --color-surface: var(--surface);
   --color-surface-raised: var(--surface-raised);
+  --color-band: var(--band);
   --color-border: var(--border);
   --color-text: var(--text);
   --color-text-muted: var(--text-muted);

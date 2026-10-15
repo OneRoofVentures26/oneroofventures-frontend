@@ -73,6 +73,15 @@ function CheckIcon() {
   );
 }
 
+function PinIcon() {
+  return (
+    <svg viewBox="0 0 20 20" className="h-3.5 w-3.5 flex-shrink-0 text-text-muted" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M10 17.5s5.5-4.8 5.5-9.5a5.5 5.5 0 0 0-11 0c0 4.7 5.5 9.5 5.5 9.5z" />
+      <circle cx="10" cy="8" r="2" />
+    </svg>
+  );
+}
+
 type CityTile = { name: string; slug: string | null; agencyCount: number };
 
 /** Live cities first, then every planned city that isn't live yet. */
@@ -185,29 +194,42 @@ export default async function Home() {
         </div>
       </Section>
 
-      {/* How it works */}
-      <Section
-        id="how-it-works"
-        className="scroll-mt-20 border-y border-border bg-surface"
-        containerClassName="grid grid-cols-1 gap-6 md:gap-10 lg:grid-cols-12 lg:gap-12"
-      >
-        <Reveal className="lg:col-span-4">
-          <h2 className={sectionTitle}>How it works</h2>
-          <p className="mt-3 max-w-[40ch] text-base text-text-muted">
-            From &quot;who do I even call?&quot; to quotes in your inbox, in about a minute.
-          </p>
+      {/* How it works: header row across the full width, then three step cards. */}
+      <Section id="how-it-works" className="scroll-mt-20 border-y border-border bg-band">
+        <Reveal className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className={eyebrow}>How it works</p>
+            <h2 className={cn(sectionTitle, "mt-2")}>From &quot;who do I call?&quot; to quotes in a minute.</h2>
+            <p className="mt-3 max-w-[56ch] text-base text-text-muted">
+              Three steps, no sign-up. Your shortlist and one quote request — that&apos;s it.
+            </p>
+          </div>
+          <Link href="#quiz" className={cn(secondaryButton, "hidden flex-shrink-0 sm:inline-flex")}>
+            Start now <ArrowRight />
+          </Link>
         </Reveal>
-        <div className="lg:col-span-8">
+        <div className="mt-8 lg:mt-10">
           <HowItWorks steps={STEPS} />
         </div>
       </Section>
 
       {/* Browse by city */}
       <Section>
-        <Reveal>
-          <h2 className={sectionTitle}>Browse by city</h2>
-          <p className="mt-3 max-w-[60ch] text-base text-text-muted">
-            Agency prices are researched and refreshed city by city. More cities are on the way.
+        <Reveal className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className={sectionTitle}>Browse by city</h2>
+            <p className="mt-3 max-w-[60ch] text-base text-text-muted">
+              Agency prices are researched and refreshed city by city. More cities are on the way.
+            </p>
+          </div>
+          <p className="flex flex-shrink-0 items-center gap-3 text-sm text-text-muted">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-success/30 bg-success/10 px-3 py-1 font-medium text-success-text">
+              <span className="h-1.5 w-1.5 rounded-full bg-success" aria-hidden="true" />
+              <span className="num">{live.length}</span> live
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1 font-medium">
+              <span className="num">{planned.length}</span> coming soon
+            </span>
           </p>
         </Reveal>
         <ul className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 lg:mt-8 lg:grid-cols-4 lg:gap-4">
@@ -215,19 +237,26 @@ export default async function Home() {
             <Reveal as="li" key={city.slug} className={cn("flex", i === 0 && "col-span-2")}>
               <Link
                 href={`/${city.slug}`}
-                className={cn(interactiveCard, "group flex w-full items-center justify-between gap-3 border-primary/30 p-4 sm:px-5")}
+                className={cn(
+                  interactiveCard,
+                  "group relative isolate flex w-full items-center justify-between gap-3 overflow-hidden border-primary/30 p-4 sm:px-5 sm:py-5",
+                )}
               >
+                <span aria-hidden="true" className="aurora -right-16 -top-20 -z-10 h-48 w-64 opacity-25" />
                 <span className="min-w-0">
                   <span className="flex items-center gap-2 text-[13px] font-medium text-success-text">
-                    <span className="h-1.5 w-1.5 rounded-full bg-success" aria-hidden="true" />
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-60" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
+                    </span>
                     Live now
                   </span>
-                  <span className="mt-1 block font-display text-xl font-semibold text-text">{city.name}</span>
+                  <span className="mt-1 block font-display text-xl font-semibold text-text sm:text-2xl">{city.name}</span>
                   <span className="mt-0.5 block text-sm text-text-muted">
                     <span className="num font-semibold text-text">{city.agencyCount}</span> agencies with published prices
                   </span>
                 </span>
-                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary text-primary-fg transition-transform duration-200 group-hover:translate-x-0.5">
+                <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-primary text-primary-fg shadow-[0_8px_20px_-8px_rgb(91_91_240/0.7)] transition-transform duration-200 group-hover:translate-x-0.5">
                   <ArrowRight />
                 </span>
               </Link>
@@ -236,11 +265,14 @@ export default async function Home() {
           {planned.map((city, i) => {
             const body = (
               <>
-                <span className="block font-display text-base font-semibold text-text-muted">{city.name}</span>
-                <span className="mt-0.5 block text-[13px] text-text-muted">Coming soon</span>
+                <span className="flex items-center gap-1.5 font-display text-base font-semibold text-text/80">
+                  <PinIcon />
+                  {city.name}
+                </span>
+                <span className="mt-0.5 block pl-5 text-[13px] text-text-muted">Coming soon</span>
               </>
             );
-            const tile = "flex min-h-14 w-full flex-col justify-center rounded-2xl border border-dashed border-border bg-bg/40 px-4 py-2.5 sm:min-h-16 sm:py-3";
+            const tile = "flex min-h-14 w-full flex-col justify-center rounded-2xl border border-border bg-surface/60 px-4 py-2.5 sm:min-h-16 sm:py-3";
             return (
               <Reveal as="li" key={city.slug ?? city.name} delay={Math.min(i, 5) * 0.04} className="flex">
                 {city.slug ? (
@@ -256,11 +288,11 @@ export default async function Home() {
           <Reveal as="li" className="flex">
             <Link
               href="/quote"
-              className="group flex min-h-14 w-full flex-col justify-center rounded-2xl border border-primary/25 bg-primary/8 px-4 py-2.5 transition-colors hover:border-primary/50 sm:min-h-16 sm:py-3"
+              className="group flex min-h-14 w-full flex-col justify-center rounded-2xl border border-dashed border-primary/40 bg-primary/8 px-4 py-2.5 transition-colors hover:border-primary/60 hover:bg-primary/12 sm:min-h-16 sm:py-3"
             >
               <span className="block text-sm font-semibold text-primary-text">Your city not listed?</span>
               <span className="mt-0.5 inline-flex items-center gap-1 text-[13px] text-text-muted">
-                Get matched quotes <ArrowRight className="h-3.5 w-3.5" />
+                Get matched quotes <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
               </span>
             </Link>
           </Reveal>

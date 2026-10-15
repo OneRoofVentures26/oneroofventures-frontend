@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import type { AgencyRequest } from "@/lib/api/types";
-import { createAgency, listCities, listServices } from "@/lib/api/admin";
+import { agencyTags, createAgency, listCities, listServices, refreshPublic } from "@/lib/api/admin";
 import { useAsync } from "@/lib/use-async";
 import { useToast } from "@/components/admin/Toast";
 import AgencyForm from "@/components/admin/AgencyForm";
@@ -15,6 +15,7 @@ export default function NewAgencyPage() {
 
   async function handleSubmit(input: AgencyRequest) {
     const agency = await createAgency(input);
+    void refreshPublic({ tags: agencyTags(null, agency) });
     toast.show(`${agency.name} created — now add its packages`);
     router.push(`/admin/agencies/${agency.id}/edit`);
   }

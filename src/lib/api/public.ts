@@ -20,13 +20,15 @@ import type {
 interface GetOptions {
   query?: Parameters<typeof buildUrl>[1];
   signal?: AbortSignal;
+  /** Cache tags refreshed by admin edits (src/app/admin/actions.ts). Ignored in the browser. */
+  tags?: string[];
 }
 
-async function get<T>(path: string, { query, signal }: GetOptions = {}): Promise<T> {
+async function get<T>(path: string, { query, signal, tags }: GetOptions = {}): Promise<T> {
   const res = await fetch(buildUrl(path, query), {
     headers: { Accept: "application/json" },
     signal,
-    next: { revalidate: PUBLIC_REVALIDATE_SECONDS },
+    next: { revalidate: PUBLIC_REVALIDATE_SECONDS, tags },
   });
   if (!res.ok) throw await toApiError(res);
   return readJson<T>(res);
@@ -35,16 +37,16 @@ async function get<T>(path: string, { query, signal }: GetOptions = {}): Promise
 const enc = encodeURIComponent;
 
 export function getCities(): Promise<CityItem[]> {
-  return get("/api/v1/cities");
+  return get("/api/v1/cities", { tags: ["cities"] });
 }
 
 export function getServices(): Promise<ServiceItem[]> {
-  return get("/api/v1/services");
+  return get("/api/v1/services", { tags: ["services"] });
 }
 
 /** Localities in a city that have at least one published agency. 404 for unknown city. */
 export function getLocalities(citySlug: string): Promise<LocalityItem[]> {
-  return get(`/api/v1/cities/${enc(citySlug)}/localities`);
+  return get(`/api/v1/cities/${enc(citySlug)}/localities`, { tags: [`city:${citySlug}`] });
 }
 
 export function listAgencies(
@@ -54,6 +56,7 @@ export function listAgencies(
 ): Promise<Page<AgencyListItem>> {
   return get(`/api/v1/cities/${enc(citySlug)}/agencies`, {
     signal,
+    tags: [`city:${citySlug}`],
     query: {
       service: params.service,
       locality: params.locality,
@@ -68,7 +71,9 @@ export function listAgencies(
 }
 
 export function getAgencyProfile(citySlug: string, agencySlug: string): Promise<AgencyProfile> {
-  return get(`/api/v1/cities/${enc(citySlug)}/agencies/${enc(agencySlug)}`);
+  return get(`/api/v1/cities/${enc(citySlug)}/agencies/${enc(agencySlug)}`, {
+    tags: [`agency:${agencySlug}`, `city:${citySlug}`],
+  });
 }
 
 /** 2–4 published agencies from the same city. `service` accepts a code or slug. */
@@ -81,7 +86,7 @@ export function compareAgencies(
 }
 
 export function getSitemapEntries(): Promise<SitemapEntries> {
-  return get("/api/v1/sitemap-entries");
+  return get("/api/v1/sitemap-entries", { tags: ["cities"] });
 }
 
 /**

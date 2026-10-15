@@ -4,7 +4,7 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { AdminAgencyFilters, AgencyResponse, AgencyStatus, PricingType } from "@/lib/api/types";
-import { deleteAgency, listAgencies, listCities, patchAgency } from "@/lib/api/admin";
+import { agencyTags, deleteAgency, listAgencies, listCities, patchAgency, refreshPublic } from "@/lib/api/admin";
 import { errorMessage } from "@/lib/api/http";
 import { useAsync } from "@/lib/use-async";
 import { formatDate, PRICING_TYPE_LABELS } from "@/lib/utils";
@@ -68,6 +68,7 @@ function AgenciesList() {
     setBusyId(agency.id);
     try {
       const updated = await patchAgency(agency.id, patch);
+      void refreshPublic({ tags: agencyTags(agency, updated) });
       agencies.setData((prev) =>
         prev ? { ...prev, items: prev.items.map((a) => (a.id === updated.id ? updated : a)) } : prev!,
       );
@@ -85,6 +86,7 @@ function AgenciesList() {
     setPendingDelete(null);
     try {
       await deleteAgency(target.id);
+      void refreshPublic({ tags: agencyTags(target, null) });
       toast.show(`${target.name} deleted`);
       agencies.reload();
     } catch (err) {

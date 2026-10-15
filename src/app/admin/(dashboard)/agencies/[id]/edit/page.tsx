@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import type { AgencyRequest } from "@/lib/api/types";
-import { getAgency, listCities, listServices, patchAgency, updateAgency } from "@/lib/api/admin";
+import { agencyTags, getAgency, listCities, listServices, patchAgency, refreshPublic, updateAgency } from "@/lib/api/admin";
 import { ApiError, errorMessage } from "@/lib/api/http";
 import { useAsync } from "@/lib/use-async";
 import { formatDate } from "@/lib/utils";
@@ -29,6 +29,7 @@ export default function EditAgencyPage() {
     setMarking(true);
     try {
       const updated = await patchAgency(id, { lastCheckedOn: todayInIndia() });
+      void refreshPublic({ tags: agencyTags(agency.data ?? null, updated) });
       agency.setData(() => updated);
       toast.show("Marked as checked today");
     } catch (err) {
@@ -40,6 +41,7 @@ export default function EditAgencyPage() {
 
   async function handleSubmit(input: AgencyRequest) {
     const updated = await updateAgency(id, input);
+    void refreshPublic({ tags: agencyTags(agency.data ?? null, updated) });
     agency.setData(() => updated);
     toast.show(`${updated.name} saved`);
   }

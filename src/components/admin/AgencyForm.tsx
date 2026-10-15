@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type {
+  AgencyQuality,
   AgencyRequest,
   AgencyResponse,
   AgencyStatus,
@@ -339,6 +341,8 @@ export default function AgencyForm({ initialData: a, cities, services, onSubmit,
         </section>
       )}
 
+      {a && <QualitySection quality={a.quality} />}
+
       {a && (
         <p className="text-[13px] text-ink-soft">
           Created {formatDateTime(a.createdAt)} · Updated {formatDateTime(a.updatedAt)}
@@ -356,5 +360,70 @@ export default function AgencyForm({ initialData: a, cities, services, onSubmit,
         </button>
       </div>
     </form>
+  );
+}
+
+function yesNo(v: boolean | null): string | null {
+  return v === null ? null : v ? "Yes" : "No";
+}
+
+function rating(score: number | null, reviews: number | null): string | null {
+  if (score === null && reviews === null) return null;
+  const parts = [score !== null ? `${score.toFixed(1)} / 5` : null, reviews !== null ? `${reviews.toLocaleString("en-IN")} reviews` : null];
+  return parts.filter(Boolean).join(" · ");
+}
+
+/** Read-only: quality data can only be set by the quality CSV import. */
+function QualitySection({ quality: q }: { quality: AgencyQuality | null | undefined }) {
+  if (!q) return null;
+  const rows: Array<[string, ReactNode, boolean?]> = [
+    ["Site live", yesNo(q.siteLive)],
+    ["Founded", q.foundedYear],
+    ["Google", rating(q.googleRating, q.googleReviews)],
+    ["Clutch", rating(q.clutchRating, q.clutchReviews)],
+    ["GoodFirms", rating(q.goodFirmsRating, q.goodFirmsReviews)],
+    ["Results shown", yesNo(q.resultsShown)],
+    ["Case studies", q.caseStudies],
+    [
+      "Case study page",
+      q.caseStudyUrl && (
+        <a href={q.caseStudyUrl} target="_blank" rel="noopener noreferrer" className="break-all text-harbor hover:underline">
+          {q.caseStudyUrl}
+        </a>
+      ),
+    ],
+    ["Address", q.address, true],
+    ["Quality notes", q.qualityNotes, true],
+  ];
+  const filled = rows.filter(([, v]) => v !== null && v !== undefined && v !== "");
+
+  return (
+    <section className={sectionClass}>
+      <h2 className={sectionTitle}>Quality (from quality sheet)</h2>
+      <p className="mt-1 text-[13px] text-ink-soft">
+        Read-only. Update it by uploading the quality sheet on the{" "}
+        <Link href="/admin/import" className="font-medium text-harbor hover:underline">
+          Import
+        </Link>{" "}
+        page. Not shown on the public site yet.
+      </p>
+      {q.excludeReason && (
+        <p className="mt-4 rounded-sm bg-danger/10 px-3 py-2 text-sm text-danger">
+          Excluded: {q.excludeReason}
+        </p>
+      )}
+      {filled.length === 0 ? (
+        !q.excludeReason && <p className="mt-4 text-sm text-ink-soft">No quality sheet imported for this agency yet.</p>
+      ) : (
+        <dl className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+          {filled.map(([k, v, wide]) => (
+            <div key={k} className={wide ? "sm:col-span-2" : undefined}>
+              <dt className="text-[13px] font-semibold text-ink-soft">{k}</dt>
+              <dd className="mt-0.5 whitespace-pre-wrap text-ink">{v}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+    </section>
   );
 }
