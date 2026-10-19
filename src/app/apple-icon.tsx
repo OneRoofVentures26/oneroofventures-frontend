@@ -1,11 +1,17 @@
 import { ImageResponse } from "next/og";
-import { LOGO_NAVY, LogoGlyph } from "@/components/Logo";
+import { LOGO_NAVY } from "@/components/Logo";
+import { loadBrandFonts } from "@/lib/og-fonts";
+import { OgWordmark, WORDMARK_DISPLAY_TEXT, WORDMARK_SANS_TEXT, WORDMARK_WIDTH_EM } from "@/lib/og-wordmark";
 
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
-// iOS masks the corners itself, so this is a full-bleed square.
-export default function AppleIcon() {
+const CREAM = "#F4EADF";
+const INK = "#1F1F1F";
+
+// iOS masks the corners itself, so this is a full-bleed square with a little more margin.
+export default async function AppleIcon() {
+  const fonts = await loadBrandFonts(WORDMARK_DISPLAY_TEXT, WORDMARK_SANS_TEXT);
   return new ImageResponse(
     (
       <div
@@ -15,12 +21,12 @@ export default function AppleIcon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: LOGO_NAVY,
+          background: CREAM,
         }}
       >
-        <LogoGlyph size={150} />
+        <OgWordmark size={(180 * 0.82) / WORDMARK_WIDTH_EM} color={INK} subColor={LOGO_NAVY} align="center" />
       </div>
     ),
-    { ...size },
+    { ...size, fonts },
   );
 }

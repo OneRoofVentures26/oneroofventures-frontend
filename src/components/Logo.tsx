@@ -6,9 +6,9 @@ import { cn } from "@/lib/utils";
  * fonts (Sitka for OneRoof, Helvetica for VENTURES) and the theme tokens: ink
  * or cream for the name depending on the panel, brand orange for the roof.
  *
- * The square mark (favicon, app icon, mobile menu) is the same idea on a navy
- * tile: an orange roof over two cream o's. Geometry is on a 32×32 grid and
- * shared with the icon routes and the OG image.
+ * The square mark (mobile menu) is the same idea on a navy tile: an orange
+ * roof over two cream o's, on a 32×32 grid. The favicon, app icon and OG
+ * image draw the full wordmark instead (src/lib/og-wordmark.tsx).
  */
 
 export const LOGO_ORANGE = "#FE7522";
@@ -24,24 +24,6 @@ const WORD_ROOF_PATH = "M5 25 L50 5 L95 25";
 const MARK_ROOF_PATH = "M6.5 14 L16 7.5 L25.5 14";
 const MARK_O = { r: 3.7, cy: 20.5, cx: [11.6, 20.4], stroke: 2.5 } as const;
 const MARK_ROOF_STROKE = 2.6;
-
-/** Roof and o's only, for drawing on top of a navy tile (icon routes, OG image). */
-export function LogoGlyph({ size }: { size: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden="true">
-      <path
-        d={MARK_ROOF_PATH}
-        stroke={LOGO_ORANGE}
-        strokeWidth={MARK_ROOF_STROKE}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      {MARK_O.cx.map((cx) => (
-        <circle key={cx} cx={cx} cy={MARK_O.cy} r={MARK_O.r} stroke={LOGO_CREAM} strokeWidth={MARK_O.stroke} />
-      ))}
-    </svg>
-  );
-}
 
 export function LogoMark({ size = 32, className }: { size?: number; className?: string }) {
   return (

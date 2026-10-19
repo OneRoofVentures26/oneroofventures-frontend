@@ -1,10 +1,21 @@
 import { ImageResponse } from "next/og";
-import { LOGO_NAVY, LOGO_TILE_RADIUS, LogoGlyph } from "@/components/Logo";
+import { LOGO_NAVY } from "@/components/Logo";
+import { loadBrandFonts } from "@/lib/og-fonts";
+import { OgWordmark, WORDMARK_DISPLAY_TEXT, WORDMARK_SANS_TEXT, WORDMARK_WIDTH_EM } from "@/lib/og-wordmark";
 
-export const size = { width: 64, height: 64 };
+/*
+ * Favicon: the full ridge wordmark on cream, as on the site header. Rendered
+ * at 192px so it stays crisp on high-density screens; browsers scale it down.
+ * src/app/favicon.ico is generated from this image.
+ */
+export const size = { width: 192, height: 192 };
 export const contentType = "image/png";
 
-export default function Icon() {
+const CREAM = "#F4EADF";
+const INK = "#1F1F1F";
+
+export default async function Icon() {
+  const fonts = await loadBrandFonts(WORDMARK_DISPLAY_TEXT, WORDMARK_SANS_TEXT);
   return new ImageResponse(
     (
       <div
@@ -14,13 +25,13 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: LOGO_NAVY,
-          borderRadius: 64 * LOGO_TILE_RADIUS,
+          background: CREAM,
+          borderRadius: 192 * 0.2,
         }}
       >
-        <LogoGlyph size={64} />
+        <OgWordmark size={(192 * 0.9) / WORDMARK_WIDTH_EM} color={INK} subColor={LOGO_NAVY} align="center" />
       </div>
     ),
-    { ...size },
+    { ...size, fonts },
   );
 }
