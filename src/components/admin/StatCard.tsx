@@ -8,8 +8,9 @@ export default function StatCard({
   tone?: "default" | "warning";
 }) {
   return (
-    <div className="rounded-lg border border-border bg-surface p-4 sm:p-5">
-      <p className="text-sm font-medium text-text-muted">{label}</p>
+    // Value pinned to the bottom so values line up across a row even when a label wraps.
+    <div className="flex h-full flex-col justify-between rounded-lg border border-border bg-surface p-4 sm:p-5">
+      <p className="text-sm font-medium leading-snug text-text-muted">{label}</p>
       <p
         className={
           tone === "warning"

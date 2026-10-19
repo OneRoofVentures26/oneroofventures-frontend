@@ -144,13 +144,15 @@ export default async function Home() {
 
             <dl
               aria-label="OneRoof in numbers"
-              className="enter mt-6 grid max-w-md grid-cols-3 gap-4 sm:mt-10"
+              className="enter mt-6 grid max-w-md grid-cols-3 items-start gap-4 sm:mt-10"
               style={enterDelay(4)}
             >
               {stats.map((stat) => (
-                <div key={stat.label} className="flex flex-col-reverse">
-                  <dt className="mt-0.5 text-[13px] leading-snug text-text-muted">{stat.label}</dt>
-                  <dd className="num text-2xl font-bold leading-tight sm:text-[1.75rem]">
+                // Number on top, label below; both top-aligned so a label that wraps
+                // to two lines on a phone doesn't push its number out of line.
+                <div key={stat.label} className="flex min-w-0 flex-col justify-start">
+                  <dt className="mt-1 text-[13px] leading-snug text-text-muted">{stat.label}</dt>
+                  <dd className="num order-first text-2xl font-bold leading-tight sm:text-[1.75rem]">
                     <CountUp value={stat.value} className={stat.highlight ? "text-gradient" : "text-text"} />
                   </dd>
                 </div>
