@@ -1,129 +1,164 @@
 "use client";
 
 import { useState } from "react";
-import { chip, ctaButton } from "@/lib/styles";
-import { cn } from "@/lib/utils";
+import { useSearchParams } from "next/navigation";
+import { PACKAGE_CONTACT, PACKAGES, type PackageKey } from "@/lib/packages";
+import { chip, ctaButton, input, secondaryButton } from "@/lib/styles";
+import { cn, formatINR } from "@/lib/utils";
 
-const BUDGET_OPTIONS = [
-  "Under ₹50,000/mo",
-  "₹50,000 – ₹1.2L/mo",
-  "₹1.2L – ₹2.5L/mo",
-  "₹2.5L+/mo",
+/*
+ * Enquiry for our own packages. There is no backend endpoint for these, so
+ * the enquiry is handed to WhatsApp (pre-written message to our number), with
+ * email as the alternative. Nothing is pretended to be "sent" on our side.
+ */
+
+type Choice = PackageKey | "unsure";
+
+const CHOICES: Array<{ key: Choice; label: string }> = [
+  ...PACKAGES.map((p) => ({ key: p.key as Choice, label: `${p.name} · ${formatINR(p.monthly)}/mo` })),
+  { key: "unsure", label: "Not sure yet" },
 ];
 
-export default function ServiceInquiryForm({ services }: { services: string[] }) {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [company, setCompany] = useState("");
-  const [budget, setBudget] = useState(BUDGET_OPTIONS[0]);
-  const [message, setMessage] = useState("");
-  const [servicesNeeded, setServicesNeeded] = useState<string[]>([]);
-  const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
+function isChoice(value: string | null): value is Choice {
+  return value === "unsure" || PACKAGES.some((p) => p.key === value);
+}
 
-  function toggleService(s: string) {
-    setServicesNeeded((prev) =>
-      prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s],
-    );
-  }
+const labelClass = "text-sm font-medium text-text";
+
+export default function ServiceInquiryForm() {
+  const searchParams = useSearchParams();
+  const fromUrl = searchParams.get("package");
+  const [choice, setChoice] = useState<Choice | null>(null);
+  // A package button on the page (?package=growth) preselects it until the visitor picks one.
+  const selected: Choice = choice ?? (isChoice(fromUrl) ? fromUrl : "unsure");
+
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [business, setBusiness] = useState("");
+  const [message, setMessage] = useState("");
+  const [handedOff, setHandedOff] = useState(false);
+
+  const packageLabel = CHOICES.find((c) => c.key === selected)?.label ?? "Not sure yet";
+  const body = [
+    "Hi OneRoof Ventures, I'd like to talk about your marketing packages.",
+    "",
+    `Name: ${name.trim()}`,
+    `Phone: ${phone.trim()}`,
+    ...(business.trim() ? [`Business: ${business.trim()}`] : []),
+    `Package: ${packageLabel}`,
+    ...(message.trim() ? ["", message.trim()] : []),
+  ].join("\n");
+
+  const whatsappHref = `https://wa.me/${PACKAGE_CONTACT.whatsapp}?text=${encodeURIComponent(body)}`;
+  const mailHref = `mailto:${PACKAGE_CONTACT.email}?subject=${encodeURIComponent(
+    `Marketing package enquiry — ${business.trim() || name.trim() || "new lead"}`,
+  )}&body=${encodeURIComponent(body)}`;
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setStatus("sending");
-    setTimeout(() => setStatus("sent"), 700);
+    window.open(whatsappHref, "_blank", "noopener,noreferrer");
+    setHandedOff(true);
   }
 
-  if (status === "sent") {
+  if (handedOff) {
     return (
-      <div className="border-y-2 border-harbor bg-surface px-4 py-8 text-center">
-        <p className="font-serif text-2xl font-semibold text-harbor">Thanks, {name || "there"}!</p>
-        <p className="mt-2 text-sm text-ink-soft">
-          Our team will reach out within one business day to talk through the
-          right package for you.
+      <div className="rounded-2xl border border-border bg-surface px-5 py-8 text-center">
+        <p className="font-display text-2xl font-semibold text-text">Almost done, {name.trim() || "there"}</p>
+        <p className="mx-auto mt-2 max-w-[48ch] text-sm text-text-muted">
+          WhatsApp has opened with your message ready — press send there and we&apos;ll reply within one
+          business day. Didn&apos;t open, or prefer email?
         </p>
+        <div className="mt-5 flex flex-col justify-center gap-2 sm:flex-row">
+          <a href={whatsappHref} target="_blank" rel="noopener noreferrer" className={ctaButton}>
+            Open WhatsApp again
+          </a>
+          <a href={mailHref} className={secondaryButton}>
+            Send by email instead
+          </a>
+        </div>
+        <button
+          type="button"
+          onClick={() => setHandedOff(false)}
+          className="mt-3 inline-flex min-h-11 items-center text-sm font-medium text-text-muted hover:text-primary-text"
+        >
+          ← Edit details
+        </button>
       </div>
     );
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div>
-          <label className="text-sm font-medium text-ink">Your name</label>
-          <input
-            required
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="mt-1 min-h-11 w-full rounded-sm border border-mist bg-surface px-3 py-2 text-sm outline-none focus:border-harbor"
-          />
-        </div>
-        <div>
-          <label className="text-sm font-medium text-ink">Business name</label>
-          <input
-            value={company}
-            onChange={(e) => setCompany(e.target.value)}
-            className="mt-1 min-h-11 w-full rounded-sm border border-mist bg-surface px-3 py-2 text-sm outline-none focus:border-harbor"
-          />
-        </div>
-        <div>
-          <label className="text-sm font-medium text-ink">Email</label>
-          <input
-            required
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 min-h-11 w-full rounded-sm border border-mist bg-surface px-3 py-2 text-sm outline-none focus:border-harbor"
-          />
-        </div>
-        <div>
-          <label className="text-sm font-medium text-ink">Monthly budget</label>
-          <select
-            value={budget}
-            onChange={(e) => setBudget(e.target.value)}
-            className="mt-1 min-h-11 w-full rounded-sm border border-mist bg-surface px-3 py-2 text-sm outline-none focus:border-harbor"
-          >
-            {BUDGET_OPTIONS.map((b) => (
-              <option key={b} value={b}>
-                {b}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      <div>
-        <label className="text-sm font-medium text-ink">Services you need</label>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {services.map((s) => (
+      <fieldset>
+        <legend className={labelClass}>Which package are you interested in?</legend>
+        <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
+          {CHOICES.map((c) => (
             <button
+              key={c.key}
               type="button"
-              key={s}
-              onClick={() => toggleService(s)}
-              className={chip(servicesNeeded.includes(s))}
+              aria-pressed={selected === c.key}
+              onClick={() => setChoice(c.key)}
+              className={chip(selected === c.key, true)}
             >
-              {s}
+              {c.label}
             </button>
           ))}
         </div>
+      </fieldset>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <label className="grid gap-1.5">
+          <span className={labelClass}>Your name</span>
+          <input required value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className={input} />
+        </label>
+        <label className="grid gap-1.5">
+          <span className={labelClass}>Phone / WhatsApp</span>
+          <input
+            required
+            type="tel"
+            inputMode="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            autoComplete="tel"
+            pattern="[0-9+\s\-()]{8,}"
+            title="A phone number, e.g. +91 98765 43210"
+            className={input}
+          />
+        </label>
       </div>
 
-      <div>
-        <label className="text-sm font-medium text-ink">Tell us about your business</label>
+      <label className="grid gap-1.5">
+        <span className={labelClass}>
+          Business name <span className="font-normal text-text-muted">(optional)</span>
+        </span>
+        <input value={business} onChange={(e) => setBusiness(e.target.value)} autoComplete="organization" className={input} />
+      </label>
+
+      <label className="grid gap-1.5">
+        <span className={labelClass}>
+          What are you looking to achieve? <span className="font-normal text-text-muted">(optional)</span>
+        </span>
         <textarea
           rows={4}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="What are you trying to achieve this quarter?"
-          className="mt-1 min-h-11 w-full rounded-sm border border-mist bg-surface px-3 py-2 text-sm outline-none focus:border-harbor"
+          placeholder="e.g. more leads for our clinic in Lucknow, around ₹20k/month ad budget"
+          className={cn(input, "min-h-28 py-2.5")}
         />
-      </div>
+      </label>
 
-      <button
-        type="submit"
-        disabled={status === "sending"}
-        className={cn(ctaButton, "w-full")}
-      >
-        {status === "sending" ? "Sending…" : "Talk to our team"}
-      </button>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <button type="submit" className={ctaButton}>
+          Send on WhatsApp
+        </button>
+        <p className="text-[13px] text-text-muted">
+          Opens WhatsApp with your message ready to send. Prefer email?{" "}
+          <a href={mailHref} className="font-medium text-primary-text hover:underline">
+            Email us instead
+          </a>
+          .
+        </p>
+      </div>
     </form>
   );
 }

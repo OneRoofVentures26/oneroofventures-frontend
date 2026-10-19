@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { LOGO_GRADIENT_CSS, LOGO_TILE_RADIUS, LogoGlyph } from "@/components/Logo";
+import { LOGO_NAVY, LOGO_TILE_RADIUS, LogoGlyph } from "@/components/Logo";
 
 export const size = { width: 64, height: 64 };
 export const contentType = "image/png";
@@ -14,7 +14,7 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          backgroundImage: LOGO_GRADIENT_CSS,
+          background: LOGO_NAVY,
           borderRadius: 64 * LOGO_TILE_RADIUS,
         }}
       >

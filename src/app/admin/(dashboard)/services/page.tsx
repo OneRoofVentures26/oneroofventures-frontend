@@ -54,8 +54,8 @@ export default function AdminServicesPage() {
       header: "Service",
       render: (s) => (
         <div>
-          <p className="font-medium text-ink">{s.name}</p>
-          <p className="text-[13px] text-ink-soft">
+          <p className="font-medium text-text">{s.name}</p>
+          <p className="text-[13px] text-text-muted">
             {s.code} · /{s.slug}
           </p>
         </div>
@@ -65,7 +65,7 @@ export default function AdminServicesPage() {
     {
       key: "keywords",
       header: "Keywords",
-      render: (s) => <span className="text-[13px] text-ink-soft">{s.keywords.join(", ") || "—"}</span>,
+      render: (s) => <span className="text-[13px] text-text-muted">{s.keywords.join(", ") || "—"}</span>,
     },
   ];
 
@@ -100,7 +100,7 @@ export default function AdminServicesPage() {
       <div className="mt-6">
         <ErrorBanner error={services.error} onRetry={services.reload} />
         {!services.data ? (
-          !services.error && <p className="text-sm text-ink-soft">Loading…</p>
+          !services.error && <p className="text-sm text-text-muted">Loading…</p>
         ) : (
           <DataTable
             columns={columns}
@@ -192,8 +192,8 @@ function ServiceForm({
   const input = (key: string) => cn(inputClass, errors[key] && "border-danger");
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 rounded-sm border border-mist bg-surface p-5" noValidate>
-      <h2 className="text-sm font-bold text-ink">{initial ? `Edit ${initial.name}` : "Add a service"}</h2>
+    <form onSubmit={handleSubmit} className="space-y-3 rounded-lg border border-border bg-surface p-5" noValidate>
+      <h2 className="text-sm font-bold text-text">{initial ? `Edit ${initial.name}` : "Add a service"}</h2>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <Field label="Code *" error={errors.code} hint={initial ? "Can't be changed" : undefined}>
           <input

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
@@ -8,20 +9,28 @@ import CitySwitcher from "@/components/CitySwitcher";
 import { Container } from "@/components/Container";
 import CompareNavBadge from "@/components/CompareNavBadge";
 import Logo from "@/components/Logo";
-import ThemeToggle from "@/components/ThemeToggle";
 import type { CityItem } from "@/lib/api/types";
 import { DURATION, EASE, SPRING } from "@/lib/motion";
 import { ctaButton } from "@/lib/styles";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
+  { href: "/#cities", label: "Cities" },
   { href: "/#how-it-works", label: "How it works" },
-  { href: "/services", label: "Our package" },
+  { href: "/services", label: "Packages" },
   { href: "/about", label: "About" },
 ];
 
+const noop = () => () => {};
+
+/** False during SSR and hydration, true afterwards (portals need document.body). */
+function useMounted() {
+  return useSyncExternalStore(noop, () => true, () => false);
+}
+
 export default function Navbar({ cities }: { cities: CityItem[] }) {
   const pathname = usePathname();
+  const mounted = useMounted();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuPath, setMenuPath] = useState(pathname);
@@ -68,10 +77,10 @@ export default function Navbar({ cities }: { cities: CityItem[] }) {
       <Container className="flex h-16 items-center justify-between gap-3">
         <Link
           href="/"
-          className="flex min-h-11 min-w-0 items-center rounded-lg max-[399px]:[&_.logo-sub]:hidden"
+          className="flex min-h-11 min-w-0 items-center rounded-lg"
           aria-label="OneRoof Ventures home"
         >
-          <Logo size={30} />
+          <Logo size={40} />
         </Link>
 
         <nav aria-label="Main" className="hidden items-center gap-1 lg:flex">
@@ -91,7 +100,6 @@ export default function Navbar({ cities }: { cities: CityItem[] }) {
           <div className="hidden md:block">
             <CitySwitcher cities={cities} />
           </div>
-          <ThemeToggle />
           <Link href="/quote" className={cn(ctaButton, "max-md:hidden")}>
             Get quotes
           </Link>
@@ -111,70 +119,79 @@ export default function Navbar({ cities }: { cities: CityItem[] }) {
         </div>
       </Container>
 
-      <AnimatePresence>
-        {menuOpen && (
-          <div className="fixed inset-0 z-50 lg:hidden">
-            <motion.div
-              className="absolute inset-0 bg-bg/70"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: DURATION.ui, ease: EASE }}
-              onClick={() => setMenuOpen(false)}
-            />
-            <motion.div
-              ref={panelRef}
-              id="mobile-menu"
-              role="dialog"
-              aria-modal="true"
-              aria-label="Menu"
-              className="absolute inset-y-0 right-0 flex w-[min(20rem,86vw)] flex-col border-l border-border bg-surface p-4 shadow-raised"
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={SPRING}
-            >
-              <div className="flex items-center justify-between">
-                <Logo size={26} variant="mark" />
-                <button
-                  type="button"
+      {/*
+        Portalled to <body>: the header's backdrop-filter makes it the
+        containing block for fixed children, which would trap the menu
+        inside the 64px header.
+      */}
+      {mounted &&
+        createPortal(
+          <AnimatePresence>
+            {menuOpen && (
+              <div className="fixed inset-0 z-50 lg:hidden">
+                <motion.div
+                  className="absolute inset-0 bg-bg/70"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: DURATION.ui, ease: EASE }}
                   onClick={() => setMenuOpen(false)}
-                  aria-label="Close menu"
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-text-muted hover:text-text"
+                />
+                <motion.div
+                  ref={panelRef}
+                  id="mobile-menu"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="Menu"
+                  className="absolute inset-y-0 right-0 flex w-[min(20rem,86vw)] flex-col border-l border-border bg-surface p-4 shadow-raised"
+                  initial={{ x: "100%" }}
+                  animate={{ x: 0 }}
+                  exit={{ x: "100%" }}
+                  transition={SPRING}
                 >
-                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
-                    <path d="M6 6l12 12M18 6L6 18" />
-                  </svg>
-                </button>
-              </div>
+                  <div className="flex items-center justify-between">
+                    <Logo size={26} variant="mark" />
+                    <button
+                      type="button"
+                      onClick={() => setMenuOpen(false)}
+                      aria-label="Close menu"
+                      className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-text-muted hover:text-text"
+                    >
+                      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+                        <path d="M6 6l12 12M18 6L6 18" />
+                      </svg>
+                    </button>
+                  </div>
 
-              <nav aria-label="Mobile" className="mt-4 flex flex-col">
-                {LINKS.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setMenuOpen(false)}
-                    className="flex min-h-12 items-center rounded-xl px-3 text-base font-medium text-text transition-colors hover:bg-surface-raised"
-                  >
-                    {link.label}
+                  <nav aria-label="Mobile" className="mt-4 flex flex-col">
+                    {LINKS.map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setMenuOpen(false)}
+                        className="flex min-h-12 items-center rounded-xl px-3 text-base font-medium text-text transition-colors hover:bg-surface-raised"
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                  </nav>
+
+                  {cities.length > 0 && (
+                    <div className="mt-6 border-t border-border pt-6">
+                      <p className="mb-2 px-1 text-sm font-medium text-text-muted">Your city</p>
+                      <CitySwitcher cities={cities} className="w-full" />
+                    </div>
+                  )}
+
+                  <Link href="/quote" onClick={() => setMenuOpen(false)} className={cn(ctaButton, "mt-auto w-full")}>
+                    Get quotes
                   </Link>
-                ))}
-              </nav>
-
-              {cities.length > 0 && (
-                <div className="mt-6 border-t border-border pt-6">
-                  <p className="mb-2 px-1 text-sm font-medium text-text-muted">Your city</p>
-                  <CitySwitcher cities={cities} className="w-full" />
-                </div>
-              )}
-
-              <Link href="/quote" onClick={() => setMenuOpen(false)} className={cn(ctaButton, "mt-auto w-full")}>
-                Get quotes
-              </Link>
-            </motion.div>
-          </div>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>,
+          document.body,
         )}
-      </AnimatePresence>
     </header>
   );
 }

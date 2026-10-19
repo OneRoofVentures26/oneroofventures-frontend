@@ -84,13 +84,13 @@ export default function AboutPage() {
       </Section>
 
       <Section>
-        <div className="rounded-3xl border border-border bg-surface px-6 py-10 text-center shadow-raised sm:px-12">
+        <div className="theme-navy bg-glow rounded-3xl px-6 py-10 text-center sm:px-12">
           <h2 className={cn(sectionTitle, "mx-auto max-w-[26ch]")}>
             Want OneRoof Ventures to run your marketing instead?
           </h2>
-          <p className="mt-3 text-base text-text-muted">See our own managed marketing package and pricing.</p>
+          <p className="mt-3 text-base text-text-muted">Managed packages from ₹12,999 a month — ads, creatives, social and SEO.</p>
           <Link href="/services" className={cn(ctaButton, "mt-6")}>
-            View our marketing package
+            See packages &amp; pricing
           </Link>
         </div>
       </Section>

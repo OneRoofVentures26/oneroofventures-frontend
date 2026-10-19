@@ -1,80 +1,23 @@
 "use client";
 
-import { createContext, useContext, useRef, useState, useSyncExternalStore } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import type { CityItem, ServiceItem } from "@/lib/api/types";
-import { useLocalStore } from "@/lib/local-store";
-import { quizStore, parseSearchQuery } from "@/lib/quiz";
+import { parseSearchQuery } from "@/lib/quiz";
 import GuidedQuiz from "@/components/GuidedQuiz";
-import { ctaButton } from "@/lib/styles";
+import { chip, ctaButton } from "@/lib/styles";
 import { cn } from "@/lib/utils";
 
 /*
- * The homepage entry points: free-text search (in the hero) and the guided
- * quiz (its own section). They share state because a search that doesn't name
- * a city pre-fills the quiz and hands off to it.
+ * The homepage entry points, deliberately separate:
+ * - HomeSearch is a filter: "SEO agency in Bangalore" opens that city's
+ *   listing with the service filter applied.
+ * - HomeQuiz records what the visitor needs as a brief (see GuidedQuiz).
  */
 
-interface HomeEntryState {
-  cities: CityItem[];
-  services: ServiceItem[];
-  quizKey: number;
-  prefill: { service: string | null; budgetBand: string };
-  go: (citySlug: string, service: string | null, budgetBand: string) => void;
-  handOffToQuiz: (prefill: { service: string | null; budgetBand: string }) => void;
-  quizRef: React.RefObject<HTMLDivElement | null>;
-}
-
-const HomeEntryContext = createContext<HomeEntryState | null>(null);
-
-function useHomeEntry() {
-  const ctx = useContext(HomeEntryContext);
-  if (!ctx) throw new Error("HomeSearch and HomeQuiz must be inside HomeEntryProvider");
-  return ctx;
-}
-
-export function HomeEntryProvider({
-  cities,
-  services,
-  children,
-}: {
-  cities: CityItem[];
-  services: ServiceItem[];
-  children: React.ReactNode;
-}) {
-  const router = useRouter();
-  const quizRef = useRef<HTMLDivElement>(null);
-  const [quizKey, setQuizKey] = useState(0);
-  const [prefill, setPrefill] = useState<{ service: string | null; budgetBand: string }>({
-    service: null,
-    budgetBand: "",
-  });
-
-  function go(citySlug: string, service: string | null, budgetBand: string) {
-    quizStore.write({ service, budgetBand, citySlug });
-    const params = new URLSearchParams();
-    if (service) params.set("service", service);
-    if (budgetBand) params.set("budget", budgetBand);
-    const queryString = params.toString();
-    router.push(`/${citySlug}${queryString ? `?${queryString}` : ""}`);
-  }
-
-  function handOffToQuiz(next: { service: string | null; budgetBand: string }) {
-    setPrefill(next);
-    setQuizKey((k) => k + 1);
-    const el = quizRef.current;
-    if (el) {
-      const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      el.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "center" });
-      el.focus({ preventScroll: true });
-    }
-  }
-
-  return (
-    <HomeEntryContext.Provider value={{ cities, services, quizKey, prefill, go, handOffToQuiz, quizRef }}>
-      {children}
-    </HomeEntryContext.Provider>
-  );
+/** The listing for a city, narrowed to one service when the search named one. */
+function listingHref(citySlug: string, service: string | null) {
+  return service ? `/${citySlug}/services/${service}` : `/${citySlug}`;
 }
 
 const WIDE_QUERY = "(min-width: 640px)";
@@ -94,36 +37,36 @@ function useWideScreen() {
   );
 }
 
-export function HomeSearch() {
-  const { cities, services, go, handOffToQuiz } = useHomeEntry();
-  const stored = useLocalStore(quizStore);
+export function HomeSearch({ cities, services }: { cities: CityItem[]; services: ServiceItem[] }) {
+  const router = useRouter();
   const [query, setQuery] = useState("");
+  /** Set when a search names no city: we ask for one instead of guessing. */
+  const [needsCity, setNeedsCity] = useState<{ service: string | null } | null>(null);
   const wide = useWideScreen();
+  const liveCities = cities.filter((c) => c.agencyCount > 0);
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     if (!query.trim()) return;
     const parsed = parseSearchQuery(query, services, cities);
     // Only one live city: no need to ask which one.
-    const citySlug = parsed.citySlug ?? (cities.length === 1 ? cities[0].slug : null);
+    const citySlug = parsed.citySlug ?? (liveCities.length === 1 ? liveCities[0].slug : null);
     if (citySlug) {
-      go(citySlug, parsed.service, parsed.budgetBand);
+      router.push(listingHref(citySlug, parsed.service));
     } else {
-      handOffToQuiz({ service: parsed.service, budgetBand: parsed.budgetBand });
+      setNeedsCity({ service: parsed.service });
     }
   }
 
-  const lastCitySlug = stored.citySlug;
-  const lastService = stored.service;
-  const lastCityName = cities.find((c) => c.slug === lastCitySlug)?.name;
-  const exampleCity = cities[0]?.name ?? "Bangalore";
+  const exampleCity = liveCities[0]?.name ?? cities[0]?.name ?? "Bangalore";
+  const serviceName = services.find((s) => s.slug === needsCity?.service)?.name;
 
   return (
     <div className="w-full max-w-xl">
       <form
         onSubmit={handleSearch}
         role="search"
-        className="glass flex items-center gap-2 rounded-2xl border border-border p-2 shadow-raised transition-[border-color,box-shadow] duration-200 focus-within:border-primary/60 focus-within:ring-4 focus-within:ring-ring/15"
+        className="flex items-center gap-2 rounded-2xl border border-border bg-surface p-2 transition-[border-color,box-shadow] duration-200 focus-within:border-primary/60 focus-within:ring-4 focus-within:ring-ring/15"
       >
         <svg
           viewBox="0 0 20 20"
@@ -138,7 +81,10 @@ export function HomeSearch() {
         </svg>
         <input
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setNeedsCity(null);
+          }}
           placeholder={wide ? `Try "affordable SEO agency in ${exampleCity}"` : `Try: SEO agency in ${exampleCity}`}
           aria-label="Search for an agency"
           className="min-h-11 w-full min-w-0 bg-transparent py-2 text-base text-text outline-none placeholder:text-text-muted focus-visible:outline-none"
@@ -148,37 +94,45 @@ export function HomeSearch() {
         </button>
       </form>
 
-      {lastCitySlug && lastService && lastCityName && (
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-primary/20 bg-primary/8 py-1 pl-4 pr-2">
-          <p className="text-sm text-text">
-            Continue to your last results in <span className="font-semibold">{lastCityName}</span>
+      {needsCity && (
+        <div className="mt-3" aria-live="polite">
+          <p className="text-sm text-text-muted">
+            Which city should we show {serviceName ? `${serviceName} agencies` : "agencies"} in?
           </p>
-          <button
-            type="button"
-            onClick={() => go(lastCitySlug, lastService, stored.budgetBand)}
-            className="inline-flex min-h-11 flex-shrink-0 items-center rounded-lg px-2 text-sm font-semibold text-primary-text transition-colors hover:underline"
-          >
-            Continue →
-          </button>
+          {liveCities.length === 0 ? (
+            <p className="mt-2 text-sm text-text">No cities are live yet — check back soon.</p>
+          ) : (
+            <div className="scrollbar-thin -mx-1 mt-2 flex gap-2 overflow-x-auto px-1 pb-1">
+              {liveCities.map((c) => (
+                <button
+                  key={c.slug}
+                  type="button"
+                  onClick={() => router.push(listingHref(c.slug, needsCity.service))}
+                  className={cn(chip(false), "flex-shrink-0")}
+                >
+                  {c.name}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
   );
 }
 
-export function HomeQuiz({ className }: { className?: string }) {
-  const { cities, services, quizKey, prefill, go, quizRef } = useHomeEntry();
-
+export function HomeQuiz({
+  cities,
+  services,
+  className,
+}: {
+  cities: CityItem[];
+  services: ServiceItem[];
+  className?: string;
+}) {
   return (
-    <div ref={quizRef} tabIndex={-1} className={cn("scroll-mt-24 rounded-2xl outline-none", className)}>
-      <GuidedQuiz
-        key={quizKey}
-        services={services}
-        cities={cities}
-        initialService={prefill.service}
-        initialBudgetBand={prefill.budgetBand}
-        onComplete={(answers) => go(answers.citySlug as string, answers.service, answers.budgetBand)}
-      />
+    <div className={cn("scroll-mt-24 rounded-2xl", className)}>
+      <GuidedQuiz services={services} cities={cities} />
     </div>
   );
 }

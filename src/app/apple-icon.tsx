@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { LOGO_GRADIENT_CSS, LogoGlyph } from "@/components/Logo";
+import { LOGO_NAVY, LogoGlyph } from "@/components/Logo";
 
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
@@ -15,7 +15,7 @@ export default function AppleIcon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          backgroundImage: LOGO_GRADIENT_CSS,
+          background: LOGO_NAVY,
         }}
       >
         <LogoGlyph size={150} />

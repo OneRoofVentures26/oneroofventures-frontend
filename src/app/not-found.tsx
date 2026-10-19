@@ -7,9 +7,9 @@ export default function NotFound() {
   return (
     <main className="flex flex-1 items-center justify-center px-4 py-20">
       <div className="max-w-md text-center">
-        <p className="font-serif text-5xl font-semibold text-harbor">404</p>
-        <h1 className="mt-3 text-[28px] leading-tight text-ink">Page not found</h1>
-        <p className="mt-3 text-sm text-ink-soft">The page you&apos;re looking for doesn&apos;t exist.</p>
+        <p className="font-display text-5xl font-semibold text-primary-text">404</p>
+        <h1 className="mt-3 text-[28px] leading-tight text-text">Page not found</h1>
+        <p className="mt-3 text-sm text-text-muted">The page you&apos;re looking for doesn&apos;t exist.</p>
         <Link
           href="/"
           className={cn(primaryButton, "mt-6")}

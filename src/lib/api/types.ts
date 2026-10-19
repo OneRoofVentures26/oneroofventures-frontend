@@ -6,7 +6,7 @@ export type Billing = "MONTHLY" | "ONE_TIME";
 export type AgencyStatus = "DRAFT" | "PUBLISHED" | "HIDDEN";
 export type LeadStatus = "NEW" | "SENT" | "CONTACTED" | "CLOSED" | "SPAM";
 export type EmailStatus = "SENT" | "FAILED" | "NO_EMAIL";
-export type ListingSort = "recent" | "price_asc" | "price_desc" | "name";
+export type ListingSort = "recent" | "price_asc" | "price_desc" | "name" | "score";
 
 export const TIERS: Tier[] = ["STARTER", "GROWTH", "PRO"];
 
@@ -45,7 +45,60 @@ export interface ServiceItem {
   slug: string;
 }
 
-export interface AgencyListItem {
+// ---------------------------------------------------------------------------
+// One Roof Score (Beta) and public quality data
+// ---------------------------------------------------------------------------
+
+/** "Beta" = scored (number shown); "New" = too little data (badge, no number); null = not scored yet. */
+export type ScoreLabel = "Beta" | "New";
+export type ScorePillar = "transparency" | "profile" | "reputation";
+
+/** Raw points for one fact. Lines don't sum to the pillar totals (pillars are scaled to their weight). */
+export interface ScoreLine {
+  pillar: ScorePillar;
+  /** Stable, e.g. "pricing_type", "google_rating". */
+  code: string;
+  label: string;
+  points: number;
+  max: number;
+}
+
+/** Pillars are out of 40 / 25 / 35 and add up to the score (out of 100). */
+export interface ScoreBreakdown {
+  transparency: number;
+  profile: number;
+  reputation: number;
+  /** All 11 lines, always in the same order. */
+  lines: ScoreLine[];
+}
+
+export interface ScoreFields {
+  score: number | null;
+  scoreLabel: ScoreLabel | null;
+}
+
+export interface ScoreDetailFields extends ScoreFields {
+  /** Null unless scoreLabel is "Beta". */
+  scoreBreakdown: ScoreBreakdown | null;
+}
+
+/** Public quality data. Always present; any field is null when it wasn't checked. */
+export interface PublicQuality {
+  googleRating: number | null;
+  googleReviews: number | null;
+  clutchRating: number | null;
+  clutchReviews: number | null;
+  goodFirmsRating: number | null;
+  goodFirmsReviews: number | null;
+  caseStudies: number | null;
+  /** Case studies show measurable results. */
+  resultsShown: boolean | null;
+  caseStudyUrl: string | null;
+  foundedYear: number | null;
+  lastCheckedOn: string | null;
+}
+
+export interface AgencyListItem extends ScoreFields {
   id: number;
   slug: string;
   name: string;
@@ -58,6 +111,9 @@ export interface AgencyListItem {
   startingPrice: number | null;
   billing: Billing | null;
   tiersAvailable: Tier[];
+  googleRating: number | null;
+  googleReviews: number | null;
+  caseStudies: number | null;
 }
 
 export interface ListingParams {
@@ -82,7 +138,7 @@ export interface PackageView {
   sourceUrl: string | null;
 }
 
-export interface AgencyProfile {
+export interface AgencyProfile extends ScoreDetailFields {
   id: number;
   slug: string;
   name: string;
@@ -100,14 +156,16 @@ export interface AgencyProfile {
   services: ServiceItem[];
   /** Keyed by service code. */
   packages: Record<string, PackageView[]>;
+  quality: PublicQuality;
 }
 
-export interface CompareAgency {
+export interface CompareAgency extends ScoreDetailFields {
   id: number;
   name: string;
   slug: string;
   pricingType: PricingType;
   verified: boolean;
+  quality: PublicQuality;
 }
 
 export interface TierCell {
@@ -121,12 +179,31 @@ export interface TierCell {
 /** tier -> agencyId (string) -> cell */
 export type TierGrid = Record<Tier, Record<string, TierCell | null>>;
 
+/**
+ * The CITY's typical starting price for one service and tier (not an agency's
+ * price), from every published priced package in the city. Rupees.
+ */
+export interface PriceRange {
+  p25: number;
+  median: number;
+  p75: number;
+  billing: Billing;
+  sampleSize: number;
+}
+
+/** tier -> range, or null when fewer than 5 priced packages exist for that tier. */
+export type CityRange = Record<Tier, PriceRange | null>;
+
 export interface CompareResponse {
   service?: string;
   agencies: CompareAgency[];
   tiers?: TierGrid;
+  /** Only when a service was requested. */
+  cityRange?: CityRange;
   /** service code -> tier grid (only when no service was requested) */
   services?: Record<string, TierGrid>;
+  /** service code -> city range (only when no service was requested) */
+  cityRanges?: Record<string, CityRange>;
 }
 
 export interface SitemapEntry {
@@ -190,7 +267,7 @@ export interface AgencyRequest {
   serviceCodes: string[] | null;
 }
 
-export interface AgencyResponse {
+export interface AgencyResponse extends ScoreDetailFields {
   id: number;
   cityId: number;
   citySlug: string;
@@ -221,6 +298,15 @@ export interface AgencyResponse {
   quality: AgencyQuality;
   createdAt: string;
   updatedAt: string;
+  /** How many of the 5 key facts are known; 3 or more makes the score public. Null until scored. */
+  knownInputs: number | null;
+  formulaVersion: string | null;
+  computedAt: string | null;
+}
+
+export interface ScoreRecomputeResult {
+  city: string;
+  agenciesScored: number;
 }
 
 /** Read-only: set only by the quality CSV import (POST /admin/import/agency-quality). */

@@ -8,13 +8,13 @@ export default function StatCard({
   tone?: "default" | "warning";
 }) {
   return (
-    <div className="rounded-sm border border-mist bg-surface p-4 sm:p-5">
-      <p className="text-sm font-medium text-ink-soft">{label}</p>
+    <div className="rounded-lg border border-border bg-surface p-4 sm:p-5">
+      <p className="text-sm font-medium text-text-muted">{label}</p>
       <p
         className={
           tone === "warning"
             ? "mt-1.5 text-2xl font-semibold text-danger"
-            : "mt-1.5 text-2xl font-semibold text-ink"
+            : "mt-1.5 text-2xl font-semibold text-text"
         }
       >
         {value}
@@ -25,9 +25,9 @@ export default function StatCard({
 
 export function StatCardSkeleton() {
   return (
-    <div className="animate-pulse rounded-sm border border-mist bg-surface p-4 sm:p-5">
-      <div className="h-3 w-20 rounded-sm bg-mist/70" />
-      <div className="mt-2 h-7 w-12 rounded-sm bg-mist/70" />
+    <div className="animate-pulse rounded-lg border border-border bg-surface p-4 sm:p-5">
+      <div className="h-3 w-20 rounded-lg bg-border/70" />
+      <div className="mt-2 h-7 w-12 rounded-lg bg-border/70" />
     </div>
   );
 }

@@ -10,12 +10,7 @@ export default function TokenSwatch({ token, role, className }: { token: string;
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const read = () => setValue(getComputedStyle(el).getPropertyValue(`--${token}`).trim());
-    read();
-    // Re-read when the site theme changes (the class on <html> flips).
-    const observer = new MutationObserver(read);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-    return () => observer.disconnect();
+    setValue(getComputedStyle(el).getPropertyValue(`--${token}`).trim());
   }, [token]);
 
   return (

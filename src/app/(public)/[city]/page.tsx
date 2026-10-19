@@ -1,13 +1,13 @@
-import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getCities, getLocalities, getServices, getSitemapEntries } from "@/lib/api/public";
+import { getCities, getLocalities, getServices, getSitemapEntries, listAgencies } from "@/lib/api/public";
 import type { SitemapEntries } from "@/lib/api/types";
+import { gridParams } from "@/lib/grid";
 import { Container } from "@/components/Container";
-import CityPageClient from "@/components/CityPageClient";
-import CityLinks from "@/components/CityLinks";
+import CityListingLanding from "@/components/CityListingLanding";
 import { ctaButton, secondaryButton } from "@/lib/styles";
+import { formatDate } from "@/lib/utils";
 
 export const revalidate = 300;
 
@@ -41,19 +41,21 @@ export async function generateMetadata({ params }: PageProps<"/[city]">): Promis
   };
 }
 
-// Static (ISR): the quiz answers in ?service=&budget= are read on the client.
+// Static (ISR): every agency in the city is rendered on the server, so the list
+// shows at once. Filters run in the browser.
 export default async function CityPage({ params }: PageProps<"/[city]">) {
   const { city: citySlug } = await params;
   const city = await findCity(citySlug);
   if (!city) notFound();
 
-  const [services, localities, entries] = await Promise.all([
+  const [services, localities, entries, initialData] = await Promise.all([
     getServices(),
     getLocalities(city.slug).catch(() => []),
     getSitemapEntries().catch(() => null),
+    city.agencyCount > 0 ? listAgencies(city.slug, gridParams()) : null,
   ]);
 
-  if (city.agencyCount === 0) {
+  if (!initialData || initialData.total === 0) {
     return (
       <Container className="section-y">
         <h1 className="max-w-[24ch] font-display text-section-sm font-semibold text-text md:text-section">
@@ -75,22 +77,18 @@ export default async function CityPage({ params }: PageProps<"/[city]">) {
     );
   }
 
+  const updatedAt = lastUpdated(entries, city.slug);
   return (
-    <>
-      <Suspense fallback={<CityPageSkeleton />}>
-        <CityPageClient city={city} services={services} localities={localities} updatedAt={lastUpdated(entries, city.slug)} />
-      </Suspense>
-      <CityLinks city={city} services={services} localities={localities} />
-    </>
-  );
-}
-
-function CityPageSkeleton() {
-  return (
-    <Container className="animate-pulse pb-12 pt-6 md:pt-8">
-      <div className="h-9 w-2/3 max-w-md rounded-lg bg-border" />
-      <div className="mt-3 h-4 w-1/2 max-w-xs rounded bg-border" />
-      <div className="mt-8 h-72 rounded-2xl border border-border bg-surface lg:ml-auto lg:w-7/12" />
-    </Container>
+    <CityListingLanding
+      city={city}
+      services={services}
+      localities={localities}
+      filters={{}}
+      initialData={initialData}
+      title={`Marketing agencies in ${city.name}`}
+      intro={`${initialData.total} agenc${initialData.total === 1 ? "y" : "ies"} listed with published prices and packages${
+        updatedAt ? ` · updated ${formatDate(updatedAt)}` : ""
+      }. Filter by service, area and budget, shortlist up to 4 and request quotes.`}
+    />
   );
 }

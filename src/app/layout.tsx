@@ -14,16 +14,13 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   // Lets env(safe-area-inset-*) report the iPhone home indicator for the sticky bars.
   viewportFit: "cover",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F6F7FC" },
-    { media: "(prefers-color-scheme: dark)", color: "#0B0D17" },
-  ],
+  // Matches the navbar's cream glass.
+  themeColor: "#F4EADF",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    // next-themes sets the theme class on <html> before paint.
-    <html lang="en" className={`${fontVariables} h-full antialiased`} suppressHydrationWarning>
+    <html lang="en" className={`${fontVariables} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <Providers>{children}</Providers>
       </body>

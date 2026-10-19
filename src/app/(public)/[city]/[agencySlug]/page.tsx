@@ -12,6 +12,7 @@ import CompareToggle from "@/components/CompareToggle";
 import CompareBar from "@/components/CompareBar";
 import StickyActionBar from "@/components/StickyActionBar";
 import VerifiedBadge from "@/components/VerifiedBadge";
+import { QualityBadges, ScoreBadge, ScorePanel } from "@/components/AgencyQuality";
 
 export const revalidate = 300;
 
@@ -84,7 +85,7 @@ export default async function AgencyProfilePage({ params }: PageProps<"/[city]/[
 
       <div className="mt-2 flex flex-col gap-5 border-b border-border pb-6 sm:flex-row sm:items-start sm:justify-between sm:gap-8 sm:pb-8">
         <div className="flex min-w-0 gap-4">
-          <span className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 via-primary/8 to-transparent font-display text-lg font-bold text-primary-text ring-1 ring-inset ring-primary/15 sm:h-16 sm:w-16">
+          <span className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-primary/8 font-display text-lg font-bold text-primary-text sm:h-16 sm:w-16">
             {initials(agency.name)}
           </span>
           <div className="min-w-0">
@@ -93,6 +94,7 @@ export default async function AgencyProfilePage({ params }: PageProps<"/[city]/[
                 {agency.name}
               </h1>
               {agency.verified && <VerifiedBadge />}
+              <ScoreBadge score={agency.score} scoreLabel={agency.scoreLabel} />
             </div>
             {agency.description && <p className="mt-2 max-w-2xl text-base text-text-muted">{agency.description}</p>}
             <div className="mt-1 flex flex-wrap items-center gap-x-4 text-sm [&>a]:inline-flex [&>a]:min-h-11 [&>a]:items-center">
@@ -112,8 +114,9 @@ export default async function AgencyProfilePage({ params }: PageProps<"/[city]/[
                 </a>
               )}
             </div>
+            {agency.quality && <QualityBadges quality={agency.quality} className="mt-2" />}
             {agency.lastCheckedOn && (
-              <p className="text-[13px] text-text-muted">Details last checked on {formatDate(agency.lastCheckedOn)}</p>
+              <p className="mt-2 text-[13px] text-text-muted">Details last checked on {formatDate(agency.lastCheckedOn)}</p>
             )}
           </div>
         </div>
@@ -138,6 +141,13 @@ export default async function AgencyProfilePage({ params }: PageProps<"/[city]/[
       </dl>
 
       <CompareToggle item={compareItem} className="mt-4 sm:hidden" />
+
+      <ScorePanel
+        score={agency.score}
+        scoreLabel={agency.scoreLabel}
+        breakdown={agency.scoreBreakdown}
+        className="mt-8 sm:mt-10"
+      />
 
       {agency.services.length > 0 && (
         <section className="mt-8 sm:mt-10">
@@ -225,7 +235,7 @@ export default async function AgencyProfilePage({ params }: PageProps<"/[city]/[
         )}
       </section>
 
-      <div className="mt-10 flex flex-col items-start justify-between gap-4 rounded-2xl border border-border bg-surface p-5 shadow-card sm:mt-12 sm:flex-row sm:items-center sm:p-6">
+      <div className="mt-10 flex flex-col items-start justify-between gap-4 rounded-2xl border border-border bg-surface p-5 sm:mt-12 sm:flex-row sm:items-center sm:p-6">
         <div>
           <p className="font-display text-xl font-semibold text-text">Ready to work with {agency.name}?</p>
           <p className="text-sm text-text-muted">Get a tailored quote, free of charge.</p>
@@ -238,7 +248,7 @@ export default async function AgencyProfilePage({ params }: PageProps<"/[city]/[
       <CompareBar />
       <StickyActionBar>
         <Link href={`/${agency.city.slug}`} className={secondaryButton}>
-          Find my top 3
+          All agencies
         </Link>
         <Link href={quoteBase} className={ctaButton}>
           Request a quote

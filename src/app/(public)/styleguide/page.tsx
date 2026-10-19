@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Logo from "@/components/Logo";
-import ThemeToggle from "@/components/ThemeToggle";
 import {
   accentBadge,
   card,
@@ -32,12 +31,19 @@ const COLOURS: Array<{ token: string; role: string; className: string }> = [
   { token: "border", role: "1px borders", className: "bg-border" },
   { token: "text", role: "Primary text", className: "bg-text" },
   { token: "text-muted", role: "Secondary text", className: "bg-text-muted" },
-  { token: "primary", role: "Iris — fills", className: "bg-primary" },
-  { token: "primary-hover", role: "Iris hover", className: "bg-primary-hover" },
-  { token: "primary-text", role: "Iris — text and links", className: "bg-primary-text" },
-  { token: "accent", role: "Saffron — ratings, score", className: "bg-accent" },
-  { token: "success", role: "Mint — Verified", className: "bg-success" },
+  { token: "primary", role: "Fills, selected states", className: "bg-primary" },
+  { token: "primary-hover", role: "Primary hover", className: "bg-primary-hover" },
+  { token: "primary-text", role: "Text and links", className: "bg-primary-text" },
+  { token: "accent", role: "Main CTA, ratings, score", className: "bg-accent" },
+  { token: "success", role: "Verified", className: "bg-success" },
   { token: "ring", role: "Focus ring", className: "bg-ring" },
+];
+
+const BRAND = [
+  { name: "Cream", hex: "#E8D5BF", className: "bg-cream text-ink" },
+  { name: "Orange", hex: "#FE7522", className: "bg-orange text-ink" },
+  { name: "Navy", hex: "#0E3655", className: "bg-navy text-cream" },
+  { name: "Ink", hex: "#1F1F1F", className: "bg-ink text-cream" },
 ];
 
 const TYPE_SCALE = [
@@ -58,16 +64,16 @@ function Block({ title, children }: { title: string; children: React.ReactNode }
   );
 }
 
-function ThemePanel({ theme }: { theme: "light" | "dark" }) {
+function ThemePanel({ panel }: { panel: "canvas" | "navy" }) {
   return (
-    <div className={cn(theme, "min-w-0 rounded-3xl border border-border bg-bg p-5 text-text sm:p-8")}>
-      <p className="font-display text-card font-semibold">{theme === "light" ? "Light theme" : "Dark theme"}</p>
+    <div className={cn(panel === "navy" && "theme-navy bg-glow", "min-w-0 rounded-3xl border border-border bg-bg p-5 text-text sm:p-8")}>
+      <p className="font-display text-card font-semibold">{panel === "canvas" ? "Canvas" : "Navy panel (.theme-navy)"}</p>
 
       <div className="mt-6 space-y-10">
         <Block title="Logo">
           <div className="flex flex-wrap items-center gap-6">
+            <Logo size={48} />
             <Logo size={36} />
-            <Logo size={28} />
             <Logo size={40} variant="mark" />
             <Logo size={28} variant="mark" />
             <Logo size={16} variant="mark" />
@@ -84,7 +90,7 @@ function ThemePanel({ theme }: { theme: "light" | "dark" }) {
             <div className="h-11 w-24 rounded-xl bg-gradient-brand" />
             <div>
               <p className="font-mono text-sm font-medium">gradient</p>
-              <p className="text-[13px] text-text-muted">Logo, hero glow, CTA hover border, one number</p>
+              <p className="text-[13px] text-text-muted">Logo and progress bars</p>
             </div>
           </div>
         </Block>
@@ -97,6 +103,12 @@ function ThemePanel({ theme }: { theme: "light" | "dark" }) {
                 <p className={cn("mt-1", t.className)}>{t.sample}</p>
               </div>
             ))}
+            <div>
+              <p className="text-[13px] text-text-muted">Italic emphasis · Sitka italic</p>
+              <p className="mt-1 font-display text-section-sm font-bold md:text-section">
+                Real prices. <span className="text-emphasis">Limitless</span> choice.
+              </p>
+            </div>
             <div>
               <p className="text-[13px] text-text-muted">Highlighted number</p>
               <p className="num mt-1 text-5xl font-bold">
@@ -116,7 +128,7 @@ function ThemePanel({ theme }: { theme: "light" | "dark" }) {
           </div>
           <p className="mt-4 text-sm">
             <a href="#" className={textLink}>Text link</a>
-            <span className="text-text-muted"> · hover the primary CTA for the gradient border</span>
+            <span className="text-text-muted"></span>
           </p>
         </Block>
 
@@ -182,12 +194,9 @@ function ThemePanel({ theme }: { theme: "light" | "dark" }) {
               <p className="font-display text-card font-semibold">Interactive card</p>
               <p className="mt-1 text-sm text-text-muted">Lifts 2px on hover.</p>
             </a>
-            <div className="relative overflow-hidden rounded-2xl">
-              <div aria-hidden="true" className="aurora -right-20 -top-20 h-60 w-80" />
-              <div className={cn(glassPanel, "relative p-5")}>
-                <p className="font-display text-card font-semibold">Glass panel</p>
-                <p className="mt-1 text-sm text-text-muted">Quiz, navbar and overlays.</p>
-              </div>
+            <div className={cn(glassPanel, "p-5")}>
+              <p className="font-display text-card font-semibold">Panel</p>
+              <p className="mt-1 text-sm text-text-muted">Self-contained widgets such as the quiz.</p>
             </div>
             <div className="space-y-2">
               <div className="shimmer h-4 w-2/3 rounded-md" />
@@ -207,16 +216,42 @@ export default function StyleguidePage() {
         <div>
           <h1 className="font-display text-section-sm font-bold md:text-section">Styleguide</h1>
           <p className="mt-2 max-w-[60ch] text-base text-text-muted">
-            Tokens and components in both themes. The panels are pinned to light
-            and dark; the rest of the page follows the site theme.
+            Brand palette, fonts, tokens and components. Primary font Sitka,
+            secondary Helvetica. The right panel shows the same components inside
+            a navy brand panel.
           </p>
         </div>
-        <ThemeToggle />
+      </div>
+
+      <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {BRAND.map((b) => (
+          <div key={b.name} className={cn(b.className, "flex h-28 flex-col justify-end rounded-2xl p-4")}>
+            <p className="font-display text-card font-bold">{b.name}</p>
+            <p className="font-mono text-[13px] opacity-80">{b.hex}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="theme-navy bg-glow flex items-end justify-between rounded-2xl p-5">
+          <div>
+            <p className="text-[13px] text-text-muted">Primary font</p>
+            <p className="font-display text-xl font-bold">Sitka</p>
+          </div>
+          <p className="font-display text-5xl">Aa</p>
+        </div>
+        <div className="theme-navy bg-glow flex items-end justify-between rounded-2xl p-5">
+          <div>
+            <p className="text-[13px] text-text-muted">Secondary font</p>
+            <p className="font-sans text-xl font-bold">Helvetica</p>
+          </div>
+          <p className="font-sans text-5xl font-bold">Aa</p>
+        </div>
       </div>
 
       <div className="mt-10 grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <ThemePanel theme="light" />
-        <ThemePanel theme="dark" />
+        <ThemePanel panel="canvas" />
+        <ThemePanel panel="navy" />
       </div>
     </div>
   );

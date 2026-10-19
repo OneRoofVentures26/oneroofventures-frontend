@@ -21,6 +21,7 @@ import type {
   PackageSuggestions,
   Page,
   RateLimitReset,
+  ScoreRecomputeResult,
   ServiceRequest,
   ServiceResponse,
 } from "@/lib/api/types";
@@ -128,6 +129,15 @@ export function patchAgency(id: number, body: AgencyPatchRequest): Promise<Agenc
 
 export function deleteAgency(id: number): Promise<void> {
   return request("DELETE", `/agencies/${id}`);
+}
+
+/**
+ * Recomputes One Roof Scores now and waits until done; all active cities when
+ * `city` is left out. Not needed day to day: scores follow every agency change
+ * within seconds and are recomputed nightly.
+ */
+export function recomputeScores(city?: string): Promise<ScoreRecomputeResult[]> {
+  return request("POST", "/scores/recompute", { query: { city } });
 }
 
 export function listPackages(agencyId: number): Promise<PackageResponse[]> {

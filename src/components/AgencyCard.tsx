@@ -8,6 +8,7 @@ import { card, secondaryButton, tag } from "@/lib/styles";
 import { cn, formatStartingPrice, initials, TIER_LABELS } from "@/lib/utils";
 import CompareToggle from "@/components/CompareToggle";
 import VerifiedBadge from "@/components/VerifiedBadge";
+import { GoogleRating, ScoreBadge } from "@/components/AgencyQuality";
 
 /**
  * Card grid for agencies: 1 column, 2 from 640px, 3 from 1024px. `withSidebar`
@@ -26,9 +27,10 @@ export function AgencyCardGrid({ children, withSidebar = false }: { children: Re
  * Compact agency card:
  * 1. initials, name (wraps, never truncated), Verified
  * 2. area · team size
- * 3. up to 3 service chips on one row, then "+N"
- * 4. starting price (never truncated) and packages
- * 5. "+ Compare" and "View profile", equal width
+ * 3. One Roof Score and Google rating, when known
+ * 4. up to 3 service chips on one row, then "+N"
+ * 5. starting price (never truncated) and packages
+ * 6. "+ Compare" and "View profile", equal width
  */
 /** Roughly one row of chips on the narrowest card (~300px at 13px). */
 const CHIP_CHAR_BUDGET = 24;
@@ -72,7 +74,7 @@ export default function AgencyCard({
       )}
     >
       <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 via-primary/8 to-transparent font-display text-sm font-bold text-primary-text ring-1 ring-inset ring-primary/15">
+        <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary/8 font-display text-sm font-bold text-primary-text">
           {initials(agency.name)}
         </span>
         <div className="min-w-0 flex-1">
@@ -86,6 +88,13 @@ export default function AgencyCard({
           {meta && <p className="text-[13px] leading-5 text-text-muted">{meta}</p>}
         </div>
       </div>
+
+      {(agency.scoreLabel || agency.googleRating != null) && (
+        <div className="mt-2.5 flex flex-wrap items-center gap-x-2.5 gap-y-1">
+          <ScoreBadge score={agency.score} scoreLabel={agency.scoreLabel} />
+          <GoogleRating rating={agency.googleRating} reviews={agency.googleReviews} compact />
+        </div>
+      )}
 
       {agency.services.length > 0 && (
         <div className="mt-2.5 flex flex-wrap gap-1.5 [&>span]:leading-5">
@@ -114,7 +123,7 @@ export default function AgencyCard({
 
       <div className="mt-2.5 grid grid-cols-2 gap-2">
         <CompareToggle item={{ id: agency.id, name: agency.name, slug: agency.slug, citySlug }} />
-        <Link href={href} className={cn(secondaryButton, "w-full px-3")}>
+        <Link href={href} className={cn(secondaryButton, "w-full whitespace-nowrap px-2")}>
           View profile
         </Link>
       </div>

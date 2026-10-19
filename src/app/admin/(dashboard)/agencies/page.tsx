@@ -4,7 +4,15 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { AdminAgencyFilters, AgencyResponse, AgencyStatus, PricingType } from "@/lib/api/types";
-import { agencyTags, deleteAgency, listAgencies, listCities, patchAgency, refreshPublic } from "@/lib/api/admin";
+import {
+  agencyTags,
+  deleteAgency,
+  listAgencies,
+  listCities,
+  patchAgency,
+  recomputeScores,
+  refreshPublic,
+} from "@/lib/api/admin";
 import { errorMessage } from "@/lib/api/http";
 import { useAsync } from "@/lib/use-async";
 import { formatDate, PRICING_TYPE_LABELS } from "@/lib/utils";
@@ -22,6 +30,8 @@ import {
 } from "@/components/admin/ui";
 
 const PAGE_SIZE = 25;
+/** The backend rescores a few seconds after a change. */
+const RESCORE_DELAY_MS = 4000;
 const STATUSES: AgencyStatus[] = ["DRAFT", "PUBLISHED", "HIDDEN"];
 const PRICING_TYPES: PricingType[] = ["FIXED", "RANGE", "QUOTE_ONLY"];
 
@@ -53,6 +63,26 @@ function AgenciesList() {
   const [fit, setFit] = useState(filters.fit ?? "");
   const [pendingDelete, setPendingDelete] = useState<AgencyResponse | null>(null);
   const [busyId, setBusyId] = useState<number | null>(null);
+  const [recomputing, setRecomputing] = useState(false);
+
+  /** Recomputes the filtered city, or every active city. Only needed after a formula change. */
+  async function handleRecompute() {
+    setRecomputing(true);
+    try {
+      const results = await recomputeScores(filters.city);
+      const scored = results.reduce((sum, r) => sum + r.agenciesScored, 0);
+      // City tags also cover every agency profile in that city.
+      void refreshPublic(filters.city ? { tags: results.map((r) => `city:${r.city}`) } : { allCities: true });
+      toast.show(
+        `Scored ${scored} agenc${scored === 1 ? "y" : "ies"} in ${results.length} cit${results.length === 1 ? "y" : "ies"}`,
+      );
+      agencies.reload();
+    } catch (err) {
+      toast.show(errorMessage(err), "error");
+    } finally {
+      setRecomputing(false);
+    }
+  }
 
   function setFilter(patch: Record<string, string | undefined>) {
     const next = new URLSearchParams(searchParams.toString());
@@ -73,6 +103,11 @@ function AgenciesList() {
         prev ? { ...prev, items: prev.items.map((a) => (a.id === updated.id ? updated : a)) } : prev!,
       );
       toast.show(`${agency.name} ${label}`);
+      // Verifying changes the One Roof Score; refresh public pages again once it's rescored.
+      window.setTimeout(() => {
+        void refreshPublic({ agencyIds: [agency.id] });
+        agencies.reload();
+      }, RESCORE_DELAY_MS);
     } catch (err) {
       toast.show(errorMessage(err), "error");
     } finally {
@@ -102,10 +137,10 @@ function AgenciesList() {
       header: "Name",
       render: (a) => (
         <div className="min-w-0">
-          <Link href={`/admin/agencies/${a.id}/edit`} className="font-medium text-ink hover:text-harbor">
+          <Link href={`/admin/agencies/${a.id}/edit`} className="font-medium text-text hover:text-primary-text">
             {a.name}
           </Link>
-          <p className="text-[13px] text-ink-soft">
+          <p className="text-[13px] text-text-muted">
             {cityName(a.citySlug)}
             {a.localitySlug ? ` · ${a.localitySlug}` : ""}
           </p>
@@ -118,9 +153,25 @@ function AgenciesList() {
       render: (a) => (
         <div className="flex flex-col items-start gap-1">
           <StatusBadge status={a.status} />
-          {a.verified && <span className="text-[13px] font-medium text-harbor-dark">✓ Verified</span>}
+          {a.verified && <span className="text-[13px] font-medium text-primary-text">✓ Verified</span>}
         </div>
       ),
+    },
+    {
+      key: "score",
+      header: "Score",
+      render: (a) =>
+        a.score == null ? (
+          <span className="text-[13px] text-text-muted">—</span>
+        ) : (
+          <div className="flex flex-col items-start">
+            <span className="num font-semibold text-text">{a.score.toFixed(1)}</span>
+            <span className="text-[13px] text-text-muted">
+              {a.scoreLabel === "Beta" ? "Public" : "New"}
+              {a.knownInputs != null ? ` · ${a.knownInputs}/5 facts` : ""}
+            </span>
+          </div>
+        ),
     },
     { key: "pricing", header: "Pricing", render: (a) => <span className="text-[13px]">{PRICING_TYPE_LABELS[a.pricingType]}</span> },
     {
@@ -133,7 +184,7 @@ function AgenciesList() {
           <span className="text-[13px] font-medium text-danger">None</span>
         ),
     },
-    { key: "fit", header: "Fit", render: (a) => <span className="text-[13px] text-ink-soft">{a.fitForUs ?? "—"}</span> },
+    { key: "fit", header: "Fit", render: (a) => <span className="text-[13px] text-text-muted">{a.fitForUs ?? "—"}</span> },
     {
       key: "checked",
       header: "Last checked",
@@ -153,10 +204,23 @@ function AgenciesList() {
         description={agencies.data ? `${agencies.data.total} matching` : "…"}
         actions={
           <>
-            <Link href="/admin/import" className="rounded-sm border border-mist px-4 py-2 text-sm font-medium text-ink hover:bg-muted">
+            <button
+              type="button"
+              disabled={recomputing}
+              onClick={handleRecompute}
+              title={
+                filters.city
+                  ? `Recompute One Roof Scores for ${cityName(filters.city)}`
+                  : "Recompute One Roof Scores for every active city"
+              }
+              className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-text hover:bg-surface-raised disabled:opacity-50"
+            >
+              {recomputing ? "Recomputing…" : filters.city ? "Recompute scores (city)" : "Recompute scores"}
+            </button>
+            <Link href="/admin/import" className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-text hover:bg-surface-raised">
               Import CSV
             </Link>
-            <Link href="/admin/agencies/new" className="rounded-sm bg-harbor px-4 py-2 text-sm font-semibold text-paper hover:bg-harbor-dark">
+            <Link href="/admin/agencies/new" className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-fg hover:bg-primary-hover">
               + Add Agency
             </Link>
           </>
@@ -183,7 +247,7 @@ function AgenciesList() {
             placeholder="Fit for us (e.g. Yes)"
             className={`${selectClass} w-40`}
           />
-          <button type="submit" className="rounded-sm border border-mist px-3 py-2 text-sm font-medium text-ink hover:bg-muted">
+          <button type="submit" className="rounded-lg border border-border px-3 py-2 text-sm font-medium text-text hover:bg-surface-raised">
             Search
           </button>
         </form>
@@ -232,7 +296,7 @@ function AgenciesList() {
               setFit("");
               router.replace(pathname);
             }}
-            className="text-[13px] font-medium text-harbor hover:underline"
+            className="text-[13px] font-medium text-primary-text hover:underline"
           >
             Clear filters
           </button>
@@ -245,7 +309,7 @@ function AgenciesList() {
 
       <div className="mt-4">
         {!agencies.data ? (
-          <p className="text-sm text-ink-soft">Loading…</p>
+          <p className="text-sm text-text-muted">Loading…</p>
         ) : (
           <div className={agencies.loading ? "opacity-60 transition" : "transition"}>
             <DataTable
@@ -331,7 +395,7 @@ function AgenciesList() {
 
 export default function AdminAgenciesPage() {
   return (
-    <Suspense fallback={<p className="text-sm text-ink-soft">Loading…</p>}>
+    <Suspense fallback={<p className="text-sm text-text-muted">Loading…</p>}>
       <AgenciesList />
     </Suspense>
   );

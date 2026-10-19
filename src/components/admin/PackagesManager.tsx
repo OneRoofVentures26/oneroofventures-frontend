@@ -56,11 +56,11 @@ export default function PackagesManager({
   }
 
   return (
-    <section className="rounded-sm border border-mist bg-surface p-5">
+    <section className="rounded-lg border border-border bg-surface p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h2 className="text-lg text-ink">Packages</h2>
-          <p className="text-[13px] text-ink-soft">One package per service and tier (Starter, Growth, Pro).</p>
+          <h2 className="text-lg text-text">Packages</h2>
+          <p className="text-[13px] text-text-muted">One package per service and tier (Starter, Growth, Pro).</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <RefreshButton onRefresh={packages.reload} loading={packages.loading} label="packages" />
@@ -118,16 +118,16 @@ export default function PackagesManager({
         )}
 
         {!packages.data ? (
-          !packages.error && <p className="text-sm text-ink-soft">Loading packages…</p>
+          !packages.error && <p className="text-sm text-text-muted">Loading packages…</p>
         ) : packages.data.length === 0 ? (
-          <p className="rounded-sm border border-dashed border-mist p-6 text-center text-sm text-ink-soft">
+          <p className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-text-muted">
             No packages yet. The agency will show as “Price on request” until you add some.
           </p>
         ) : (
           [...groups.entries()].map(([code, list]) => (
             <div key={code}>
-              <h3 className="mb-2 text-base text-ink">{serviceName(code)}</h3>
-              <ul className="divide-y divide-mist rounded-sm border border-mist">
+              <h3 className="mb-2 text-base text-text">{serviceName(code)}</h3>
+              <ul className="divide-y divide-border rounded-lg border border-border">
                 {list.map((p) =>
                   editing === p.id ? (
                     <li key={p.id} className="p-2">
@@ -147,13 +147,13 @@ export default function PackagesManager({
                   ) : (
                     <li key={p.id} className="flex flex-wrap items-center justify-between gap-3 px-3 py-2.5">
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-ink">
-                          <span className="mr-2 rounded-sm bg-muted px-1.5 py-0.5 text-[13px] font-semibold text-ink-soft">
+                        <p className="text-sm font-medium text-text">
+                          <span className="mr-2 rounded-lg bg-surface-raised px-1.5 py-0.5 text-[13px] font-semibold text-text-muted">
                             {TIER_LABELS[p.tier]}
                           </span>
                           {p.name}
                         </p>
-                        <p className="text-[13px] text-ink-soft">
+                        <p className="text-[13px] text-text-muted">
                           {formatPackagePrice(p.priceMin, p.priceMax, p.billing)} · {p.inclusions.length} inclusion
                           {p.inclusions.length === 1 ? "" : "s"}
                         </p>

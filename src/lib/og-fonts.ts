@@ -19,12 +19,19 @@ async function loadGoogleFont(family: string, weight: OgFont["weight"], text: st
   }
 }
 
-/** Space Grotesk 700 for headings, Inter 400/500 for body text. */
+/**
+ * Sitka and Helvetica can't be fetched, so the OG image uses their closest
+ * open stand-ins: Source Serif 4 700 for headings, Arimo (Helvetica metrics)
+ * 400/500 for body text.
+ */
+export const OG_DISPLAY_FONT = "Source Serif 4";
+export const OG_SANS_FONT = "Arimo";
+
 export async function loadBrandFonts(displayText: string, sansText: string): Promise<OgFont[]> {
   const fonts = await Promise.all([
-    loadGoogleFont("Space Grotesk", 700, displayText),
-    loadGoogleFont("Inter", 400, sansText),
-    loadGoogleFont("Inter", 500, sansText),
+    loadGoogleFont(OG_DISPLAY_FONT, 700, displayText),
+    loadGoogleFont(OG_SANS_FONT, 400, sansText),
+    loadGoogleFont(OG_SANS_FONT, 500, sansText),
   ]);
   return fonts.filter((f): f is OgFont => f !== null);
 }

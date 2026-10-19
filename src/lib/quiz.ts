@@ -1,19 +1,4 @@
-import type { AgencyListItem, CityItem, ServiceItem } from "@/lib/api/types";
-import { createLocalStore } from "@/lib/local-store";
-import { formatINR } from "@/lib/utils";
-
-export interface QuizAnswers {
-  /** Service slug, e.g. "seo". */
-  service: string | null;
-  budgetBand: string;
-  citySlug: string | null;
-}
-
-export const quizStore = createLocalStore<QuizAnswers>("oneroof_quiz_v2", {
-  service: null,
-  budgetBand: "",
-  citySlug: null,
-});
+import type { CityItem, ServiceItem } from "@/lib/api/types";
 
 export interface QuizBudgetBand {
   key: string;
@@ -33,46 +18,6 @@ export const QUIZ_BUDGET_BANDS: QuizBudgetBand[] = [
 
 export function getQuizBudgetBand(key: string): QuizBudgetBand | undefined {
   return QUIZ_BUDGET_BANDS.find((b) => b.key === key);
-}
-
-export interface Recommendation {
-  agency: AgencyListItem;
-  reason: string;
-}
-
-/**
- * Picks up to `count` agencies from a listing already filtered by service and budget.
- * There are no ratings yet, so verified agencies with published prices come first;
- * otherwise the API order is kept.
- */
-export function getTopPicks(
-  agencies: AgencyListItem[],
-  service: ServiceItem | null,
-  band: QuizBudgetBand | undefined,
-  cityName: string,
-  count = 3,
-): Recommendation[] {
-  const rank = (a: AgencyListItem) => (a.verified ? 2 : 0) + (a.startingPrice != null ? 1 : 0);
-  const ranked = agencies
-    .map((agency, idx) => ({ agency, idx }))
-    .sort((a, b) => rank(b.agency) - rank(a.agency) || a.idx - b.idx)
-    .slice(0, count)
-    .map((x) => x.agency);
-
-  return ranked.map((agency) => {
-    const parts: string[] = [];
-    if (agency.verified) parts.push("Verified");
-    if (service) {
-      parts.push(
-        agency.startingPrice != null
-          ? `${service.name} from ${formatINR(agency.startingPrice)}${agency.billing === "ONE_TIME" ? " one-time" : "/mo"}`
-          : `Offers ${service.name}`,
-      );
-    }
-    if (band?.max != null && agency.startingPrice != null) parts.push(`fits ${band.phrase}`);
-    if (agency.locality) parts.push(`based in ${agency.locality}, ${cityName}`);
-    return { agency, reason: parts.join(" · ") || `Listed in ${cityName}` };
-  });
 }
 
 // ---------------------------------------------------------------------------

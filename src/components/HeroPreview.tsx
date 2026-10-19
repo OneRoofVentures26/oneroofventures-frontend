@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useInView, useReducedMotion } from "framer-motion";
-import { EASE } from "@/lib/motion";
-import { accentBadge, successBadge } from "@/lib/styles";
+import { motion, useInView, useReducedMotion } from "framer-motion";
+import { successBadge } from "@/lib/styles";
 import { cn, formatINR } from "@/lib/utils";
 
 /*
@@ -86,7 +85,7 @@ export default function HeroPreview({ className }: { className?: string }) {
       role="img"
       aria-label="Example: as you pick a service, three agencies are ranked into your top 3 picks."
       className={cn(
-        "rounded-2xl border border-border bg-surface/80 p-4 shadow-raised sm:p-5 md:glass",
+        "rounded-2xl border border-border bg-surface/70 p-4 sm:p-5",
         className,
       )}
     >
@@ -127,7 +126,7 @@ export default function HeroPreview({ className }: { className?: string }) {
               layout
               transition={{ type: "spring", stiffness: 260, damping: 30 }}
               className={cn(
-                "flex items-center gap-3 rounded-xl border bg-surface p-3 shadow-card",
+                "flex items-center gap-3 rounded-xl border bg-surface p-3",
                 i === 0 ? "border-primary/40" : "border-border",
               )}
             >
@@ -139,7 +138,7 @@ export default function HeroPreview({ className }: { className?: string }) {
               >
                 {i + 1}
               </span>
-              <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 via-primary/8 to-transparent font-display text-sm font-bold text-primary-text ring-1 ring-inset ring-primary/15">
+              <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary/8 font-display text-sm font-bold text-primary-text">
                 {agency.initials}
               </span>
               <span className="min-w-0 flex-1">
@@ -151,22 +150,6 @@ export default function HeroPreview({ className }: { className?: string }) {
                   {agency.area} · from{" "}
                   <span className="num font-semibold text-text">{formatINR(agency.price[active])}</span>/mo
                 </span>
-              </span>
-              <span className={cn(accentBadge, "num relative gap-1 overflow-hidden px-2 py-1 text-sm")}>
-                <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" fill="currentColor" aria-hidden="true">
-                  <path d="M10 1.8l2.5 5.2 5.7.7-4.2 3.9 1.1 5.6L10 14.5l-5.1 2.7 1.1-5.6L1.8 7.7l5.7-.7L10 1.8z" />
-                </svg>
-                <AnimatePresence mode="popLayout" initial={false}>
-                  <motion.span
-                    key={agency.score[active]}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -6 }}
-                    transition={{ duration: 0.25, ease: EASE }}
-                  >
-                    {agency.score[active].toFixed(1)}
-                  </motion.span>
-                </AnimatePresence>
               </span>
             </motion.li>
           ))}

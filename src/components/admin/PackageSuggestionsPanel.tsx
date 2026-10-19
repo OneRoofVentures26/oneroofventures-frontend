@@ -17,12 +17,12 @@ interface Row extends SuggestedPackage {
 }
 
 const CONFIDENCE_STYLES: Record<string, string> = {
-  HIGH: "bg-harbor-light text-harbor-dark",
-  MEDIUM: "bg-mist text-ink",
+  HIGH: "bg-primary/10 text-primary-text",
+  MEDIUM: "bg-border text-text",
   LOW: "bg-danger/10 text-danger",
 };
 
-const cellInput = "w-full rounded-sm border border-mist bg-surface px-2 py-1 text-[13px] outline-none focus:border-harbor";
+const cellInput = "w-full rounded-lg border border-border bg-surface px-2 py-1 text-[13px] outline-none focus:border-primary";
 
 function toRows(suggestions: SuggestedPackage[]): Row[] {
   return suggestions.map((s) => ({
@@ -119,15 +119,15 @@ export default function PackageSuggestionsPanel({
   }
 
   return (
-    <div className="space-y-4 rounded-sm border border-harbor/40 bg-paper p-4">
+    <div className="space-y-4 rounded-lg border border-primary/40 bg-bg p-4">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <h3 className="text-sm font-bold text-ink">Suggested packages</h3>
-          <p className="text-[13px] text-ink-soft">
+          <h3 className="text-sm font-bold text-text">Suggested packages</h3>
+          <p className="text-[13px] text-text-muted">
             Built from the researched price text. Nothing is saved until you click save. Review prices before saving.
           </p>
         </div>
-        <button type="button" onClick={onClose} className="text-[13px] font-medium text-ink-soft hover:text-ink">
+        <button type="button" onClick={onClose} className="text-[13px] font-medium text-text-muted hover:text-text">
           Close
         </button>
       </div>
@@ -135,21 +135,21 @@ export default function PackageSuggestionsPanel({
       <ErrorBanner error={suggestions.error} onRetry={suggestions.reload} />
 
       {!suggestions.data ? (
-        !suggestions.error && <p className="text-sm text-ink-soft">Reading price text…</p>
+        !suggestions.error && <p className="text-sm text-text-muted">Reading price text…</p>
       ) : (
         <>
           {suggestions.data.rawPrices ? (
-            <pre className="max-h-32 overflow-auto whitespace-pre-wrap rounded-sm bg-muted p-3 text-[13px] text-ink-soft">
+            <pre className="max-h-32 overflow-auto whitespace-pre-wrap rounded-lg bg-surface-raised p-3 text-[13px] text-text-muted">
               {suggestions.data.rawPrices}
             </pre>
           ) : (
-            <p className="text-sm text-ink-soft">
+            <p className="text-sm text-text-muted">
               This agency has no researched price text. Add it under “Researched price text” above and save first.
             </p>
           )}
 
           {suggestions.data.existingPackages.length > 0 && (
-            <p className="text-[13px] text-ink-soft">
+            <p className="text-[13px] text-text-muted">
               <span className="font-semibold">Already saved:</span>{" "}
               {suggestions.data.existingPackages
                 .map((p) => `${services.find((s) => s.code === p.serviceCode)?.name ?? p.serviceCode} ${TIER_LABELS[p.tier]}`)
@@ -158,15 +158,15 @@ export default function PackageSuggestionsPanel({
           )}
 
           {items.length === 0 ? (
-            <p className="text-sm text-ink-soft">No packages could be suggested from this text.</p>
+            <p className="text-sm text-text-muted">No packages could be suggested from this text.</p>
           ) : (
             <div className="space-y-3">
               {items.map((r, idx) => (
                 <div
                   key={idx}
                   className={cn(
-                    "rounded-sm border bg-surface p-3",
-                    r.alreadyExists ? "border-mist opacity-60" : r.selected ? "border-harbor/50" : "border-mist",
+                    "rounded-lg border bg-surface p-3",
+                    r.alreadyExists ? "border-border opacity-60" : r.selected ? "border-primary/50" : "border-border",
                   )}
                 >
                   <div className="flex flex-wrap items-center gap-2">
@@ -175,18 +175,18 @@ export default function PackageSuggestionsPanel({
                       checked={r.selected && !r.alreadyExists}
                       disabled={r.alreadyExists}
                       onChange={(e) => update(idx, { selected: e.target.checked })}
-                      className="h-4 w-4 accent-harbor"
+                      className="h-4 w-4 accent-primary"
                       aria-label={`Include ${r.name}`}
                     />
                     <span
                       className={cn(
-                        "rounded-sm px-2 py-0.5 text-[13px] font-semibold",
-                        CONFIDENCE_STYLES[r.confidence] ?? "bg-muted text-ink-soft",
+                        "rounded-lg px-2 py-0.5 text-[13px] font-semibold",
+                        CONFIDENCE_STYLES[r.confidence] ?? "bg-surface-raised text-text-muted",
                       )}
                     >
                       {sentenceCase(r.confidence)} confidence
                     </span>
-                    {r.alreadyExists && <span className="text-[13px] font-medium text-ink-soft">Already exists</span>}
+                    {r.alreadyExists && <span className="text-[13px] font-medium text-text-muted">Already exists</span>}
                   </div>
                   <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-6">
                     <select
@@ -262,7 +262,7 @@ export default function PackageSuggestionsPanel({
                     />
                   </div>
                   {(r.evidence || (r.notes && r.notes.length > 0)) && (
-                    <div className="mt-2 space-y-1 text-[13px] text-ink-soft">
+                    <div className="mt-2 space-y-1 text-[13px] text-text-muted">
                       {r.evidence && (
                         <p>
                           <span className="font-semibold">Evidence:</span> “{r.evidence}”
@@ -279,7 +279,7 @@ export default function PackageSuggestionsPanel({
           )}
 
           {suggestions.data.ignored.length > 0 && (
-            <details className="text-[13px] text-ink-soft">
+            <details className="text-[13px] text-text-muted">
               <summary className="cursor-pointer font-medium">
                 {suggestions.data.ignored.length} amount{suggestions.data.ignored.length === 1 ? "" : "s"} ignored
               </summary>

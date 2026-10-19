@@ -50,7 +50,7 @@ export default function AdminDashboardPage() {
         title="Dashboard"
         description="Public pages pick up admin changes within about 5 minutes."
         actions={
-          <Link href="/admin/agencies/new" className="rounded-sm bg-harbor px-4 py-2 text-sm font-semibold text-paper hover:bg-harbor-dark">
+          <Link href="/admin/agencies/new" className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-fg hover:bg-primary-hover">
             + Add Agency
           </Link>
         }
@@ -70,27 +70,27 @@ export default function AdminDashboardPage() {
             ))}
       </div>
 
-      <div className="mt-8 rounded-sm border border-mist bg-surface p-5">
+      <div className="mt-8 rounded-lg border border-border bg-surface p-5">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-bold text-ink">Latest quote requests</h2>
-          <Link href="/admin/leads" className="text-[13px] font-medium text-harbor hover:underline">
+          <h2 className="text-sm font-bold text-text">Latest quote requests</h2>
+          <Link href="/admin/leads" className="text-[13px] font-medium text-primary-text hover:underline">
             View all →
           </Link>
         </div>
         {!stats ? (
-          <p className="mt-3 text-sm text-ink-soft">Loading…</p>
+          <p className="mt-3 text-sm text-text-muted">Loading…</p>
         ) : stats.recentLeads.length === 0 ? (
-          <p className="mt-3 text-sm text-ink-soft">No quote requests yet.</p>
+          <p className="mt-3 text-sm text-text-muted">No quote requests yet.</p>
         ) : (
-          <ul className="mt-3 divide-y divide-mist">
+          <ul className="mt-3 divide-y divide-border">
             {stats.recentLeads.map((lead) => (
               <li key={lead.id} className="flex items-center justify-between gap-3 py-2.5">
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-ink">
+                  <p className="truncate text-sm font-medium text-text">
                     {lead.name}
-                    {lead.businessName && <span className="font-normal text-ink-soft"> · {lead.businessName}</span>}
+                    {lead.businessName && <span className="font-normal text-text-muted"> · {lead.businessName}</span>}
                   </p>
-                  <p className="text-[13px] text-ink-soft">
+                  <p className="text-[13px] text-text-muted">
                     {lead.serviceSlug} · {lead.citySlug} · {formatDateTime(lead.createdAt)}
                   </p>
                 </div>

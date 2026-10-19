@@ -23,9 +23,9 @@ export default function ImportPage() {
           description="Rows matching an existing agency update it; the rest create new agencies."
           upload={importAgenciesCsv}
           next={
-            <p className="text-sm text-ink-soft">
+            <p className="text-sm text-text-muted">
               Next:{" "}
-              <Link href="/admin/agencies?hasPackages=false" className="font-medium text-harbor hover:underline">
+              <Link href="/admin/agencies?hasPackages=false" className="font-medium text-primary-text hover:underline">
                 add packages to agencies that need them
               </Link>{" "}
               and publish the ones that are ready.
@@ -41,15 +41,15 @@ export default function ImportPage() {
               Updates ratings, reviews, case studies, founded year and address on agencies that already exist (matched by City +
               Website, then City + Agency). It never creates agencies or publishes them. Each upload is a full snapshot: a blank
               cell clears that field. Rows with an exclude reason, or &ldquo;Site live&rdquo; = No, set the agency to{" "}
-              <strong className="font-semibold text-ink">Hidden</strong>.
+              <strong className="font-semibold text-text">Hidden</strong>.
             </>
           }
           upload={importAgencyQualityCsv}
           hideCreated
           next={
-            <p className="text-sm text-ink-soft">
+            <p className="text-sm text-text-muted">
               Check{" "}
-              <Link href="/admin/agencies?status=HIDDEN" className="font-medium text-harbor hover:underline">
+              <Link href="/admin/agencies?status=HIDDEN" className="font-medium text-primary-text hover:underline">
                 hidden agencies
               </Link>{" "}
               to review any the sheet excluded.
@@ -106,12 +106,12 @@ function CsvImporter({
 
   return (
     <section>
-      <h2 className="text-lg text-ink">{title}</h2>
-      <p className="mt-1 max-w-2xl text-sm text-ink-soft">{description}</p>
+      <h2 className="text-lg text-text">{title}</h2>
+      <p className="mt-1 max-w-2xl text-sm text-text-muted">{description}</p>
 
-      <form onSubmit={handleUpload} className="mt-4 max-w-xl space-y-4 rounded-sm border border-mist bg-surface p-5">
+      <form onSubmit={handleUpload} className="mt-4 max-w-xl space-y-4 rounded-lg border border-border bg-surface p-5">
         <div>
-          <label htmlFor={id} className="text-sm font-medium text-ink">
+          <label htmlFor={id} className="text-sm font-medium text-text">
             CSV file (max 5 MB)
           </label>
           <input
@@ -122,7 +122,7 @@ function CsvImporter({
               setFile(e.target.files?.[0] ?? null);
               setError(null);
             }}
-            className="mt-2 block w-full text-sm text-ink file:mr-3 file:rounded-sm file:border file:border-mist file:bg-muted file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-ink"
+            className="mt-2 block w-full text-sm text-text file:mr-3 file:rounded-lg file:border file:border-border file:bg-surface-raised file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-text"
           />
         </div>
         <ErrorBanner error={error} />
@@ -139,7 +139,7 @@ function CsvImporter({
             <StatCard label="Skipped" value={report.skipped} tone={report.skipped > 0 ? "warning" : "default"} />
           </div>
           {hideCreated && report.skipped > 0 && (
-            <p className="text-[13px] text-ink-soft">Skipped rows were identical to what was already stored.</p>
+            <p className="text-[13px] text-text-muted">Skipped rows were identical to what was already stored.</p>
           )}
 
           {report.errors.length > 0 && (
@@ -176,15 +176,15 @@ function ReportTable({
   rows: Array<{ row: number; text: string }>;
 }) {
   return (
-    <div className="rounded-sm border border-mist bg-surface">
-      <h3 className={`border-b border-mist px-4 py-3 text-sm font-bold ${tone === "danger" ? "text-danger" : "text-ink"}`}>
+    <div className="rounded-lg border border-border bg-surface">
+      <h3 className={`border-b border-border px-4 py-3 text-sm font-bold ${tone === "danger" ? "text-danger" : "text-text"}`}>
         {title}
       </h3>
-      <ul className="max-h-96 divide-y divide-mist overflow-auto">
+      <ul className="max-h-96 divide-y divide-border overflow-auto">
         {rows.map((r, i) => (
           <li key={i} className="flex gap-4 px-4 py-2 text-sm">
-            <span className="w-16 flex-shrink-0 text-ink-soft">Row {r.row}</span>
-            <span className="text-ink">{r.text}</span>
+            <span className="w-16 flex-shrink-0 text-text-muted">Row {r.row}</span>
+            <span className="text-text">{r.text}</span>
           </li>
         ))}
       </ul>

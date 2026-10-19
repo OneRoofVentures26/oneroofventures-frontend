@@ -15,7 +15,7 @@ export default function AdminGuard({ children }: { children: ReactNode }) {
 
   if (!session) {
     return (
-      <div className="flex min-h-screen items-center justify-center text-sm text-ink-soft">
+      <div className="flex min-h-screen items-center justify-center text-sm text-text-muted">
         Checking session…
       </div>
     );

@@ -35,20 +35,20 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="admin-shell flex min-h-screen items-center justify-center bg-paper px-4">
+    <div className="admin-shell flex min-h-screen items-center justify-center bg-bg px-4">
       <div className="w-full max-w-sm">
         <div className="mb-6 flex flex-col items-center gap-2">
-          <Logo size={36} />
-          <span className="text-[13px] font-medium text-ink-soft">Admin</span>
+          <Logo size={48} />
+          <span className="text-[13px] font-medium text-text-muted">Admin</span>
         </div>
 
-        <form onSubmit={handleSubmit} className="rounded-sm border border-mist bg-surface p-6">
-          <h1 className="text-2xl text-ink">Sign in</h1>
-          <p className="mt-1 text-sm text-ink-soft">Manage agencies, packages and leads.</p>
+        <form onSubmit={handleSubmit} className="rounded-lg border border-border bg-surface p-6">
+          <h1 className="text-2xl text-text">Sign in</h1>
+          <p className="mt-1 text-sm text-text-muted">Manage agencies, packages and leads.</p>
 
           <div className="mt-5 space-y-4">
             <div>
-              <label htmlFor="admin-email" className="text-sm font-medium text-ink">
+              <label htmlFor="admin-email" className="text-sm font-medium text-text">
                 Email
               </label>
               <input
@@ -58,11 +58,11 @@ export default function AdminLoginPage() {
                 autoComplete="username"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 min-h-11 w-full rounded-sm border border-mist bg-surface px-3 py-2 text-sm outline-none focus:border-harbor"
+                className="mt-1 min-h-11 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none transition-[border-color,box-shadow] focus:border-primary focus:ring-4 focus:ring-ring/15"
               />
             </div>
             <div>
-              <label htmlFor="admin-password" className="text-sm font-medium text-ink">
+              <label htmlFor="admin-password" className="text-sm font-medium text-text">
                 Password
               </label>
               <input
@@ -72,22 +72,22 @@ export default function AdminLoginPage() {
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 min-h-11 w-full rounded-sm border border-mist bg-surface px-3 py-2 text-sm outline-none focus:border-harbor"
+                className="mt-1 min-h-11 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none transition-[border-color,box-shadow] focus:border-primary focus:ring-4 focus:ring-ring/15"
               />
             </div>
           </div>
 
-          {error && <p className="mt-4 rounded-sm bg-danger/10 px-3 py-2 text-sm text-danger">{error}</p>}
+          {error && <p className="mt-4 rounded-lg bg-danger/10 px-3 py-2 text-sm text-danger">{error}</p>}
 
           <button
             type="submit"
             disabled={submitting}
-            className="mt-5 min-h-11 w-full rounded-sm bg-harbor px-4 py-2.5 text-sm font-semibold text-paper transition hover:bg-harbor-dark disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-5 min-h-11 w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-fg transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
           >
             {submitting ? "Signing in…" : "Sign in"}
           </button>
           {submitting && (
-            <p className="mt-2 text-center text-[13px] text-ink-soft">
+            <p className="mt-2 text-center text-[13px] text-text-muted">
               The server may take up to a minute to wake up.
             </p>
           )}

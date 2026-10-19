@@ -73,9 +73,9 @@ export default function CitiesPage() {
       />
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <section className="rounded-sm border border-mist bg-surface p-5">
+        <section className="rounded-lg border border-border bg-surface p-5">
           <div className="flex items-center justify-between gap-2">
-            <h2 className="text-lg text-ink">Cities</h2>
+            <h2 className="text-lg text-text">Cities</h2>
             <RefreshButton onRefresh={cities.reload} loading={cities.loading} label="cities" />
           </div>
           <div className="mt-4">
@@ -92,10 +92,10 @@ export default function CitiesPage() {
           <div className="mt-4">
             <ErrorBanner error={cities.error} onRetry={cities.reload} />
             {!cities.data ? (
-              !cities.error && <p className="text-sm text-ink-soft">Loading…</p>
+              !cities.error && <p className="text-sm text-text-muted">Loading…</p>
             ) : (
-              <ul className="divide-y divide-mist rounded-sm border border-mist">
-                {cities.data.length === 0 && <li className="p-4 text-sm text-ink-soft">No cities yet.</li>}
+              <ul className="divide-y divide-border rounded-lg border border-border">
+                {cities.data.length === 0 && <li className="p-4 text-sm text-text-muted">No cities yet.</li>}
                 {cities.data.map((c) => (
                   <CityRow
                     key={c.id}
@@ -115,9 +115,9 @@ export default function CitiesPage() {
           </div>
         </section>
 
-        <section className="rounded-sm border border-mist bg-surface p-5">
+        <section className="rounded-lg border border-border bg-surface p-5">
           <div className="flex items-center justify-between gap-2">
-            <h2 className="text-lg text-ink">
+            <h2 className="text-lg text-text">
               Localities {selected ? `in ${selected.name}` : ""}
             </h2>
             {selected && (
@@ -125,7 +125,7 @@ export default function CitiesPage() {
             )}
           </div>
           {!selected ? (
-            <p className="mt-4 text-sm text-ink-soft">Add a city first.</p>
+            <p className="mt-4 text-sm text-text-muted">Add a city first.</p>
           ) : (
             <>
               <div className="mt-4">
@@ -141,11 +141,11 @@ export default function CitiesPage() {
               <div className="mt-4">
                 <ErrorBanner error={localities.error} onRetry={localities.reload} />
                 {!localities.data ? (
-                  !localities.error && <p className="text-sm text-ink-soft">Loading…</p>
+                  !localities.error && <p className="text-sm text-text-muted">Loading…</p>
                 ) : (
-                  <ul className="divide-y divide-mist rounded-sm border border-mist">
+                  <ul className="divide-y divide-border rounded-lg border border-border">
                     {localities.data.length === 0 && (
-                      <li className="p-4 text-sm text-ink-soft">No localities in {selected.name} yet.</li>
+                      <li className="p-4 text-sm text-text-muted">No localities in {selected.name} yet.</li>
                     )}
                     {localities.data.map((l) => (
                       <LocalityRow
@@ -221,8 +221,8 @@ function CityForm({
         <input value={slug} maxLength={140} onChange={(e) => setSlug(e.target.value)} placeholder="slug (optional)" className={cn(inputClass, "mt-0")} />
       </div>
       <div className="flex flex-wrap items-center gap-3">
-        <label className="flex items-center gap-2 text-sm text-ink">
-          <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} className="h-4 w-4 accent-harbor" />
+        <label className="flex items-center gap-2 text-sm text-text">
+          <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} className="h-4 w-4 accent-primary" />
           Active (shown on site)
         </label>
         <button type="submit" disabled={saving} className={primaryButton}>
@@ -268,13 +268,13 @@ function CityRow({
     );
   }
   return (
-    <li className={cn("flex items-center justify-between gap-3 px-3 py-2.5", selected && "bg-harbor-light/40")}>
+    <li className={cn("flex items-center justify-between gap-3 px-3 py-2.5", selected && "bg-primary/6")}>
       <button type="button" onClick={onSelect} className="min-w-0 text-left">
-        <p className="text-sm font-medium text-ink">
+        <p className="text-sm font-medium text-text">
           {city.name}
-          {!city.active && <span className="ml-2 text-[13px] font-normal text-ink-soft">(inactive)</span>}
+          {!city.active && <span className="ml-2 text-[13px] font-normal text-text-muted">(inactive)</span>}
         </p>
-        <p className="text-[13px] text-ink-soft">/{city.slug}</p>
+        <p className="text-[13px] text-text-muted">/{city.slug}</p>
       </button>
       <div className="flex flex-shrink-0 gap-3">
         <button type="button" onClick={() => setEditing(true)} className={linkButton}>
@@ -366,8 +366,8 @@ function LocalityRow({
   return (
     <li className="flex items-center justify-between gap-3 px-3 py-2.5">
       <div className="min-w-0">
-        <p className="text-sm font-medium text-ink">{locality.name}</p>
-        <p className="text-[13px] text-ink-soft">{locality.slug}</p>
+        <p className="text-sm font-medium text-text">{locality.name}</p>
+        <p className="text-[13px] text-text-muted">{locality.slug}</p>
       </div>
       <div className="flex flex-shrink-0 gap-3">
         <button type="button" onClick={() => setEditing(true)} className={linkButton}>

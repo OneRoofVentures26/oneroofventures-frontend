@@ -29,8 +29,8 @@ export interface FilterSidebarProps {
   className?: string;
 }
 
-const legendClass = "font-serif text-base font-semibold text-ink";
-const optionClass = "flex min-h-11 items-center gap-2.5 text-sm text-ink lg:min-h-8";
+const legendClass = "font-display text-base font-semibold text-text";
+const optionClass = "flex min-h-11 items-center gap-2.5 text-sm text-text lg:min-h-8";
 
 export default function FilterSidebar({
   services,
@@ -49,10 +49,10 @@ export default function FilterSidebar({
   className,
 }: FilterSidebarProps) {
   return (
-    <div className={cn("space-y-6 [&>fieldset]:border-t [&>fieldset]:border-mist [&>fieldset]:pt-5", className)}>
+    <div className={cn("space-y-6 [&>fieldset]:border-t [&>fieldset]:border-border [&>fieldset]:pt-5", className)}>
       <div className="flex items-center justify-between">
-        <h2 className="text-xl text-ink">Filters</h2>
-        <button onClick={onReset} className="inline-flex min-h-11 items-center text-sm font-medium text-harbor hover:underline lg:min-h-0">
+        <h2 className="text-xl text-text">Filters</h2>
+        <button onClick={onReset} className="inline-flex min-h-11 items-center text-sm font-medium text-primary-text hover:underline lg:min-h-0">
           Reset
         </button>
       </div>
@@ -67,7 +67,7 @@ export default function FilterSidebar({
                 name="service"
                 checked={service === s.slug}
                 onChange={() => onServiceChange(s.slug)}
-                className="h-4 w-4 accent-harbor"
+                className="h-4 w-4 accent-primary"
               />
               {s.name}
             </label>
@@ -85,13 +85,13 @@ export default function FilterSidebar({
                 name="budget"
                 checked={budgetMax === band.max}
                 onChange={() => onBudgetMaxChange(band.max)}
-                className="h-4 w-4 accent-harbor"
+                className="h-4 w-4 accent-primary"
               />
               {band.label}
             </label>
           ))}
         </div>
-        <p className="mt-2 text-[13px] text-ink-soft">
+        <p className="mt-2 text-[13px] text-text-muted">
           Shows agencies with at least one package in budget. Quote-only agencies are hidden.
         </p>
       </fieldset>
@@ -122,7 +122,7 @@ export default function FilterSidebar({
               type="checkbox"
               checked={verifiedOnly}
               onChange={(e) => onVerifiedOnlyChange(e.target.checked)}
-              className="h-4 w-4 accent-harbor"
+              className="h-4 w-4 accent-primary"
             />
             Verified agencies
           </label>
@@ -131,7 +131,7 @@ export default function FilterSidebar({
               type="checkbox"
               checked={pricesOnly}
               onChange={(e) => onPricesOnlyChange(e.target.checked)}
-              className="h-4 w-4 accent-harbor"
+              className="h-4 w-4 accent-primary"
             />
             Agencies that show prices
           </label>

@@ -147,6 +147,7 @@ export default function CompareClient({ services }: { services: ServiceItem[] })
   const { data, profiles } = current;
   const serviceByCode = new Map(services.map((s) => [s.code, s]));
   const grids = data.services ?? {};
+  const cityName = profiles?.values().next().value?.city.name ?? null;
   const codes = Object.keys(grids);
   const activeTab = codes.includes(activeService) ? activeService : "";
   const shownCodes = activeTab ? [activeTab] : codes;
@@ -217,6 +218,8 @@ export default function CompareClient({ services }: { services: ServiceItem[] })
                 agencies={data.agencies}
                 grid={grids[code]}
                 citySlug={citySlug}
+                cityRange={data.cityRanges?.[code] ?? null}
+                cityName={cityName}
                 quoteHref={quoteHrefFor(code)}
                 onRemove={handleRemove}
               />

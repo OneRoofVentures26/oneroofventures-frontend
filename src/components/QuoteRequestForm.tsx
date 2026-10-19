@@ -31,6 +31,8 @@ interface QuoteRequestFormProps {
   initialAgencies: AgencyProfile[];
   initialPackageId: number | null;
   initialServiceSlug: string;
+  /** Monthly budget in rupees, e.g. from the homepage quiz. */
+  initialBudget?: string;
   /** Agencies in the link that couldn't be found (unpublished or wrong city). */
   missingAgencies: number;
 }
@@ -38,7 +40,7 @@ interface QuoteRequestFormProps {
 type Errors = Partial<Record<keyof LeadRequest | "form", string>>;
 
 const inputClass =
-  "mt-1 min-h-11 w-full rounded-sm border bg-surface px-3 py-2 text-sm outline-none focus:border-harbor disabled:bg-muted disabled:text-ink-soft";
+  "mt-1 min-h-11 w-full rounded-lg border bg-surface px-3 py-2 text-sm outline-none focus:border-primary disabled:bg-surface-raised disabled:text-text-muted";
 
 function guessService(agencies: AgencyProfile[], packageId: number | null, services: ServiceItem[]): string {
   if (agencies.length === 1 && packageId) {
@@ -58,6 +60,7 @@ export default function QuoteRequestForm({
   initialAgencies,
   initialPackageId,
   initialServiceSlug,
+  initialBudget = "",
   missingAgencies,
 }: QuoteRequestFormProps) {
   const [agencies, setAgencies] = useState(initialAgencies);
@@ -76,7 +79,7 @@ export default function QuoteRequestForm({
     initialServiceSlug || guessService(initialAgencies, initialPackageId, services),
   );
   const [packageId, setPackageId] = useState<number | null>(initialPackageId);
-  const [budget, setBudget] = useState("");
+  const [budget, setBudget] = useState(initialBudget);
   const [message, setMessage] = useState("");
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [errors, setErrors] = useState<Errors>({});
@@ -167,29 +170,29 @@ export default function QuoteRequestForm({
 
   if (result) {
     return (
-      <div className="border-y-2 border-harbor bg-surface px-4 py-8 text-center">
-        <p className="font-serif text-2xl font-semibold text-harbor">Quote request sent</p>
+      <div className="border-y-2 border-primary bg-surface px-4 py-8 text-center">
+        <p className="font-display text-2xl font-semibold text-primary-text">Quote request sent</p>
         {result.sentTo.length > 0 ? (
           <>
-            <p className="mt-2 text-sm text-ink-soft">
+            <p className="mt-2 text-sm text-text-muted">
               We&apos;ve forwarded your brief to {result.sentTo.length}{" "}
               {result.sentTo.length === 1 ? "agency" : "agencies"}. Expect them to get in touch soon.
             </p>
             <ul className="mt-3 flex flex-wrap justify-center gap-2">
               {result.sentTo.map((a) => (
-                <li key={a.id} className="rounded-sm bg-mist/60 px-2 py-0.5 text-[13px] font-medium text-ink">
+                <li key={a.id} className="rounded-lg bg-border/60 px-2 py-0.5 text-[13px] font-medium text-text">
                   {a.name}
                 </li>
               ))}
             </ul>
           </>
         ) : (
-          <p className="mt-2 text-sm text-ink-soft">
+          <p className="mt-2 text-sm text-text-muted">
             We&apos;ve received your request and will match you with agencies shortly.
           </p>
         )}
-        <p className="mt-4 text-[13px] text-ink-soft">Reference #{result.leadId}</p>
-        <Link href={citySlug ? `/${citySlug}` : "/"} className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-harbor hover:underline">
+        <p className="mt-4 text-[13px] text-text-muted">Reference #{result.leadId}</p>
+        <Link href={citySlug ? `/${citySlug}` : "/"} className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-primary-text hover:underline">
           Keep browsing agencies →
         </Link>
       </div>
@@ -198,32 +201,32 @@ export default function QuoteRequestForm({
 
   const fieldError = (key: keyof Errors) =>
     errors[key] ? <p className="mt-1 text-[13px] text-danger">{errors[key]}</p> : null;
-  const borderFor = (key: keyof Errors) => (errors[key] ? "border-danger" : "border-mist");
+  const borderFor = (key: keyof Errors) => (errors[key] ? "border-danger" : "border-border");
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6" noValidate>
       {missingAgencies > 0 && (
-        <p className="rounded-sm border-l-2 border-danger bg-danger/5 px-3 py-2 text-sm text-ink">
+        <p className="rounded-lg border-l-2 border-danger bg-danger/5 px-3 py-2 text-sm text-text">
           {missingAgencies === 1 ? "One agency" : `${missingAgencies} agencies`} from your link{" "}
           {missingAgencies === 1 ? "is" : "are"} no longer listed and won&apos;t receive this request.
         </p>
       )}
 
       <div>
-        <p className="text-sm font-medium text-ink">Sending to</p>
+        <p className="text-sm font-medium text-text">Sending to</p>
         {agencies.length > 0 ? (
           <ul className="mt-2 flex flex-wrap gap-2">
             {agencies.map((a) => (
               <li
                 key={a.id}
-                className="flex items-center gap-1 rounded-sm bg-mist/60 py-0.5 pl-3 pr-0.5 text-sm font-medium text-ink"
+                className="flex items-center gap-1 rounded-lg bg-border/60 py-0.5 pl-3 pr-0.5 text-sm font-medium text-text"
               >
                 {a.name}
                 <button
                   type="button"
                   onClick={() => setAgencies((prev) => prev.filter((x) => x.id !== a.id))}
                   aria-label={`Remove ${a.name}`}
-                  className="flex h-10 w-10 items-center justify-center text-ink-soft hover:text-danger"
+                  className="flex h-10 w-10 items-center justify-center text-text-muted hover:text-danger"
                 >
                   ✕
                 </button>
@@ -231,7 +234,7 @@ export default function QuoteRequestForm({
             ))}
           </ul>
         ) : (
-          <p className="mt-2 text-sm text-ink-soft">
+          <p className="mt-2 text-sm text-text-muted">
             Up to 3 agencies that match your city, service and budget — we pick them for you.
           </p>
         )}
@@ -239,7 +242,7 @@ export default function QuoteRequestForm({
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="q-name" className="text-sm font-medium text-ink">
+          <label htmlFor="q-name" className="text-sm font-medium text-text">
             Your name *
           </label>
           <input
@@ -252,7 +255,7 @@ export default function QuoteRequestForm({
           {fieldError("name")}
         </div>
         <div>
-          <label htmlFor="q-phone" className="text-sm font-medium text-ink">
+          <label htmlFor="q-phone" className="text-sm font-medium text-text">
             Mobile number *
           </label>
           <input
@@ -267,7 +270,7 @@ export default function QuoteRequestForm({
           {fieldError("phone")}
         </div>
         <div>
-          <label htmlFor="q-email" className="text-sm font-medium text-ink">
+          <label htmlFor="q-email" className="text-sm font-medium text-text">
             Email
           </label>
           <input
@@ -281,7 +284,7 @@ export default function QuoteRequestForm({
           {fieldError("email")}
         </div>
         <div>
-          <label htmlFor="q-business" className="text-sm font-medium text-ink">
+          <label htmlFor="q-business" className="text-sm font-medium text-text">
             Business name
           </label>
           <input
@@ -294,7 +297,7 @@ export default function QuoteRequestForm({
           {fieldError("businessName")}
         </div>
         <div>
-          <label htmlFor="q-type" className="text-sm font-medium text-ink">
+          <label htmlFor="q-type" className="text-sm font-medium text-text">
             Type of business
           </label>
           <input
@@ -314,7 +317,7 @@ export default function QuoteRequestForm({
           {fieldError("businessType")}
         </div>
         <div>
-          <label htmlFor="q-budget" className="text-sm font-medium text-ink">
+          <label htmlFor="q-budget" className="text-sm font-medium text-text">
             Monthly budget (₹)
           </label>
           <input
@@ -328,7 +331,7 @@ export default function QuoteRequestForm({
           {fieldError("budgetMonthly")}
         </div>
         <div>
-          <label htmlFor="q-city" className="text-sm font-medium text-ink">
+          <label htmlFor="q-city" className="text-sm font-medium text-text">
             City *
           </label>
           <select
@@ -351,7 +354,7 @@ export default function QuoteRequestForm({
           {fieldError("citySlug")}
         </div>
         <div>
-          <label htmlFor="q-locality" className="text-sm font-medium text-ink">
+          <label htmlFor="q-locality" className="text-sm font-medium text-text">
             Area
           </label>
           <select
@@ -373,7 +376,7 @@ export default function QuoteRequestForm({
       </div>
 
       <div>
-        <label className="text-sm font-medium text-ink">Service needed *</label>
+        <label className="text-sm font-medium text-text">Service needed *</label>
         <div className="mt-2 flex flex-wrap gap-2">
           {services.map((s) => (
             <button
@@ -392,7 +395,7 @@ export default function QuoteRequestForm({
 
       {packageOptions.length > 0 && (
         <div>
-          <label htmlFor="q-package" className="text-sm font-medium text-ink">
+          <label htmlFor="q-package" className="text-sm font-medium text-text">
             Package you&apos;re interested in
           </label>
           <select
@@ -413,7 +416,7 @@ export default function QuoteRequestForm({
       )}
 
       <div>
-        <label htmlFor="q-message" className="text-sm font-medium text-ink">
+        <label htmlFor="q-message" className="text-sm font-medium text-text">
           Tell us about your project
         </label>
         <textarea
@@ -434,7 +437,7 @@ export default function QuoteRequestForm({
       </div>
 
       {(errors.form || errors.agencyId || errors.agencyIds) && (
-        <p className="rounded-sm bg-danger/10 px-3 py-2 text-sm text-danger">
+        <p className="rounded-lg bg-danger/10 px-3 py-2 text-sm text-danger">
           {errors.form ?? errors.agencyId ?? errors.agencyIds}
         </p>
       )}
@@ -452,7 +455,7 @@ export default function QuoteRequestForm({
               : "Get matched quotes"}
         </button>
         {status === "sending" && (
-          <p className="mt-2 text-center text-[13px] text-ink-soft">This can take up to a minute if our server is waking up.</p>
+          <p className="mt-2 text-center text-[13px] text-text-muted">This can take up to a minute if our server is waking up.</p>
         )}
       </div>
     </form>

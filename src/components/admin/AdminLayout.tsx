@@ -6,7 +6,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAdminSession, logout } from "@/lib/admin-auth";
 import { cn } from "@/lib/utils";
 import Logo from "@/components/Logo";
-import ThemeToggle from "@/components/ThemeToggle";
 
 const NAV_ITEMS = [
   { href: "/admin", label: "Dashboard" },
@@ -41,10 +40,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           href={item.href}
           onClick={() => setSidebarOpen(false)}
           className={cn(
-            "block rounded-sm border-l-2 px-3 py-2 text-sm font-medium transition",
+            "block rounded-lg border-l-2 px-3 py-2 text-sm font-medium transition",
             isActive(item.href)
-              ? "border-paper bg-harbor-dark text-paper"
-              : "border-transparent text-paper/75 hover:bg-harbor-dark hover:text-paper",
+              ? "border-accent bg-surface text-text"
+              : "border-transparent text-text-muted hover:bg-surface hover:text-text",
           )}
         >
           {item.label}
@@ -54,14 +53,14 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         href="/"
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-4 block rounded-sm border-t border-paper/15 px-3 pb-2 pt-4 text-sm font-medium text-paper/75 transition hover:text-paper"
+        className="mt-4 block border-t border-border px-3 pb-2 pt-4 text-sm font-medium text-text-muted transition hover:text-text"
       >
         View site ↗
       </a>
       <button
         type="button"
         onClick={handleLogout}
-        className="block w-full rounded-sm px-3 py-2 text-left text-sm font-medium text-paper/75 transition hover:bg-harbor-dark hover:text-paper"
+        className="block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-text-muted transition hover:bg-surface hover:text-text"
       >
         Logout
       </button>
@@ -69,7 +68,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   );
 
   return (
-    <div className="admin-shell min-h-screen bg-paper">
+    <div className="admin-shell min-h-screen bg-bg">
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-surface px-4 sm:px-6">
         <div className="flex items-center gap-3">
           <button
@@ -82,27 +81,26 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               <path d="M3 5h14M3 10h14M3 15h14" strokeLinecap="square" />
             </svg>
           </button>
-          <Logo size={26} />
+          <Logo size={34} />
           <span className="hidden border-l border-border pl-3 text-sm font-medium text-text-muted sm:inline">Admin</span>
         </div>
         <div className="flex min-w-0 items-center gap-3">
           <span className="min-w-0 truncate text-sm text-text-muted">{session?.username}</span>
-          <ThemeToggle />
         </div>
       </header>
 
       <div className="flex">
-        <aside className="sticky top-14 hidden h-[calc(100dvh-3.5rem)] w-56 flex-shrink-0 self-start overflow-y-auto bg-harbor p-4 lg:block">
+        <aside className="sticky top-14 hidden h-[calc(100dvh-3.5rem)] w-56 flex-shrink-0 self-start overflow-y-auto p-4 lg:block theme-navy">
           {navLinks}
         </aside>
 
         {sidebarOpen && (
           <div className="fixed inset-0 z-40 lg:hidden">
             <div
-              className="absolute inset-0 bg-ink/40"
+              className="absolute inset-0 bg-ink/50"
               onClick={() => setSidebarOpen(false)}
             />
-            <aside className="absolute inset-y-0 left-0 w-56 bg-harbor p-4">
+            <aside className="theme-navy absolute inset-y-0 left-0 w-56 p-4">
               {navLinks}
             </aside>
           </div>

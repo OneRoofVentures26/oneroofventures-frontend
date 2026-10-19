@@ -46,6 +46,7 @@ export default async function QuotePage({ searchParams }: PageProps<"/quote">) {
 
   const packageId = Number(param(sp.package));
   const serviceSlug = param(sp.service);
+  const budget = param(sp.budget);
 
   return (
     <Container className="grid grid-cols-1 gap-6 pb-12 pt-6 md:pb-16 md:pt-10 lg:pb-20 lg:grid-cols-12 lg:gap-12">
@@ -78,6 +79,7 @@ export default async function QuotePage({ searchParams }: PageProps<"/quote">) {
         initialAgencies={agencies}
         initialPackageId={Number.isInteger(packageId) && packageId > 0 ? packageId : null}
         initialServiceSlug={serviceSlug && services.some((s) => s.slug === serviceSlug) ? serviceSlug : ""}
+        initialBudget={budget && /^\d{1,9}$/.test(budget) ? budget : ""}
         missingAgencies={agencySlugs.length - agencies.length}
       />
       </div>

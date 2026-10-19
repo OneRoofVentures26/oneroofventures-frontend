@@ -99,7 +99,7 @@ export default function DataTable<T>({
               setPage(1);
             }}
             placeholder={searchPlaceholder}
-            className="w-full rounded-sm border border-mist bg-surface px-3 py-2 text-sm outline-none focus:border-harbor sm:max-w-xs"
+            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary sm:max-w-xs"
           />
         ) : (
           <div />
@@ -113,17 +113,17 @@ export default function DataTable<T>({
       </div>
       )}
 
-      <div className="overflow-x-auto rounded-sm border border-mist border-t-ink/80 bg-surface">
+      <div className="overflow-x-auto rounded-lg border border-border border-t-text/80 bg-surface">
         <table className="w-full min-w-[640px] border-collapse text-sm">
           <thead>
-            <tr className="border-b border-mist">
+            <tr className="border-b border-border">
               {columns.map((col) => (
                 <th
                   key={col.key}
                   onClick={() => toggleSort(col)}
                   className={cn(
-                    "whitespace-nowrap p-3 text-left text-[13px] font-semibold text-ink-soft",
-                    col.sortValue && "cursor-pointer select-none hover:text-ink",
+                    "whitespace-nowrap p-3 text-left text-[13px] font-semibold text-text-muted",
+                    col.sortValue && "cursor-pointer select-none hover:text-text",
                     col.className,
                   )}
                 >
@@ -131,21 +131,21 @@ export default function DataTable<T>({
                   {sortKey === col.key && (sortDir === "asc" ? " ↑" : " ↓")}
                 </th>
               ))}
-              {renderActions && <th className="p-3 text-right text-[13px] font-semibold text-ink-soft">Actions</th>}
+              {renderActions && <th className="p-3 text-right text-[13px] font-semibold text-text-muted">Actions</th>}
             </tr>
           </thead>
           <tbody>
             {paged.length === 0 ? (
               <tr>
-                <td colSpan={columns.length + (renderActions ? 1 : 0)} className="p-8 text-center text-sm text-ink-soft">
+                <td colSpan={columns.length + (renderActions ? 1 : 0)} className="p-8 text-center text-sm text-text-muted">
                   {emptyMessage}
                 </td>
               </tr>
             ) : (
               paged.map((row) => (
-                <tr key={getRowId(row)} className="border-b border-mist last:border-0 hover:bg-muted/30">
+                <tr key={getRowId(row)} className="border-b border-border last:border-0 hover:bg-surface-raised/30">
                   {columns.map((col) => (
-                    <td key={col.key} className={cn("p-3 align-middle text-ink", col.className)}>
+                    <td key={col.key} className={cn("p-3 align-middle text-text", col.className)}>
                       {col.render(row)}
                     </td>
                   ))}
@@ -163,7 +163,7 @@ export default function DataTable<T>({
 
       {totalPages > 1 && (
         <div className="mt-4 flex items-center justify-between">
-          <p className="text-[13px] text-ink-soft">
+          <p className="text-[13px] text-text-muted">
             Page {currentPage} of {totalPages} · {sorted.length} total
           </p>
           <div className="flex items-center gap-2">
@@ -171,7 +171,7 @@ export default function DataTable<T>({
               type="button"
               disabled={currentPage === 1}
               onClick={() => setPage((p) => p - 1)}
-              className="rounded-sm border border-mist px-3 py-1.5 text-[13px] font-medium text-ink disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-lg border border-border px-3 py-1.5 text-[13px] font-medium text-text disabled:cursor-not-allowed disabled:opacity-40"
             >
               Previous
             </button>
@@ -179,7 +179,7 @@ export default function DataTable<T>({
               type="button"
               disabled={currentPage === totalPages}
               onClick={() => setPage((p) => p + 1)}
-              className="rounded-sm border border-mist px-3 py-1.5 text-[13px] font-medium text-ink disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-lg border border-border px-3 py-1.5 text-[13px] font-medium text-text disabled:cursor-not-allowed disabled:opacity-40"
             >
               Next
             </button>

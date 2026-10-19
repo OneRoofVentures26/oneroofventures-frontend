@@ -1,93 +1,117 @@
 @import "tailwindcss";
 
-/* next-themes puts `light` or `dark` on <html>; components should rarely need
-   this because every colour below is a token that already switches. */
-@custom-variant dark (&:where(.dark, .dark *));
-
 /*
- * OneRoof design tokens. Every colour in a component comes from here.
+ * OneRoof design tokens. Every colour in a component comes from here; there is
+ * one theme (no light/dark switch).
  *
- * - primary (iris) is for fills; primary-text is the AA-safe version for text
- *   and links (lighter in dark theme).
- * - accent (saffron) is for ratings, stars and the OneRoof Score only;
- *   accent-text is its AA-safe text colour.
- * - success (mint) is for Verified and positive states.
- * - The signature gradient is used sparingly: logo mark, hero glow, primary
- *   CTA hover border, one highlighted number.
+ * Brand palette:
+ *   cream  #E8D5BF   orange #FE7522   navy #0E3655   ink #1F1F1F
+ *
+ * - primary (navy) is for fills, links and selected states; primary-text is
+ *   the AA-safe version for text.
+ * - accent (orange) is for the main call to action, ratings, the OneRoof
+ *   Score and italic emphasis; accent-text is its AA-safe text colour.
+ * - The signature gradient (navy → orange) is used sparingly: logo mark,
+ *   progress bars, primary CTA hover border.
+ *
+ * Panels in the brand colours use a scope class instead of one-off colours:
+ * `.theme-navy` (hero, CTA band, admin sidebar) and `.theme-ink` (footer)
+ * re-point the same tokens, so everything inside them adapts on its own.
  */
-:root,
-.light {
+:root {
   color-scheme: light;
 
-  /* Soft ivory rather than pure white: warm enough to feel softer, neutral
-     enough that the cool iris primary stays clean on it. */
-  --bg: #f8f6f1;
-  --surface: #fffefb;
-  --surface-raised: #f0ede6;
-  --band: #f1eee7;
-  --border: #e5e1d8;
-  --text: #1c1828;
-  --text-muted: #5f5b6e;
+  --brand-cream: #e8d5bf;
+  --brand-orange: #fe7522;
+  --brand-navy: #0e3655;
+  --brand-ink: #1f1f1f;
 
-  --primary: #5b5bf0;
-  --primary-hover: #4a48e0;
-  --primary-text: #4643d6;
-  --primary-fg: #ffffff;
+  /* Canvas is the cream at half strength so long pages stay easy to read;
+     the full cream is kept for bands. */
+  --bg: #f4eadf;
+  --surface: #fbf7f1;
+  --surface-raised: #ede1d2;
+  --band: var(--brand-cream);
+  --border: #e6d9c8;
+  --text: var(--brand-ink);
+  --text-muted: #5c5650;
 
-  --accent: #f5a623;
-  --accent-text: #8f5200;
-  --success: #17b892;
-  --success-text: #0a7158;
-  --danger: #c9343f;
-  --ring: #5b5bf0;
+  --primary: var(--brand-navy);
+  --primary-hover: #0a2941;
+  --primary-text: var(--brand-navy);
+  --primary-fg: #fbf7f1;
 
-  --gradient: linear-gradient(135deg, #5b5bf0 0%, #8b5cf6 50%, #22d3ee 100%);
-  /* Same hues, darker cyan end so gradient text holds 3:1 on light backgrounds. */
-  --gradient-text: linear-gradient(135deg, #5b5bf0 0%, #8b5cf6 50%, #0891b2 100%);
+  --accent: var(--brand-orange);
+  --accent-hover: #ff8a45;
+  --accent-text: #9a3d0a;
+  --accent-fg: var(--brand-ink);
+  /* "VENTURES" under the wordmark. */
+  --logo-sub: var(--brand-navy);
+  --success: #2f9461;
+  --success-text: #1d6b43;
+  --danger: #c0362c;
+  --ring: var(--brand-navy);
 
-  /* Warm-tinted shadows so cards sit on the cream instead of looking grey. */
-  --shadow-card: 0 1px 2px rgb(48 40 28 / 0.05), 0 4px 12px -2px rgb(48 40 28 / 0.07);
-  --shadow-card-hover: 0 2px 4px rgb(48 40 28 / 0.06), 0 16px 32px -8px rgb(48 40 28 / 0.14);
-  --shadow-raised: 0 1px 2px rgb(48 40 28 / 0.06), 0 12px 32px -8px rgb(48 40 28 / 0.16);
+  --gradient: linear-gradient(135deg, #0e3655 0%, #fe7522 100%);
+  /* Darker orange so gradient numbers hold 3:1 on the cream canvas. */
+  --gradient-text: linear-gradient(135deg, #d9580c 0%, #9a3d0a 100%);
+  /* Navy panel with an orange glow rising from the bottom (the brand poster). */
+  --glow: radial-gradient(120% 90% at 85% 115%, rgb(254 117 34 / 0.55), transparent 60%),
+    radial-gradient(80% 60% at 0% 0%, rgb(255 255 255 / 0.04), transparent 70%);
 
-  --glass: rgb(250 248 243 / 0.8);
-  --dot: rgb(48 40 28 / 0.13);
-  --aurora-opacity: 0.28;
+  /* Flat by default: cards are defined by a hairline border, and only
+     floating things (menus, sheets, hover) get a soft shadow. */
+  --shadow-card: 0 0 #0000;
+  --shadow-card-hover: 0 12px 28px -16px rgb(31 31 31 / 0.18);
+  --shadow-raised: 0 16px 40px -20px rgb(31 31 31 / 0.22);
+
+  --glass: rgb(244 234 223 / 0.82);
 }
 
-.dark {
+/* Navy and ink panels: same tokens, re-pointed for a dark brand surface. */
+.theme-navy,
+.theme-ink {
   color-scheme: dark;
 
-  --bg: #0a0b14;
-  --surface: #12142a;
-  --surface-raised: #1a1d38;
-  --band: #0f1123;
-  --border: rgb(255 255 255 / 0.09);
-  --text: #eef0fa;
-  --text-muted: #a3a9c4;
+  --bg: var(--brand-navy);
+  --surface: #154166;
+  --surface-raised: #1b4b72;
+  --band: #0b2c46;
+  --border: rgb(232 213 191 / 0.12);
+  --text: #f4eadf;
+  --text-muted: #cdbba6;
 
-  --primary: #6363f2;
-  --primary-hover: #5252e6;
-  --primary-text: #8b8bff;
-  --primary-fg: #ffffff;
+  /* On a dark panel orange takes over as the action colour. */
+  --primary: var(--brand-orange);
+  --primary-hover: var(--accent-hover);
+  --primary-text: #ff9a5c;
+  --primary-fg: var(--brand-ink);
 
-  --accent: #ffb020;
-  --accent-text: #ffbe45;
-  --success: #22d3a6;
-  --success-text: #3ddbb2;
-  --danger: #ff6b7a;
-  --ring: #8b8bff;
+  --accent-text: #ff9a5c;
+  --logo-sub: #cdbba6;
+  --success: #4cc488;
+  --success-text: #6fd9a2;
+  --danger: #ff7a6e;
+  --ring: var(--brand-orange);
 
-  --gradient: linear-gradient(135deg, #5b5bf0 0%, #8b5cf6 50%, #22d3ee 100%);
-  --gradient-text: linear-gradient(135deg, #8b8bff 0%, #b197fc 50%, #22d3ee 100%);
+  --gradient-text: linear-gradient(135deg, #ffb07a 0%, #fe7522 100%);
 
-  --shadow-card: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 1px 2px rgb(0 0 0 / 0.3);
-  --shadow-card-hover: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 16px 40px -12px rgb(0 0 0 / 0.65);
-  --shadow-raised: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 16px 40px -12px rgb(0 0 0 / 0.6);
+  --shadow-card: 0 0 #0000;
+  --shadow-card-hover: 0 16px 36px -16px rgb(0 0 0 / 0.5);
+  --shadow-raised: 0 16px 40px -16px rgb(0 0 0 / 0.45);
 
-  --glass: rgb(14 16 32 / 0.7);
-  --dot: rgb(255 255 255 / 0.09);
-  --aurora-opacity: 0.5;
+  --glass: rgb(14 54 85 / 0.75);
+
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+.theme-ink {
+  --bg: var(--brand-ink);
+  --surface: #2a2a2a;
+  --surface-raised: #333333;
+  --band: #181818;
+  --glass: rgb(31 31 31 / 0.8);
 }
 
 @theme inline {
@@ -103,47 +127,37 @@
   --color-primary-text: var(--primary-text);
   --color-primary-fg: var(--primary-fg);
   --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
   --color-accent-text: var(--accent-text);
+  --color-accent-fg: var(--accent-fg);
+  --color-logo-sub: var(--logo-sub);
   --color-success: var(--success);
   --color-success-text: var(--success-text);
   --color-danger: var(--danger);
   --color-ring: var(--ring);
 
-  /*
-   * Legacy names still used by pages that haven't been restyled yet. They point
-   * at the new tokens so those pages follow the new palette and both themes.
-   * Remove each alias once nothing references it.
-   */
-  --color-ink: var(--text);
-  --color-ink-soft: var(--text-muted);
-  --color-paper: var(--bg);
-  --color-muted: var(--surface-raised);
-  --color-mist: var(--border);
-  --color-harbor: var(--primary-text);
-  --color-harbor-dark: var(--primary-hover);
-  --color-harbor-light: color-mix(in oklab, var(--primary) 12%, transparent);
-  --color-brass: var(--accent);
-  --color-brass-dark: var(--accent-text);
-  --color-brass-light: color-mix(in oklab, var(--accent) 16%, transparent);
+  --color-cream: var(--brand-cream);
+  --color-orange: var(--brand-orange);
+  --color-navy: var(--brand-navy);
+  --color-ink: var(--brand-ink);
 
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-display: var(--font-space-grotesk), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  /* Legacy: there is no serif any more. */
-  --font-serif: var(--font-space-grotesk), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  /* Primary: Sitka (Windows), Source Serif 4 elsewhere. Secondary: Helvetica. */
+  --font-display: "Sitka Heading", "Sitka Text", Sitka, var(--font-display-fallback), Georgia, serif;
+  --font-sans: "Helvetica Neue", Helvetica, Arial, ui-sans-serif, system-ui, sans-serif;
 
   /* Type scale: hero 56/34, section 32/24, card 18, body 16, small 14. */
   --text-hero: 3.5rem;
-  --text-hero--line-height: 1.05;
-  --text-hero--letter-spacing: -0.02em;
+  --text-hero--line-height: 1.06;
+  --text-hero--letter-spacing: -0.015em;
   --text-hero-sm: 2.125rem;
   --text-hero-sm--line-height: 1.12;
-  --text-hero-sm--letter-spacing: -0.02em;
+  --text-hero-sm--letter-spacing: -0.01em;
   --text-section: 2rem;
   --text-section--line-height: 1.15;
-  --text-section--letter-spacing: -0.02em;
+  --text-section--letter-spacing: -0.01em;
   --text-section-sm: 1.5rem;
   --text-section-sm--line-height: 1.2;
-  --text-section-sm--letter-spacing: -0.015em;
+  --text-section-sm--letter-spacing: -0.005em;
   --text-card: 1.125rem;
   --text-card--line-height: 1.35;
 
@@ -180,8 +194,8 @@
   h3,
   h4 {
     font-family: var(--font-display);
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-weight: 700;
+    letter-spacing: -0.01em;
     line-height: 1.2;
   }
 
@@ -200,7 +214,7 @@
   }
 
   ::selection {
-    background: color-mix(in oklab, var(--primary) 28%, transparent);
+    background: color-mix(in oklab, var(--brand-orange) 30%, transparent);
   }
 
   :focus-visible {
@@ -259,8 +273,22 @@
 /* Prices, scores and stats. */
 @utility num {
   font-family: var(--font-display);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.01em;
+  font-variant-numeric: lining-nums tabular-nums;
+  letter-spacing: 0;
+}
+
+/* The brand's italic emphasis: one word in a headline set in italic Sitka,
+   orange ("Limitless" on the brand poster). */
+@utility text-emphasis {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--accent-text);
+}
+
+/* Navy panel lit by an orange glow; pair with `.theme-navy`. */
+@utility bg-glow {
+  background-image: var(--glow);
 }
 
 @utility shadow-card {
@@ -292,40 +320,27 @@
   color: transparent;
 }
 
-/* 1px gradient border that fades in on hover (primary CTA). */
-@utility gradient-ring {
-  position: relative;
-  isolation: isolate;
-
-  &::before {
-    content: "";
-    position: absolute;
-    inset: -2px;
-    border-radius: inherit;
-    padding: 2px;
-    background: var(--gradient);
-    -webkit-mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    opacity: 0;
-    transition: opacity 200ms var(--ease-brand);
-    pointer-events: none;
-  }
-
-  &:hover::before,
-  &:focus-visible::before {
-    opacity: 1;
-  }
+/*
+ * Wordmark roof (<Logo>). The "oo" box is trimmed to the o's themselves
+ * (x-height to baseline), so the roof sits on them in any font. Browsers
+ * without text-box (Firefox) get an em-based offset tuned for Sitka.
+ */
+.logo-oo {
+  text-box: trim-both ex alphabetic;
 }
 
-/* Faint dot grid that fades out towards the edges. */
-@utility bg-dot-grid {
-  background-image: radial-gradient(var(--dot) 1px, transparent 1px);
-  background-size: 22px 22px;
-  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 20%, transparent 75%);
-  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 20%, transparent 75%);
+.logo-roof {
+  left: -0.16em;
+  width: calc(100% + 0.32em);
+  height: auto;
+  bottom: calc(100% + 0.1em);
+  aspect-ratio: 100 / 30;
+}
+
+@supports not (text-box: trim-both ex alphabetic) {
+  .logo-roof {
+    bottom: 0.81em;
+  }
 }
 
 .scrollbar-thin::-webkit-scrollbar {
@@ -359,27 +374,6 @@
   }
   to {
     opacity: 1;
-  }
-}
-
-@keyframes aurora-drift {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  50% {
-    transform: translate3d(4%, -3%, 0) scale(1.08);
-  }
-}
-
-@keyframes icon-in {
-  from {
-    opacity: 0;
-    transform: rotate(-90deg) scale(0.5);
-  }
-  to {
-    opacity: 1;
-    transform: none;
   }
 }
 
@@ -421,32 +415,9 @@
     transition-delay: var(--reveal-delay, 0ms);
   }
 
-  /* Theme toggle icon: replays whenever the icon is shown. */
-  .icon-swap {
-    animation: icon-in 320ms var(--ease-brand) both;
-  }
-
   /* Route change: a short fade on each new page. */
   .page-enter {
     animation: fade-in 220ms var(--ease-brand) both;
-  }
-
-  /* Soft aurora behind the hero. Pre-blurred radial gradients, no filter. */
-  .aurora {
-    position: absolute;
-    pointer-events: none;
-    border-radius: 9999px;
-    opacity: var(--aurora-opacity);
-    background:
-      radial-gradient(closest-side, rgb(91 91 240 / 0.55), transparent),
-      radial-gradient(closest-side at 70% 60%, rgb(139 92 246 / 0.45), transparent),
-      radial-gradient(closest-side at 30% 70%, rgb(34 211 238 / 0.35), transparent);
-  }
-
-  @media (width >= 64rem) {
-    .aurora {
-      animation: aurora-drift 18s ease-in-out infinite;
-    }
   }
 
   .shimmer {

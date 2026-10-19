@@ -28,8 +28,8 @@ interface AgencyFormProps {
 
 type Errors = Record<string, string>;
 
-const sectionClass = "rounded-sm border border-mist bg-surface p-5";
-const sectionTitle = "text-lg text-ink";
+const sectionClass = "rounded-lg border border-border bg-surface p-5";
+const sectionTitle = "text-lg text-text";
 
 export default function AgencyForm({ initialData: a, cities, services, onSubmit, submitLabel = "Save Agency" }: AgencyFormProps) {
   const router = useRouter();
@@ -177,12 +177,12 @@ export default function AgencyForm({ initialData: a, cities, services, onSubmit,
               className={input("lastCheckedOn")}
             />
           </Field>
-          <label className="flex items-center gap-2 text-sm font-medium text-ink sm:col-span-2">
+          <label className="flex items-center gap-2 text-sm font-medium text-text sm:col-span-2">
             <input
               type="checkbox"
               checked={verified}
               onChange={(e) => setVerified(e.target.checked)}
-              className="h-4 w-4 accent-harbor"
+              className="h-4 w-4 accent-primary"
             />
             Verified (shows a “Verified” badge on the site)
           </label>
@@ -264,8 +264,8 @@ export default function AgencyForm({ initialData: a, cities, services, onSubmit,
                   onClick={() => toggleService(s.code)}
                   aria-pressed={serviceCodes.includes(s.code)}
                   className={cn(
-                    "rounded-sm px-3 py-1.5 text-[13px] font-medium transition",
-                    serviceCodes.includes(s.code) ? "bg-harbor text-paper" : "bg-mist/60 text-ink hover:bg-mist",
+                    "rounded-lg px-3 py-1.5 text-[13px] font-medium transition",
+                    serviceCodes.includes(s.code) ? "bg-primary text-primary-fg" : "bg-border/60 text-text hover:bg-border",
                   )}
                 >
                   {s.name}
@@ -333,8 +333,8 @@ export default function AgencyForm({ initialData: a, cities, services, onSubmit,
               .filter(([, v]) => v)
               .map(([k, v]) => (
                 <div key={k} className={k === "Notes" ? "sm:col-span-2" : undefined}>
-                  <dt className="text-[13px] font-semibold text-ink-soft">{k}</dt>
-                  <dd className="mt-0.5 whitespace-pre-wrap text-ink">{v}</dd>
+                  <dt className="text-[13px] font-semibold text-text-muted">{k}</dt>
+                  <dd className="mt-0.5 whitespace-pre-wrap text-text">{v}</dd>
                 </div>
               ))}
           </dl>
@@ -344,7 +344,7 @@ export default function AgencyForm({ initialData: a, cities, services, onSubmit,
       {a && <QualitySection quality={a.quality} />}
 
       {a && (
-        <p className="text-[13px] text-ink-soft">
+        <p className="text-[13px] text-text-muted">
           Created {formatDateTime(a.createdAt)} · Updated {formatDateTime(a.updatedAt)}
         </p>
       )}
@@ -387,7 +387,7 @@ function QualitySection({ quality: q }: { quality: AgencyQuality | null | undefi
     [
       "Case study page",
       q.caseStudyUrl && (
-        <a href={q.caseStudyUrl} target="_blank" rel="noopener noreferrer" className="break-all text-harbor hover:underline">
+        <a href={q.caseStudyUrl} target="_blank" rel="noopener noreferrer" className="break-all text-primary-text hover:underline">
           {q.caseStudyUrl}
         </a>
       ),
@@ -400,26 +400,26 @@ function QualitySection({ quality: q }: { quality: AgencyQuality | null | undefi
   return (
     <section className={sectionClass}>
       <h2 className={sectionTitle}>Quality (from quality sheet)</h2>
-      <p className="mt-1 text-[13px] text-ink-soft">
+      <p className="mt-1 text-[13px] text-text-muted">
         Read-only. Update it by uploading the quality sheet on the{" "}
-        <Link href="/admin/import" className="font-medium text-harbor hover:underline">
+        <Link href="/admin/import" className="font-medium text-primary-text hover:underline">
           Import
         </Link>{" "}
         page. Not shown on the public site yet.
       </p>
       {q.excludeReason && (
-        <p className="mt-4 rounded-sm bg-danger/10 px-3 py-2 text-sm text-danger">
+        <p className="mt-4 rounded-lg bg-danger/10 px-3 py-2 text-sm text-danger">
           Excluded: {q.excludeReason}
         </p>
       )}
       {filled.length === 0 ? (
-        !q.excludeReason && <p className="mt-4 text-sm text-ink-soft">No quality sheet imported for this agency yet.</p>
+        !q.excludeReason && <p className="mt-4 text-sm text-text-muted">No quality sheet imported for this agency yet.</p>
       ) : (
         <dl className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
           {filled.map(([k, v, wide]) => (
             <div key={k} className={wide ? "sm:col-span-2" : undefined}>
-              <dt className="text-[13px] font-semibold text-ink-soft">{k}</dt>
-              <dd className="mt-0.5 whitespace-pre-wrap text-ink">{v}</dd>
+              <dt className="text-[13px] font-semibold text-text-muted">{k}</dt>
+              <dd className="mt-0.5 whitespace-pre-wrap text-text">{v}</dd>
             </div>
           ))}
         </dl>

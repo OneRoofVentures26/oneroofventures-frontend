@@ -14,5 +14,7 @@ export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.oneroo
 );
 
 // Backup lifetime for cached public API data. Admin edits refresh the affected cache tags
-// right away (see src/app/admin/actions.ts), so this only matters if a refresh is missed.
-export const PUBLIC_REVALIDATE_SECONDS = 86400;
+// right away (see src/app/admin/actions.ts). One Roof Scores are also recomputed by the
+// backend every night (03:00 IST) without any admin action, so this is kept to an hour
+// for those to show up the same morning.
+export const PUBLIC_REVALIDATE_SECONDS = 3600;

@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 
 const OPTIONS: Array<{ key: ListingSort; label: string }> = [
   { key: "recent", label: "Recently updated" },
+  { key: "score", label: "One Roof Score" },
   { key: "price_asc", label: "Price: Low to High" },
   { key: "price_desc", label: "Price: High to Low" },
   { key: "name", label: "Name" },

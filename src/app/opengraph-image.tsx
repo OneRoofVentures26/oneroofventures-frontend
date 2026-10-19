@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
-import { LOGO_GRADIENT_CSS, LOGO_TILE_RADIUS, LogoGlyph } from "@/components/Logo";
-import { loadBrandFonts } from "@/lib/og-fonts";
+import { LOGO_ORANGE } from "@/components/Logo";
+import { loadBrandFonts, OG_DISPLAY_FONT, OG_SANS_FONT } from "@/lib/og-fonts";
 
 export const alt = "OneRoof Ventures — compare marketing agencies city by city";
 export const size = { width: 1200, height: 630 };
@@ -10,13 +10,19 @@ const HEADLINE = "Find the right marketing agency, city by city.";
 const SUBLINE = "Compare agencies on real, published prices and packages.";
 const DOMAIN = "oneroofventures.com";
 
-// Dark-theme palette (OG images can't read CSS variables).
-const BG = "#0B0D17";
-const TEXT = "#EEF0FA";
-const MUTED = "#9AA1BD";
+// Brand navy panel (OG images can't read CSS variables).
+const BG = "#0E3655";
+const TEXT = "#F4EADF";
+const MUTED = "#CDBBA6";
+const ORANGE = "#FE7522";
+
+// Wordmark sizing. ROOF_TOP puts the roof just above the o's for Source Serif 4 at this size.
+const WORD_SIZE = 64;
+const ROOF_WIDTH = WORD_SIZE * 1.42;
+const ROOF_TOP = -WORD_SIZE * 0.2;
 
 export default async function OpengraphImage() {
-  const fonts = await loadBrandFonts(`OneRoof${HEADLINE}`, `Ventures${SUBLINE}${DOMAIN}`);
+  const fonts = await loadBrandFonts(`OneRoof${HEADLINE}`, `VENTURES${SUBLINE}${DOMAIN}`);
 
   return new ImageResponse(
     (
@@ -29,48 +35,69 @@ export default async function OpengraphImage() {
           justifyContent: "space-between",
           background: BG,
           backgroundImage:
-            "radial-gradient(circle at 85% 10%, rgba(91,91,240,0.45), transparent 45%), radial-gradient(circle at 100% 70%, rgba(34,211,238,0.22), transparent 40%)",
+            "radial-gradient(circle at 90% 115%, rgba(254,117,34,0.6), transparent 55%)",
           padding: "72px 80px",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
+        {/* The ridge wordmark: a roof over the o's of "Roof", VENTURES spaced below. */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", alignSelf: "flex-start" }}>
           <div
             style={{
-              width: 88,
-              height: 88,
               display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundImage: LOGO_GRADIENT_CSS,
-              borderRadius: 88 * LOGO_TILE_RADIUS,
+              fontFamily: OG_DISPLAY_FONT,
+              fontWeight: 700,
+              fontSize: WORD_SIZE,
+              lineHeight: 1,
+              color: TEXT,
             }}
           >
-            <LogoGlyph size={88} />
+            <span>OneR</span>
+            <div style={{ display: "flex", position: "relative" }}>
+              <span>oo</span>
+              <svg
+                width={ROOF_WIDTH}
+                height={ROOF_WIDTH * 0.3}
+                viewBox="0 0 100 30"
+                style={{ position: "absolute", left: -WORD_SIZE * 0.16, top: ROOF_TOP }}
+              >
+                <path d="M5 25 L50 5 L95 25" fill="none" stroke={LOGO_ORANGE} strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <span>f</span>
           </div>
-          <div style={{ display: "flex", alignItems: "baseline", gap: 14, fontSize: 52 }}>
-            <span style={{ fontFamily: "Space Grotesk", fontWeight: 700, color: TEXT, letterSpacing: -1 }}>OneRoof</span>
-            <span style={{ fontFamily: "Inter", fontWeight: 500, color: MUTED }}>Ventures</span>
-          </div>
+          <span
+            style={{
+              fontFamily: OG_SANS_FONT,
+              fontWeight: 500,
+              fontSize: WORD_SIZE * 0.3,
+              letterSpacing: WORD_SIZE * 0.3 * 0.42,
+              color: MUTED,
+              marginTop: WORD_SIZE * 0.3,
+              alignSelf: "center",
+            }}
+          >
+            VENTURES
+          </span>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column" }}>
           <span
-            style={{ fontFamily: "Space Grotesk", fontWeight: 700, fontSize: 68, color: TEXT, lineHeight: 1.08, letterSpacing: -1.5 }}
+            style={{ fontFamily: OG_DISPLAY_FONT, fontWeight: 700, fontSize: 68, color: TEXT, lineHeight: 1.08, letterSpacing: -1.5 }}
           >
             {HEADLINE}
           </span>
-          <span style={{ fontFamily: "Inter", fontSize: 30, color: MUTED, marginTop: 20 }}>{SUBLINE}</span>
+          <span style={{ fontFamily: OG_SANS_FONT, fontSize: 30, color: MUTED, marginTop: 20 }}>{SUBLINE}</span>
         </div>
 
         <div
           style={{
             display: "flex",
-            borderTop: "1px solid rgba(255,255,255,0.12)",
+            borderTop: "1px solid rgba(232,213,191,0.16)",
             paddingTop: 24,
-            fontFamily: "Inter",
+            fontFamily: OG_SANS_FONT,
             fontWeight: 500,
             fontSize: 26,
-            color: "#7C7CFF",
+            color: ORANGE,
           }}
         >
           {DOMAIN}

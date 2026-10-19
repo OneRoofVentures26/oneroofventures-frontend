@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import type { AgencyRequest } from "@/lib/api/types";
@@ -11,7 +11,11 @@ import { formatDate } from "@/lib/utils";
 import { useToast } from "@/components/admin/Toast";
 import AgencyForm from "@/components/admin/AgencyForm";
 import PackagesManager from "@/components/admin/PackagesManager";
+import AgencyScoreCard from "@/components/admin/AgencyScoreCard";
 import { ErrorBanner, Loading, PageHeader, secondaryButton, StatusBadge } from "@/components/admin/ui";
+
+/** The backend rescores a few seconds after a change; a save's response still has the old score. */
+const RESCORE_DELAY_MS = 4000;
 
 function todayInIndia(): string {
   return new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
@@ -24,6 +28,20 @@ export default function EditAgencyPage() {
   const agency = useAsync(() => getAgency(id), params.id);
   const options = useAsync(() => Promise.all([listCities(), listServices()]));
   const [marking, setMarking] = useState(false);
+  const rescoreTimer = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(rescoreTimer.current), []);
+
+  /**
+   * Once the backend has rescored: re-fetch here, and refresh the public pages
+   * again (the refresh right after saving still cached the old score).
+   */
+  function refreshScoreSoon() {
+    window.clearTimeout(rescoreTimer.current);
+    rescoreTimer.current = window.setTimeout(() => {
+      agency.reload();
+      void refreshPublic({ agencyIds: [id] });
+    }, RESCORE_DELAY_MS);
+  }
 
   async function markCheckedToday() {
     setMarking(true);
@@ -31,6 +49,7 @@ export default function EditAgencyPage() {
       const updated = await patchAgency(id, { lastCheckedOn: todayInIndia() });
       void refreshPublic({ tags: agencyTags(agency.data ?? null, updated) });
       agency.setData(() => updated);
+      refreshScoreSoon();
       toast.show("Marked as checked today");
     } catch (err) {
       toast.show(errorMessage(err), "error");
@@ -43,15 +62,16 @@ export default function EditAgencyPage() {
     const updated = await updateAgency(id, input);
     void refreshPublic({ tags: agencyTags(agency.data ?? null, updated) });
     agency.setData(() => updated);
+    refreshScoreSoon();
     toast.show(`${updated.name} saved`);
   }
 
   if (agency.error instanceof ApiError && agency.error.status === 404) {
     return (
       <div>
-        <h1 className="text-xl font-bold text-ink">Agency not found</h1>
-        <p className="mt-1 text-sm text-ink-soft">This agency may have already been deleted.</p>
-        <Link href="/admin/agencies" className="mt-4 inline-block text-sm font-medium text-harbor hover:underline">
+        <h1 className="text-xl font-bold text-text">Agency not found</h1>
+        <p className="mt-1 text-sm text-text-muted">This agency may have already been deleted.</p>
+        <Link href="/admin/agencies" className="mt-4 inline-block text-sm font-medium text-primary-text hover:underline">
           ← Back to agencies
         </Link>
       </div>
@@ -62,7 +82,7 @@ export default function EditAgencyPage() {
 
   return (
     <div>
-      <Link href="/admin/agencies" className="text-sm font-medium text-ink-soft hover:text-harbor">
+      <Link href="/admin/agencies" className="text-sm font-medium text-text-muted hover:text-primary-text">
         ← Agencies
       </Link>
       <div className="mt-2">
@@ -77,12 +97,12 @@ export default function EditAgencyPage() {
                     href={`/${a.citySlug}/${a.slug}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-harbor hover:underline"
+                    className="text-primary-text hover:underline"
                   >
                     View on site ↗
                   </a>
                 )}
-                <span className="text-ink-soft">
+                <span className="text-text-muted">
                   · Last checked {a.lastCheckedOn ? formatDate(a.lastCheckedOn) : "never"}
                 </span>
               </span>
@@ -104,6 +124,7 @@ export default function EditAgencyPage() {
           !agency.error && !options.error && <Loading />
         ) : (
           <>
+            <AgencyScoreCard agency={a} />
             {/* Remount the form when the saved record changes so it shows server-normalised values. */}
             <AgencyForm
               key={a.updatedAt}
@@ -113,7 +134,14 @@ export default function EditAgencyPage() {
               onSubmit={handleSubmit}
               submitLabel="Save Changes"
             />
-            <PackagesManager agencyId={a.id} services={options.data[1]} onChanged={agency.reload} />
+            <PackagesManager
+              agencyId={a.id}
+              services={options.data[1]}
+              onChanged={() => {
+                agency.reload();
+                refreshScoreSoon();
+              }}
+            />
           </>
         )}
       </div>

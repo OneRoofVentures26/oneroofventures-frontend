@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Container, Section } from "@/components/Container";
 import HeroPreview from "@/components/HeroPreview";
-import { HomeEntryProvider, HomeQuiz, HomeSearch } from "@/components/HomeEntry";
+import { HomeQuiz, HomeSearch } from "@/components/HomeEntry";
 import HowItWorks from "@/components/HowItWorks";
 import CountUp from "@/components/motion/CountUp";
 import Reveal from "@/components/motion/Reveal";
@@ -14,16 +14,16 @@ export const revalidate = 300;
 
 const STEPS = [
   {
-    title: "Answer 2 quick taps",
-    summary: "Pick a service and a budget, or just search.",
+    title: "Pick your city",
+    summary: "Every agency in your city, prices up front.",
     description:
-      "Tell us the service you need and your budget — or just search, e.g. \"affordable SEO agency in Bangalore\".",
+      "Open your city to see every listed agency with published prices — or just search, e.g. \"affordable SEO agency in Bangalore\".",
   },
   {
-    title: "See your top 3 picks",
-    summary: "Three matched agencies, full list one tap away.",
+    title: "Filter and shortlist",
+    summary: "Filter by service, area and budget.",
     description:
-      "No long lists to scroll. We show exactly 3 agencies matched to your answers, with the full list one tap away.",
+      "Narrow the list by service, area and budget, and compare packages side by side.",
   },
   {
     title: "Compare & request quotes",
@@ -114,17 +114,13 @@ export default async function Home() {
   ];
 
   return (
-    <HomeEntryProvider cities={cities} services={services}>
-      {/* Hero: 48px bottom padding, the quiz follows straight on. */}
-      <section className="relative isolate overflow-hidden pb-12 pt-6 sm:pt-12 lg:pt-16">
-        <div aria-hidden="true" className="absolute inset-0 -z-10">
-          <div className="bg-dot-grid absolute inset-0" />
-          <div className="aurora -top-24 right-[-30%] h-[22rem] w-[30rem] sm:right-[-10%] lg:-top-32 lg:right-[-6%] lg:h-[40rem] lg:w-[52rem]" />
-        </div>
+    <>
+      {/* Hero: a navy brand panel lit by the orange glow. */}
+      <section className="theme-navy bg-glow relative isolate overflow-hidden pb-12 pt-8 sm:pb-16 sm:pt-14 lg:pb-20 lg:pt-20">
 
         <Container className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12">
           <div className="lg:col-span-7">
-            <p className={cn(eyebrow, "enter rounded-full border border-primary/20 bg-primary/8 px-3 py-1")} style={enterDelay(0)}>
+            <p className={cn(eyebrow, "enter")} style={enterDelay(0)}>
               <span className="h-1.5 w-1.5 rounded-full bg-success" aria-hidden="true" />
               Free for businesses
             </p>
@@ -132,7 +128,7 @@ export default async function Home() {
               className="enter mt-4 font-display text-[1.875rem] font-bold leading-[1.12] tracking-[-0.02em] text-text sm:mt-5 sm:max-w-[18ch] sm:text-[2.75rem] sm:leading-[1.08] lg:text-hero"
               style={enterDelay(1)}
             >
-              Find the right marketing agency, city by city.
+              Find the right marketing agency, <span className="text-emphasis">city by city.</span>
             </h1>
             {/* Hidden on short phones (e.g. iPhone SE) so the quiz still starts in the first screen. */}
             <p
@@ -143,16 +139,16 @@ export default async function Home() {
               one quote request to your shortlist.
             </p>
             <div className="enter mt-5 sm:mt-8" style={enterDelay(3)}>
-              <HomeSearch />
+              <HomeSearch cities={cities} services={services} />
             </div>
 
             <dl
               aria-label="OneRoof in numbers"
-              className="enter mt-5 grid max-w-xl grid-cols-3 divide-x divide-border sm:mt-8"
+              className="enter mt-6 grid max-w-md grid-cols-3 gap-4 sm:mt-10"
               style={enterDelay(4)}
             >
               {stats.map((stat) => (
-                <div key={stat.label} className="flex flex-col-reverse px-3 first:pl-0 sm:px-5">
+                <div key={stat.label} className="flex flex-col-reverse">
                   <dt className="mt-0.5 text-[13px] leading-snug text-text-muted">{stat.label}</dt>
                   <dd className="num text-2xl font-bold leading-tight sm:text-[1.75rem]">
                     <CountUp value={stat.value} className={stat.highlight ? "text-gradient" : "text-text"} />
@@ -162,7 +158,7 @@ export default async function Home() {
             </dl>
           </div>
 
-          {/* The animated preview sits beside the search on desktop; below that it moves under the quiz. */}
+          {/* The animated preview sits beside the search on desktop only. */}
           <div className="enter hidden lg:col-span-5 lg:block" style={enterDelay(4)}>
             <HeroPreview />
           </div>
@@ -170,12 +166,12 @@ export default async function Home() {
       </section>
 
       {/* Guided quiz */}
-      <Section flush id="quiz" className="scroll-mt-20" containerClassName="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-12">
+      <Section id="quiz" className="scroll-mt-20" containerClassName="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-12">
         <Reveal className="lg:col-span-5 lg:pt-2">
-          <h2 className={sectionTitle}>Not sure what to search?</h2>
+          <h2 className={sectionTitle}>Tell us what you need</h2>
           <p className="mt-3 max-w-[48ch] text-base text-text-muted">
-            Answer a few quick taps and we&apos;ll show your top 3 agencies — matched on
-            service, budget and city.
+            Three quick taps — service, budget and city. Then send it as one quote
+            request, or browse the agencies in your city yourself.
           </p>
           <ul className="mt-6 hidden space-y-3 lg:block">
             {TRUST_POINTS.map((point) => (
@@ -187,11 +183,66 @@ export default async function Home() {
           </ul>
         </Reveal>
         <div className="lg:col-span-7">
-          <HomeQuiz />
-          <div className="mt-6 hidden sm:block lg:hidden">
-            <HeroPreview />
-          </div>
+          <HomeQuiz cities={cities} services={services} />
         </div>
+      </Section>
+
+      {/* Browse by city: live cities as cards, upcoming ones as quiet chips. */}
+      <Section flush id="cities" className="scroll-mt-20">
+        <Reveal>
+          <h2 className={sectionTitle}>Browse by city</h2>
+          <p className="mt-3 max-w-[60ch] text-base text-text-muted">
+            Agency prices are researched and refreshed city by city. More cities are on the way.
+          </p>
+        </Reveal>
+
+        {live.length > 0 && (
+          // Phones: one swipeable row. From md: a grid.
+          <ul className="scrollbar-thin -mx-4 mt-6 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-4 px-4 pb-2 sm:-mx-6 sm:scroll-px-6 sm:px-6 md:mx-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0 md:pb-0 lg:mt-8 lg:gap-4">
+            {live.map((city) => (
+              <li key={city.slug} className={cn("flex flex-shrink-0 snap-start md:w-auto", live.length === 1 ? "w-full" : "w-[78%]")}>
+                <Link
+                  href={`/${city.slug}`}
+                  className={cn(interactiveCard, "group flex w-full items-end justify-between gap-3 p-5")}
+                >
+                  <span className="min-w-0">
+                    <span className="flex items-center gap-1.5 text-[13px] font-medium text-success-text">
+                      <span className="h-1.5 w-1.5 rounded-full bg-success" aria-hidden="true" />
+                      Live
+                    </span>
+                    <span className="mt-4 block font-display text-2xl font-bold text-text">{city.name}</span>
+                    <span className="mt-0.5 block text-sm text-text-muted">
+                      <span className="num font-semibold text-text">{city.agencyCount}</span>{" "}
+                      {city.agencyCount === 1 ? "agency" : "agencies"}
+                    </span>
+                  </span>
+                  <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary text-primary-fg transition-transform duration-200 group-hover:translate-x-0.5">
+                    <ArrowRight />
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <Reveal className="mt-8 flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:items-start sm:justify-between">
+          {planned.length > 0 && (
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-text">Coming soon</p>
+              <ul className="mt-3 flex flex-wrap gap-2">
+                {planned.map((city) => (
+                  <li key={city.slug ?? city.name} className="inline-flex items-center gap-1 rounded-full bg-surface-raised px-3 py-1.5 text-[13px] text-text-muted">
+                    <PinIcon />
+                    {city.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <Link href="/quote" className={cn(textLink, "inline-flex min-h-11 flex-shrink-0 items-center gap-1.5 text-sm")}>
+            City not listed? Get matched quotes <ArrowRight />
+          </Link>
+        </Reveal>
       </Section>
 
       {/* How it works: header row across the full width, then three step cards. */}
@@ -204,7 +255,7 @@ export default async function Home() {
               Three steps, no sign-up. Your shortlist and one quote request — that&apos;s it.
             </p>
           </div>
-          <Link href="#quiz" className={cn(secondaryButton, "hidden flex-shrink-0 sm:inline-flex")}>
+          <Link href="/quote" className={cn(secondaryButton, "hidden flex-shrink-0 sm:inline-flex")}>
             Start now <ArrowRight />
           </Link>
         </Reveal>
@@ -213,103 +264,17 @@ export default async function Home() {
         </div>
       </Section>
 
-      {/* Browse by city */}
-      <Section>
-        <Reveal className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h2 className={sectionTitle}>Browse by city</h2>
-            <p className="mt-3 max-w-[60ch] text-base text-text-muted">
-              Agency prices are researched and refreshed city by city. More cities are on the way.
-            </p>
-          </div>
-          <p className="flex flex-shrink-0 items-center gap-3 text-sm text-text-muted">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-success/30 bg-success/10 px-3 py-1 font-medium text-success-text">
-              <span className="h-1.5 w-1.5 rounded-full bg-success" aria-hidden="true" />
-              <span className="num">{live.length}</span> live
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1 font-medium">
-              <span className="num">{planned.length}</span> coming soon
-            </span>
-          </p>
-        </Reveal>
-        <ul className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 lg:mt-8 lg:grid-cols-4 lg:gap-4">
-          {live.map((city, i) => (
-            <Reveal as="li" key={city.slug} className={cn("flex", i === 0 && "col-span-2")}>
-              <Link
-                href={`/${city.slug}`}
-                className={cn(
-                  interactiveCard,
-                  "group relative isolate flex w-full items-center justify-between gap-3 overflow-hidden border-primary/30 p-4 sm:px-5 sm:py-5",
-                )}
-              >
-                <span aria-hidden="true" className="aurora -right-16 -top-20 -z-10 h-48 w-64 opacity-25" />
-                <span className="min-w-0">
-                  <span className="flex items-center gap-2 text-[13px] font-medium text-success-text">
-                    <span className="relative flex h-2 w-2">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-60" />
-                      <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
-                    </span>
-                    Live now
-                  </span>
-                  <span className="mt-1 block font-display text-xl font-semibold text-text sm:text-2xl">{city.name}</span>
-                  <span className="mt-0.5 block text-sm text-text-muted">
-                    <span className="num font-semibold text-text">{city.agencyCount}</span> agencies with published prices
-                  </span>
-                </span>
-                <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-primary text-primary-fg shadow-[0_8px_20px_-8px_rgb(91_91_240/0.7)] transition-transform duration-200 group-hover:translate-x-0.5">
-                  <ArrowRight />
-                </span>
-              </Link>
-            </Reveal>
-          ))}
-          {planned.map((city, i) => {
-            const body = (
-              <>
-                <span className="flex items-center gap-1.5 font-display text-base font-semibold text-text/80">
-                  <PinIcon />
-                  {city.name}
-                </span>
-                <span className="mt-0.5 block pl-5 text-[13px] text-text-muted">Coming soon</span>
-              </>
-            );
-            const tile = "flex min-h-14 w-full flex-col justify-center rounded-2xl border border-border bg-surface/60 px-4 py-2.5 sm:min-h-16 sm:py-3";
-            return (
-              <Reveal as="li" key={city.slug ?? city.name} delay={Math.min(i, 5) * 0.04} className="flex">
-                {city.slug ? (
-                  <Link href={`/${city.slug}`} className={cn(tile, "transition-colors hover:border-primary/40")}>
-                    {body}
-                  </Link>
-                ) : (
-                  <div className={tile}>{body}</div>
-                )}
-              </Reveal>
-            );
-          })}
-          <Reveal as="li" className="flex">
-            <Link
-              href="/quote"
-              className="group flex min-h-14 w-full flex-col justify-center rounded-2xl border border-dashed border-primary/40 bg-primary/8 px-4 py-2.5 transition-colors hover:border-primary/60 hover:bg-primary/12 sm:min-h-16 sm:py-3"
-            >
-              <span className="block text-sm font-semibold text-primary-text">Your city not listed?</span>
-              <span className="mt-0.5 inline-flex items-center gap-1 text-[13px] text-text-muted">
-                Get matched quotes <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-              </span>
-            </Link>
-          </Reveal>
-        </ul>
-      </Section>
-
       {/* Our package + founders beside the final CTA (stacked on mobile). The CTA is the one centred band. */}
-      <Section flush containerClassName="grid grid-cols-1 gap-4 lg:grid-cols-12">
+      <Section containerClassName="grid grid-cols-1 gap-4 lg:grid-cols-12">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:col-span-5 lg:grid-cols-1">
           <Reveal className={cn(card, "p-5 sm:p-6")}>
             <h2 className="text-lg font-semibold text-text sm:text-xl">Would rather skip the comparison?</h2>
             <p className="mt-2 text-base text-text-muted">
-              OneRoof Ventures also runs a managed marketing package of our
-              own — see what&apos;s included and why it&apos;s economical.
+              OneRoof Ventures runs managed marketing packages of its own —
+              Meta &amp; Google Ads, creatives, social and SEO, from ₹12,999 a month.
             </p>
             <Link href="/services" className={cn(textLink, "mt-1 inline-flex min-h-11 items-center gap-1.5 text-sm")}>
-              View our marketing package <ArrowRight />
+              See packages &amp; pricing <ArrowRight />
             </Link>
           </Reveal>
 
@@ -324,13 +289,9 @@ export default async function Home() {
           </Reveal>
         </div>
 
-        <Reveal className="relative isolate flex flex-col justify-center overflow-hidden rounded-3xl border border-border bg-surface px-5 py-8 text-center shadow-raised sm:px-12 sm:py-10 lg:col-span-7">
-          <div aria-hidden="true" className="absolute inset-0 -z-10">
-            <div className="bg-dot-grid absolute inset-0" />
-            <div className="aurora -bottom-40 left-[calc(50%-18rem)] h-80 w-[36rem] opacity-30" />
-          </div>
+        <Reveal className="theme-navy bg-glow relative isolate flex flex-col justify-center overflow-hidden rounded-3xl px-5 py-8 text-center sm:px-12 sm:py-10 lg:col-span-7">
           <h2 className={cn(sectionTitle, "mx-auto max-w-[22ch]")}>
-            Your shortlist is a minute away.
+            Your shortlist is <span className="text-emphasis">a minute away.</span>
           </h2>
           <p className="mx-auto mt-3 max-w-[52ch] text-base text-text-muted">
             Compare real prices from agencies in your city, then send one quote
@@ -338,7 +299,7 @@ export default async function Home() {
           </p>
           <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
             <Link href="#quiz" className={ctaButton}>
-              Find my top 3
+              Tell us what you need
             </Link>
             <Link href="/quote" className={secondaryButton}>
               Get quotes
@@ -346,6 +307,6 @@ export default async function Home() {
           </div>
         </Reveal>
       </Section>
-    </HomeEntryProvider>
+    </>
   );
 }

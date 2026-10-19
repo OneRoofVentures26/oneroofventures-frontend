@@ -23,18 +23,18 @@ export default function BulletListEditor({
     <div className="space-y-2">
       {items.map((item, idx) => (
         <div key={idx} className="flex items-center gap-2">
-          <span className="text-ink-soft">•</span>
+          <span className="text-text-muted">•</span>
           <input
             value={item}
             onChange={(e) => updateItem(idx, e.target.value)}
             placeholder="e.g. Monthly performance report"
-            className="min-w-0 flex-1 rounded-sm border border-mist bg-surface px-3 py-1.5 text-sm outline-none focus:border-harbor"
+            className="min-w-0 flex-1 rounded-lg border border-border bg-surface px-3 py-1.5 text-sm outline-none focus:border-primary"
           />
           <button
             type="button"
             onClick={() => removeItem(idx)}
             aria-label="Remove line"
-            className="flex-shrink-0 text-ink-soft hover:text-danger"
+            className="flex-shrink-0 text-text-muted hover:text-danger"
           >
             ✕
           </button>
@@ -43,7 +43,7 @@ export default function BulletListEditor({
       <button
         type="button"
         onClick={addItem}
-        className="text-[13px] font-medium text-harbor hover:underline"
+        className="text-[13px] font-medium text-primary-text hover:underline"
       >
         + Add line
       </button>
