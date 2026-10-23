@@ -63,12 +63,21 @@ export interface ScoreLine {
   max: number;
 }
 
-/** Pillars are out of 40 / 25 / 35 and add up to the score (out of 100). */
+/**
+ * Pillars add up to the score (out of 100). Each is out of maxPoints: 40 / 25 / 35
+ * for priced agencies; quote-only agencies have no transparency pillar (null) and
+ * profile / reputation are scaled up to fill 100.
+ */
 export interface ScoreBreakdown {
-  transparency: number;
+  transparency: number | null;
   profile: number;
   reputation: number;
-  /** All 11 lines, always in the same order. */
+  maxPoints: {
+    transparency: number | null;
+    profile: number;
+    reputation: number;
+  };
+  /** One line per fact, grouped by pillar; the count varies (10 priced, 7 quote-only). */
   lines: ScoreLine[];
 }
 

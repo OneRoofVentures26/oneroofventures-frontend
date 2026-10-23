@@ -150,19 +150,13 @@ export function QualityBadges({ quality, className }: { quality: PublicQuality; 
   return <ul className={cn("flex flex-wrap gap-2", className)}>{items}</ul>;
 }
 
-const PILLARS: Array<{ key: ScorePillar; label: string; max: number }> = [
-  { key: "transparency", label: "Price transparency", max: 40 },
-  { key: "profile", label: "Profile", max: 25 },
-  { key: "reputation", label: "Reputation", max: 35 },
+const PILLARS: Array<{ key: ScorePillar; label: string }> = [
+  { key: "transparency", label: "Price transparency" },
+  { key: "profile", label: "Profile" },
+  { key: "reputation", label: "Reputation" },
 ];
 
-/** Not collected yet, so it is always 0 and shouldn't read as a fault. */
-const NOT_COLLECTED = new Set(["registered_business"]);
-
 function LineMark({ line }: { line: ScoreLine }) {
-  if (NOT_COLLECTED.has(line.code)) {
-    return <span className="w-4 flex-shrink-0 text-center text-text-muted" aria-label="Not collected yet">–</span>;
-  }
   if (line.points >= line.max) {
     return <span className="w-4 flex-shrink-0 text-center font-bold text-success-text" aria-label="Met">✓</span>;
   }
@@ -173,7 +167,7 @@ function LineMark({ line }: { line: ScoreLine }) {
 }
 
 /**
- * Profile panel: the score, three pillar bars and the 11 facts behind it
+ * Profile panel: the score, the pillar bars and the facts behind them
  * (collapsed). For "New" agencies a short note; nothing when not scored.
  */
 export function ScorePanel({
@@ -229,7 +223,10 @@ export function ScorePanel({
   );
 }
 
-/** Three pillar bars and the 11 facts behind them (collapsed). Shared by the profile and the admin. */
+/**
+ * Pillar bars and the facts behind them (collapsed). Shared by the profile and the admin.
+ * Quote-only agencies aren't scored on transparency, so that pillar is shown as not applicable.
+ */
 export function ScoreBreakdownView({
   breakdown,
   showPoints = false,
@@ -242,22 +239,36 @@ export function ScoreBreakdownView({
   defaultOpen?: boolean;
   className?: string;
 }) {
+  const groups = PILLARS.map((pillar) => ({
+    pillar,
+    lines: breakdown.lines.filter((l) => l.pillar === pillar.key),
+  })).filter((g) => g.lines.length > 0);
+
   return (
     <div className={cn("space-y-4", className)}>
       {PILLARS.map((p) => {
         const value = breakdown[p.key];
+        const max = breakdown.maxPoints[p.key];
+        if (value == null || max == null) {
+          return (
+            <div key={p.key} className="flex items-baseline justify-between gap-3 text-sm">
+              <span className="font-medium text-text">{p.label}</span>
+              <span className="text-[13px] text-text-muted">Not applicable: prices on request</span>
+            </div>
+          );
+        }
         return (
           <div key={p.key}>
             <div className="flex items-baseline justify-between gap-3 text-sm">
               <span className="font-medium text-text">{p.label}</span>
               <span className="num text-text-muted">
-                <span className="font-semibold text-text">{oneDecimal(value)}</span> / {p.max}
+                <span className="font-semibold text-text">{oneDecimal(value)}</span> / {oneDecimal(max)}
               </span>
             </div>
             <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-surface-raised">
               <div
                 className="h-full rounded-full bg-primary"
-                style={{ width: `${Math.max(0, Math.min(100, (value / p.max) * 100))}%` }}
+                style={{ width: `${max > 0 ? Math.max(0, Math.min(100, (value / max) * 100)) : 0}%` }}
               />
             </div>
           </div>
@@ -269,18 +280,15 @@ export function ScoreBreakdownView({
           What goes into it
           <span aria-hidden="true" className="transition-transform group-open:rotate-180">⌄</span>
         </summary>
-        <div className="mt-1 grid gap-4 sm:grid-cols-3">
-          {PILLARS.map((p) => (
+        <div className={cn("mt-1 grid gap-4", groups.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2")}>
+          {groups.map(({ pillar: p, lines }) => (
             <ul key={p.key} className="space-y-1.5">
               <li className="text-[13px] font-semibold text-text">{p.label}</li>
-              {breakdown.lines
-                .filter((l) => l.pillar === p.key)
-                .map((line) => (
+              {lines.map((line) => (
                   <li key={line.code} className="flex gap-2 text-[13px] leading-5 text-text-muted">
                     <LineMark line={line} />
                     <span>
                       {line.label}
-                      {NOT_COLLECTED.has(line.code) && " (not collected yet)"}
                       {showPoints && (
                         <span className="num ml-1 whitespace-nowrap text-text">
                           {oneDecimal(line.points)} / {oneDecimal(line.max)}
