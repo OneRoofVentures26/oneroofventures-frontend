@@ -50,7 +50,9 @@ export default function ServiceInquiryForm() {
   ].join("\n");
 
   const whatsappHref = `https://wa.me/${PACKAGE_CONTACT.whatsapp}?text=${encodeURIComponent(body)}`;
-  const mailHref = `mailto:${PACKAGE_CONTACT.email}?subject=${encodeURIComponent(
+  // Gmail's web composer rather than mailto:, which silently does nothing when
+  // the visitor has no desktop mail app set up.
+  const mailHref = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(PACKAGE_CONTACT.email)}&su=${encodeURIComponent(
     `Marketing package enquiry — ${business.trim() || name.trim() || "new lead"}`,
   )}&body=${encodeURIComponent(body)}`;
 
@@ -72,7 +74,7 @@ export default function ServiceInquiryForm() {
           <a href={whatsappHref} target="_blank" rel="noopener noreferrer" className={ctaButton}>
             Open WhatsApp again
           </a>
-          <a href={mailHref} className={secondaryButton}>
+          <a href={mailHref} target="_blank" rel="noopener noreferrer" className={secondaryButton}>
             Send by email instead
           </a>
         </div>
@@ -153,7 +155,7 @@ export default function ServiceInquiryForm() {
         </button>
         <p className="text-[13px] text-text-muted">
           Opens WhatsApp with your message ready to send. Prefer email?{" "}
-          <a href={mailHref} className="font-medium text-primary-text hover:underline">
+          <a href={mailHref} target="_blank" rel="noopener noreferrer" className="font-medium text-primary-text hover:underline">
             Email us instead
           </a>
           .

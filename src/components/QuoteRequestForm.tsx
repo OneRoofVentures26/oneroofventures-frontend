@@ -75,9 +75,13 @@ export default function QuoteRequestForm({
     items: initialLocalities,
   });
   const [localitySlug, setLocalitySlug] = useState("");
-  const [serviceSlug, setServiceSlug] = useState(
-    initialServiceSlug || guessService(initialAgencies, initialPackageId, services),
-  );
+  // The first selected service is the one leads are matched on; the API takes a
+  // single service, so any others are listed in the message.
+  const [serviceSlugs, setServiceSlugs] = useState<string[]>(() => {
+    const initial = initialServiceSlug || guessService(initialAgencies, initialPackageId, services);
+    return initial ? [initial] : [];
+  });
+  const serviceSlug = serviceSlugs[0] ?? "";
   const [packageId, setPackageId] = useState<number | null>(initialPackageId);
   const [budget, setBudget] = useState(initialBudget);
   const [message, setMessage] = useState("");
@@ -116,7 +120,7 @@ export default function QuoteRequestForm({
     if (!PHONE_PATTERN.test(phone.trim())) next.phone = "Enter a 10-digit Indian mobile number, optionally with +91";
     if (email.trim() && !/^\S+@\S+\.\S+$/.test(email.trim())) next.email = "Enter a valid email address";
     if (!citySlug) next.citySlug = "Choose your city";
-    if (!serviceSlug) next.serviceSlug = "Choose the service you need";
+    if (!serviceSlug) next.serviceSlug = "Choose at least one service";
     if (budget && (!/^\d+$/.test(budget) || Number(budget) > 100_000_000)) next.budgetMonthly = "Enter a whole number in rupees";
     if (!captchaToken) next.captchaToken = "Please complete the captcha check";
     return next;
@@ -128,6 +132,14 @@ export default function QuoteRequestForm({
     setErrors(found);
     if (Object.keys(found).length > 0) return;
 
+    const extraServices = serviceSlugs
+      .slice(1)
+      .map((slug) => services.find((s) => s.slug === slug)?.name ?? slug);
+    const fullMessage = [
+      ...(extraServices.length > 0 ? [`Also interested in: ${extraServices.join(", ")}`] : []),
+      ...(message.trim() ? [message.trim()] : []),
+    ].join("\n\n");
+
     const body: LeadRequest = {
       name: name.trim(),
       phone: phone.trim(),
@@ -138,7 +150,7 @@ export default function QuoteRequestForm({
       localitySlug: localitySlug || undefined,
       serviceSlug,
       budgetMonthly: budget ? Number(budget) : undefined,
-      message: message.trim() || undefined,
+      message: fullMessage.slice(0, 2000) || undefined,
       agencyId: singleAgency?.id,
       agencyIds: agencies.length > 1 ? agencies.map((a) => a.id) : undefined,
       packageId: singleAgency ? (effectivePackageId ?? undefined) : undefined,
@@ -376,15 +388,21 @@ export default function QuoteRequestForm({
       </div>
 
       <div>
-        <label className="text-sm font-medium text-text">Service needed *</label>
+        <label className="text-sm font-medium text-text">
+          Services needed * <span className="font-normal text-text-muted">(select all that apply)</span>
+        </label>
         <div className="mt-2 flex flex-wrap gap-2">
           {services.map((s) => (
             <button
               type="button"
               key={s.slug}
-              onClick={() => setServiceSlug(s.slug)}
-              aria-pressed={serviceSlug === s.slug}
-              className={chip(serviceSlug === s.slug)}
+              onClick={() =>
+                setServiceSlugs((prev) =>
+                  prev.includes(s.slug) ? prev.filter((x) => x !== s.slug) : [...prev, s.slug],
+                )
+              }
+              aria-pressed={serviceSlugs.includes(s.slug)}
+              className={chip(serviceSlugs.includes(s.slug))}
             >
               {s.name}
             </button>
@@ -454,9 +472,6 @@ export default function QuoteRequestForm({
               ? `Send quote request to ${agencies.length} agenc${agencies.length === 1 ? "y" : "ies"}`
               : "Get matched quotes"}
         </button>
-        {status === "sending" && (
-          <p className="mt-2 text-center text-[13px] text-text-muted">This can take up to a minute if our server is waking up.</p>
-        )}
       </div>
     </form>
   );

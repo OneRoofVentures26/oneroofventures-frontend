@@ -205,23 +205,14 @@ export default function ServicesPage() {
             Questions, or want something built to fit? Get in touch and we&apos;ll put a custom scope together.
           </p>
           <ul className="mt-6 space-y-1 text-sm">
-            <li>
-              <a href={`tel:${PACKAGE_CONTACT.phoneE164}`} className="inline-flex min-h-11 items-center gap-2 font-medium text-text hover:text-primary-text">
-                <span className="w-20 text-text-muted">Phone</span>
-                {PACKAGE_CONTACT.phoneDisplay}
-              </a>
-            </li>
-            <li>
-              <a
-                href={`https://wa.me/${PACKAGE_CONTACT.whatsapp}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center gap-2 font-medium text-text hover:text-primary-text"
-              >
-                <span className="w-20 text-text-muted">WhatsApp</span>
-                Chat with us ↗
-              </a>
-            </li>
+            {PACKAGE_CONTACT.phones.map((p, i) => (
+              <li key={p.e164}>
+                <a href={`tel:${p.e164}`} className="inline-flex min-h-11 items-center gap-2 font-medium text-text hover:text-primary-text">
+                  <span className="w-20 text-text-muted">{i === 0 ? "Phone" : ""}</span>
+                  {p.display}
+                </a>
+              </li>
+            ))}
             <li>
               <a href={`mailto:${PACKAGE_CONTACT.email}`} className="inline-flex min-h-11 items-center gap-2 break-all font-medium text-text hover:text-primary-text">
                 <span className="w-20 flex-shrink-0 text-text-muted">Email</span>

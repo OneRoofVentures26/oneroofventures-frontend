@@ -86,11 +86,6 @@ export default function AdminLoginPage() {
           >
             {submitting ? "Signing in…" : "Sign in"}
           </button>
-          {submitting && (
-            <p className="mt-2 text-center text-[13px] text-text-muted">
-              The server may take up to a minute to wake up.
-            </p>
-          )}
         </form>
       </div>
     </div>

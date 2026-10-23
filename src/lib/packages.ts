@@ -239,23 +239,25 @@ export const CAPABILITIES: Array<{ name: string; description: string }> = [
 ];
 
 export const TERMS: string[] = [
-  "Advertising spend is paid by you directly to Meta, Google or the relevant platform, and is separate from the retainer.",
-  "Monthly retainers are billed in advance, on the 1st of each month.",
-  "One-time project work is billed 50% in advance and 50% on delivery.",
-  "All three packages carry a 3-month minimum commitment. After that, 30 days' written notice to cancel.",
-  "Creative counts, post counts and keyword counts reset monthly and do not carry forward.",
-  "Third-party costs — creator fees, stock assets, paid tools, hosting and domains — are billed at actual.",
-  "Photo and video shoots included in your scope are coordinated and managed by our team, from the shoot itself through to the finished edits and reels, so the output stays consistent with the agreed content plan.",
-  "A single creative resized or reformatted for multiple platforms counts as one creative against your monthly allowance. A creative built to a different concept or brief counts as a new one.",
-  "Every reel, creative and post includes up to 3 rounds of revisions. Further changes, or a change of brief after work has begun, are billed as a new creative at add-on rates.",
-  "A written quote holds for 30 days from the date it is issued.",
+  "Ad spend is paid by you directly to Meta, Google or other platforms. It is not part of our fee.",
+  "Monthly fees are paid in advance, on the 1st of every month.",
+  "One-time projects: 50% upfront, 50% on delivery.",
+  "Minimum 3 months on every package. After that, cancel anytime with 30 days' notice.",
+  "Monthly counts (creatives, posts, keywords) don't carry over to the next month.",
+  "Extra costs like creator fees, stock images, paid tools, hosting and domains are charged at actual cost.",
+  "Photo and video shoots in your plan are fully handled by our team, from shoot to final edits and reels.",
+  "One design resized for different platforms counts as one creative. A new idea or brief counts as a new one.",
+  "Each reel, creative and post gets up to 3 rounds of changes. More changes, or a new brief after work starts, are charged as a new creative.",
+  "Quotes are valid for 30 days.",
 ];
 
 export const PACKAGE_CONTACT = {
-  phoneDisplay: "+91 84000 46056",
-  phoneE164: "+918400046056",
+  phones: [
+    { display: "+91 84000 46056", e164: "+918400046056" },
+    { display: "+91 96827 60167", e164: "+919682760167" },
+  ],
   /** wa.me number: country code + number, digits only. */
   whatsapp: "918400046056",
-  email: "aryaagaarwal20031@gmail.com",
+  email: "oneroofventures26@gmail.com",
   location: "Lucknow",
 };
