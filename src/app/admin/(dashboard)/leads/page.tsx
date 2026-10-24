@@ -2,11 +2,12 @@
 
 import { Suspense, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import type { AdminLeadFilters, EmailStatus, LeadResponse, LeadStatus } from "@/lib/api/types";
 import { listCities, listLeads, resendLead, resetLeadRateLimit, updateLeadStatus } from "@/lib/api/admin";
 import { errorMessage } from "@/lib/api/http";
 import { useAsync } from "@/lib/use-async";
+import { useSavedFilters } from "@/lib/use-saved-filters";
 import { cn, formatDateTime, formatINR } from "@/lib/utils";
 import { useToast } from "@/components/admin/Toast";
 import { ErrorBanner, linkButton, PageHeader, Pager, RefreshButton, selectClass, StatusBadge } from "@/components/admin/ui";
@@ -32,10 +33,8 @@ function readFilters(sp: URLSearchParams): AdminLeadFilters {
   };
 }
 
-function LeadsInbox() {
+function LeadsInbox({ setQuery }: { setQuery: (next: URLSearchParams) => void }) {
   const toast = useToast();
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
   const filters = readFilters(searchParams);
   const filterKey = searchParams.toString();
@@ -51,7 +50,7 @@ function LeadsInbox() {
       else next.delete(k);
     }
     if (!("page" in patch)) next.delete("page");
-    router.replace(`${pathname}${next.size ? `?${next.toString()}` : ""}`);
+    setQuery(next);
   }
 
   function replaceLead(updated: LeadResponse) {
@@ -140,7 +139,7 @@ function LeadsInbox() {
           />
         </label>
         {filterKey && (
-          <button type="button" onClick={() => router.replace(pathname)} className="pb-2 text-[13px] font-medium text-primary-text hover:underline">
+          <button type="button" onClick={() => setQuery(new URLSearchParams())} className="pb-2 text-[13px] font-medium text-primary-text hover:underline">
             Clear filters
           </button>
         )}
@@ -362,7 +361,12 @@ function RateLimitReset() {
 export default function AdminLeadsPage() {
   return (
     <Suspense fallback={<p className="text-sm text-text-muted">Loading…</p>}>
-      <LeadsInbox />
+      <SavedFiltersLeadsInbox />
     </Suspense>
   );
+}
+
+function SavedFiltersLeadsInbox() {
+  const { ready, setQuery } = useSavedFilters("admin:leads:filters");
+  return ready ? <LeadsInbox setQuery={setQuery} /> : <p className="text-sm text-text-muted">Loading…</p>;
 }

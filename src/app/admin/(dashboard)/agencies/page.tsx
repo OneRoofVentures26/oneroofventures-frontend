@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import type { AdminAgencyFilters, AgencyResponse, AgencyStatus, PricingType } from "@/lib/api/types";
 import {
   agencyTags,
@@ -15,6 +15,7 @@ import {
 } from "@/lib/api/admin";
 import { errorMessage } from "@/lib/api/http";
 import { useAsync } from "@/lib/use-async";
+import { useSavedFilters } from "@/lib/use-saved-filters";
 import { formatDate, PRICING_TYPE_LABELS } from "@/lib/utils";
 import DataTable, { type DataTableColumn } from "@/components/admin/DataTable";
 import ConfirmDialog from "@/components/admin/ConfirmDialog";
@@ -49,10 +50,8 @@ function readFilters(sp: URLSearchParams): AdminAgencyFilters {
   };
 }
 
-function AgenciesList() {
+function AgenciesList({ setQuery }: { setQuery: (next: URLSearchParams) => void }) {
   const toast = useToast();
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
   const filters = readFilters(searchParams);
   const filterKey = searchParams.toString();
@@ -91,7 +90,7 @@ function AgenciesList() {
       else next.delete(k);
     }
     if (!("page" in patch)) next.delete("page");
-    router.replace(`${pathname}${next.size ? `?${next.toString()}` : ""}`);
+    setQuery(next);
   }
 
   async function quickPatch(agency: AgencyResponse, patch: { status?: AgencyStatus; verified?: boolean }, label: string) {
@@ -294,7 +293,7 @@ function AgenciesList() {
             onClick={() => {
               setSearch("");
               setFit("");
-              router.replace(pathname);
+              setQuery(new URLSearchParams());
             }}
             className="text-[13px] font-medium text-primary-text hover:underline"
           >
@@ -393,10 +392,15 @@ function AgenciesList() {
   );
 }
 
+function SavedFiltersAgenciesList() {
+  const { ready, setQuery } = useSavedFilters("admin:agencies:filters");
+  return ready ? <AgenciesList setQuery={setQuery} /> : <p className="text-sm text-text-muted">Loading…</p>;
+}
+
 export default function AdminAgenciesPage() {
   return (
     <Suspense fallback={<p className="text-sm text-text-muted">Loading…</p>}>
-      <AgenciesList />
+      <SavedFiltersAgenciesList />
     </Suspense>
   );
 }

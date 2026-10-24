@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import type { AgencyRequest } from "@/lib/api/types";
+import type { AgencyRequest, AgencyStatus } from "@/lib/api/types";
 import { agencyTags, getAgency, listCities, listServices, patchAgency, refreshPublic, updateAgency } from "@/lib/api/admin";
 import { ApiError, errorMessage } from "@/lib/api/http";
 import { useAsync } from "@/lib/use-async";
@@ -12,7 +12,7 @@ import { useToast } from "@/components/admin/Toast";
 import AgencyForm from "@/components/admin/AgencyForm";
 import PackagesManager from "@/components/admin/PackagesManager";
 import AgencyScoreCard from "@/components/admin/AgencyScoreCard";
-import { ErrorBanner, Loading, PageHeader, secondaryButton, StatusBadge } from "@/components/admin/ui";
+import { ErrorBanner, Loading, PageHeader, primaryButton, secondaryButton, StatusBadge } from "@/components/admin/ui";
 
 /** The backend rescores a few seconds after a change; a save's response still has the old score. */
 const RESCORE_DELAY_MS = 4000;
@@ -28,6 +28,7 @@ export default function EditAgencyPage() {
   const agency = useAsync(() => getAgency(id), params.id);
   const options = useAsync(() => Promise.all([listCities(), listServices()]));
   const [marking, setMarking] = useState(false);
+  const [publishing, setPublishing] = useState(false);
   const rescoreTimer = useRef<number | undefined>(undefined);
   useEffect(() => () => window.clearTimeout(rescoreTimer.current), []);
 
@@ -55,6 +56,21 @@ export default function EditAgencyPage() {
       toast.show(errorMessage(err), "error");
     } finally {
       setMarking(false);
+    }
+  }
+
+  async function changeStatus(status: AgencyStatus, label: string) {
+    setPublishing(true);
+    try {
+      const updated = await patchAgency(id, { status });
+      void refreshPublic({ tags: agencyTags(agency.data ?? null, updated) });
+      agency.setData(() => updated);
+      refreshScoreSoon();
+      toast.show(`${updated.name} ${label}`);
+    } catch (err) {
+      toast.show(errorMessage(err), "error");
+    } finally {
+      setPublishing(false);
     }
   }
 
@@ -110,9 +126,31 @@ export default function EditAgencyPage() {
           }
           actions={
             a && (
-              <button type="button" disabled={marking} onClick={markCheckedToday} className={secondaryButton}>
-                {marking ? "Saving…" : "Mark checked today"}
-              </button>
+              <>
+                <button type="button" disabled={marking} onClick={markCheckedToday} className={secondaryButton}>
+                  {marking ? "Saving…" : "Mark checked today"}
+                </button>
+                {a.status === "PUBLISHED" ? (
+                  <button
+                    type="button"
+                    disabled={publishing}
+                    onClick={() => changeStatus("HIDDEN", "hidden")}
+                    className={secondaryButton}
+                  >
+                    {publishing ? "Hiding…" : "Hide from site"}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    disabled={publishing}
+                    onClick={() => changeStatus("PUBLISHED", "published")}
+                    title="Publishes the last saved version. Save any changes first."
+                    className={primaryButton}
+                  >
+                    {publishing ? "Publishing…" : "Publish"}
+                  </button>
+                )}
+              </>
             )
           }
         />
