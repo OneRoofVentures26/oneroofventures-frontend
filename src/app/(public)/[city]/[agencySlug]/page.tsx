@@ -5,7 +5,7 @@ import { getAgencyProfile, getSitemapEntries } from "@/lib/api/public";
 import { isNotFound } from "@/lib/api/http";
 import { TIERS, type AgencyProfile } from "@/lib/api/types";
 import { formatDate, formatPackagePrice, initials, PRICING_TYPE_LABELS, shortSentence, TIER_LABELS } from "@/lib/utils";
-import { chip, ctaButton, primaryButton, secondaryButton, sectionTitle } from "@/lib/styles";
+import { ctaButton, primaryButton, secondaryButton, sectionTitle } from "@/lib/styles";
 import { Container } from "@/components/Container";
 import PricingPackageCard from "@/components/PricingPackageCard";
 import CompareToggle from "@/components/CompareToggle";
@@ -152,13 +152,16 @@ export default async function AgencyProfilePage({ params }: PageProps<"/[city]/[
       {agency.services.length > 0 && (
         <section className="mt-8 sm:mt-10">
           <h2 className={sectionTitle}>Services</h2>
-          <div className="mt-4 flex flex-wrap gap-2">
+          <ul className="mt-4 flex flex-wrap gap-2">
             {agency.services.map((s) => (
-              <Link key={s.code} href={`/${agency.city.slug}/services/${s.slug}`} className={chip(false)}>
+              <li
+                key={s.code}
+                className="inline-flex min-h-10 items-center rounded-full border border-border bg-surface px-4 text-sm font-medium text-text"
+              >
                 {s.name}
-              </Link>
+              </li>
             ))}
-          </div>
+          </ul>
         </section>
       )}
 
