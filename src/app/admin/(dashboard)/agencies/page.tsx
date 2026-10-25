@@ -3,20 +3,23 @@
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import type { AdminAgencyFilters, AgencyResponse, AgencyStatus, PricingType } from "@/lib/api/types";
+import type { AdminAgencyFilters, AgencyBulkStatusResult, AgencyResponse, AgencyStatus, PricingType } from "@/lib/api/types";
 import {
   agencyTags,
   deleteAgency,
+  fetchCityLogos,
   listAgencies,
   listCities,
   patchAgency,
   recomputeScores,
   refreshPublic,
+  setAgenciesStatus,
 } from "@/lib/api/admin";
 import { errorMessage } from "@/lib/api/http";
 import { useAsync } from "@/lib/use-async";
 import { useSavedFilters } from "@/lib/use-saved-filters";
 import { formatDate, PRICING_TYPE_LABELS } from "@/lib/utils";
+import AgencyLogo from "@/components/AgencyLogo";
 import DataTable, { type DataTableColumn } from "@/components/admin/DataTable";
 import ConfirmDialog from "@/components/admin/ConfirmDialog";
 import { useToast } from "@/components/admin/Toast";
@@ -35,6 +38,7 @@ const PAGE_SIZE = 25;
 const RESCORE_DELAY_MS = 4000;
 const STATUSES: AgencyStatus[] = ["DRAFT", "PUBLISHED", "HIDDEN"];
 const PRICING_TYPES: PricingType[] = ["FIXED", "RANGE", "QUOTE_ONLY"];
+const STATUS_VERBS: Record<AgencyStatus, string> = { PUBLISHED: "published", HIDDEN: "hidden", DRAFT: "moved to draft" };
 
 function readFilters(sp: URLSearchParams): AdminAgencyFilters {
   const hasPackages = sp.get("hasPackages");
@@ -63,6 +67,54 @@ function AgenciesList({ setQuery }: { setQuery: (next: URLSearchParams) => void 
   const [pendingDelete, setPendingDelete] = useState<AgencyResponse | null>(null);
   const [busyId, setBusyId] = useState<number | null>(null);
   const [recomputing, setRecomputing] = useState(false);
+  const [fetchingLogos, setFetchingLogos] = useState(false);
+  // Ticked rows; cleared whenever the filters or page change.
+  const [selection, setSelection] = useState<{ key: string; ids: number[] }>({ key: filterKey, ids: [] });
+  const selectedIds = selection.key === filterKey ? selection.ids : [];
+  const [bulkBusy, setBulkBusy] = useState(false);
+  const [bulkWarnings, setBulkWarnings] = useState<AgencyBulkStatusResult["warnings"]>([]);
+
+  function toggleSelected(id: number) {
+    setSelection({
+      key: filterKey,
+      ids: selectedIds.includes(id) ? selectedIds.filter((x) => x !== id) : [...selectedIds, id],
+    });
+  }
+
+  /** Publish, hide or draft several agencies at once. All or nothing on the backend. */
+  async function bulkSetStatus(ids: number[], status: AgencyStatus) {
+    if (ids.length === 0) return;
+    setBulkBusy(true);
+    try {
+      const result = await setAgenciesStatus(ids, status);
+      const verb = STATUS_VERBS[status];
+      const parts = [`${result.updated.length} ${verb}`];
+      if (result.unchanged.length > 0) parts.push(`${result.unchanged.length} already ${verb}`);
+      toast.show(parts.join(", "));
+
+      const rows = agencies.data?.items ?? [];
+      const tags = rows
+        .filter((a) => result.updated.includes(a.id))
+        .flatMap((a) => agencyTags(a, { ...a, status }));
+      if (tags.length > 0) void refreshPublic({ tags: [...new Set(tags)] });
+
+      // A new publish replaces the warnings; anything else drops the agencies it changed.
+      setBulkWarnings((prev) =>
+        status === "PUBLISHED" ? result.warnings : prev.filter((w) => !ids.includes(w.agencyId)),
+      );
+      setSelection({ key: filterKey, ids: [] });
+      agencies.reload();
+      // Scores and city price ranges update a few seconds later.
+      window.setTimeout(() => {
+        if (result.updated.length > 0) void refreshPublic({ agencyIds: result.updated });
+        agencies.reload();
+      }, RESCORE_DELAY_MS);
+    } catch (err) {
+      toast.show(errorMessage(err), "error");
+    } finally {
+      setBulkBusy(false);
+    }
+  }
 
   /** Recomputes the filtered city, or every active city. Only needed after a formula change. */
   async function handleRecompute() {
@@ -80,6 +132,22 @@ function AgenciesList({ setQuery }: { setQuery: (next: URLSearchParams) => void 
       toast.show(errorMessage(err), "error");
     } finally {
       setRecomputing(false);
+    }
+  }
+
+  /** Queues logo fetches for the filtered city's agencies that have none; they arrive over the next minutes. */
+  async function handleFetchLogos() {
+    if (!filters.city) return;
+    setFetchingLogos(true);
+    try {
+      const res = await fetchCityLogos(filters.city);
+      toast.show(
+        `${res.queued} queued${res.skipped ? `, ${res.skipped} skipped` : ""}. Refresh in a few minutes to see the logos.`,
+      );
+    } catch (err) {
+      toast.show(errorMessage(err), "error");
+    } finally {
+      setFetchingLogos(false);
     }
   }
 
@@ -130,7 +198,38 @@ function AgenciesList({ setQuery }: { setQuery: (next: URLSearchParams) => void 
 
   const cityName = (slug: string) => cities.data?.find((c) => c.slug === slug)?.name ?? slug;
 
+  const pageIds = agencies.data?.items.map((a) => a.id) ?? [];
+  const allSelected = pageIds.length > 0 && pageIds.every((id) => selectedIds.includes(id));
+
   const columns: DataTableColumn<AgencyResponse>[] = [
+    {
+      key: "select",
+      header: (
+        <input
+          type="checkbox"
+          checked={allSelected}
+          onChange={() => setSelection({ key: filterKey, ids: allSelected ? [] : pageIds })}
+          aria-label="Select all agencies on this page"
+          className="h-4 w-4 accent-primary"
+        />
+      ),
+      className: "w-10",
+      render: (a) => (
+        <input
+          type="checkbox"
+          checked={selectedIds.includes(a.id)}
+          onChange={() => toggleSelected(a.id)}
+          aria-label={`Select ${a.name}`}
+          className="h-4 w-4 accent-primary"
+        />
+      ),
+    },
+    {
+      key: "logo",
+      header: "",
+      className: "w-12",
+      render: (a) => <AgencyLogo name={a.name} logoUrl={a.logoUrl} className="h-9 w-9 rounded-lg" initialsClassName="text-[12px]" />,
+    },
     {
       key: "name",
       header: "Name",
@@ -216,6 +315,17 @@ function AgenciesList({ setQuery }: { setQuery: (next: URLSearchParams) => void 
             >
               {recomputing ? "Recomputing…" : filters.city ? "Recompute scores (city)" : "Recompute scores"}
             </button>
+            {filters.city && (
+              <button
+                type="button"
+                disabled={fetchingLogos}
+                onClick={handleFetchLogos}
+                title={`Fetch logos from the website for every ${cityName(filters.city)} agency that has none`}
+                className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-text hover:bg-surface-raised disabled:opacity-50"
+              >
+                {fetchingLogos ? "Queueing…" : "Fetch missing logos"}
+              </button>
+            )}
             <Link href="/admin/import" className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-text hover:bg-surface-raised">
               Import CSV
             </Link>
@@ -305,6 +415,86 @@ function AgenciesList({ setQuery }: { setQuery: (next: URLSearchParams) => void 
       <div className="mt-4">
         <ErrorBanner error={agencies.error} onRetry={agencies.reload} />
       </div>
+
+      {selectedIds.length > 0 && (
+        <div className="sticky top-16 z-10 mt-4 flex flex-wrap items-center gap-2 rounded-lg border border-primary/40 bg-surface px-4 py-2.5 shadow-card">
+          <span className="text-sm font-semibold text-text">{selectedIds.length} selected</span>
+          <span className="mx-1 h-4 w-px bg-border" aria-hidden="true" />
+          <button
+            type="button"
+            disabled={bulkBusy}
+            onClick={() => bulkSetStatus(selectedIds, "PUBLISHED")}
+            className="rounded-lg bg-primary px-3 py-1.5 text-sm font-semibold text-primary-fg hover:bg-primary-hover disabled:opacity-50"
+          >
+            Publish
+          </button>
+          <button
+            type="button"
+            disabled={bulkBusy}
+            onClick={() => bulkSetStatus(selectedIds, "HIDDEN")}
+            className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-raised disabled:opacity-50"
+          >
+            Hide
+          </button>
+          <button
+            type="button"
+            disabled={bulkBusy}
+            onClick={() => bulkSetStatus(selectedIds, "DRAFT")}
+            className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-raised disabled:opacity-50"
+          >
+            Move to draft
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelection({ key: filterKey, ids: [] })}
+            className="ml-auto text-[13px] font-medium text-text-muted hover:text-text"
+          >
+            Clear selection
+          </button>
+        </div>
+      )}
+
+      {bulkWarnings.length > 0 && (
+        <div className="mt-4 rounded-lg border border-accent/40 bg-accent/10 p-4 text-sm">
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <p className="font-semibold text-text">
+              {bulkWarnings.length} published agenc{bulkWarnings.length === 1 ? "y was" : "ies were"} flagged by the
+              quality sheet. They are live now — hide any that shouldn&apos;t be.
+            </p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                disabled={bulkBusy}
+                onClick={() => bulkSetStatus(bulkWarnings.map((w) => w.agencyId), "HIDDEN")}
+                className={linkButton}
+              >
+                Hide all flagged
+              </button>
+              <button type="button" onClick={() => setBulkWarnings([])} className="text-[13px] font-medium text-text-muted hover:text-text">
+                Dismiss
+              </button>
+            </div>
+          </div>
+          <ul className="mt-2 space-y-1.5">
+            {bulkWarnings.map((w) => (
+              <li key={w.agencyId} className="flex flex-wrap items-baseline gap-x-2 text-[13px]">
+                <Link href={`/admin/agencies/${w.agencyId}/edit`} className="font-medium text-primary-text hover:underline">
+                  {w.agencyName}
+                </Link>
+                <span className="text-text-muted">{w.message}</span>
+                <button
+                  type="button"
+                  disabled={bulkBusy}
+                  onClick={() => bulkSetStatus([w.agencyId], "HIDDEN")}
+                  className={linkButton}
+                >
+                  Hide again
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="mt-4">
         {!agencies.data ? (

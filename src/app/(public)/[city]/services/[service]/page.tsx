@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { getCities, getLocalities, getServices, getSitemapEntries, listAgencies } from "@/lib/api/public";
 import { gridParams } from "@/lib/grid";
 import CityListingLanding from "@/components/CityListingLanding";
+import { NOT_FOUND_METADATA } from "@/lib/seo";
 
 export const revalidate = 300;
 
@@ -22,10 +23,13 @@ async function load(citySlug: string, serviceSlug: string) {
 
 export async function generateMetadata({ params }: PageProps<"/[city]/services/[service]">): Promise<Metadata> {
   const { city: citySlug, service: serviceSlug } = await params;
-  const { city, service } = await load(citySlug, serviceSlug).catch(() => ({ city: undefined, service: undefined }));
-  if (!city || !service) return {};
+  const loaded = await load(citySlug, serviceSlug).catch(() => null);
+  if (!loaded) return {}; // API down: keep the default title
+  const { city, service } = loaded;
+  if (!city || !service) return NOT_FOUND_METADATA;
   return {
     title: `${service.name} Agencies in ${city.name} — Prices & Packages | OneRoof Ventures`,
+    alternates: { canonical: `/${city.slug}/services/${service.slug}` },
     description: `Compare ${service.name} agencies in ${city.name} on published prices and Starter, Growth and Pro packages. Request quotes for free.`,
   };
 }

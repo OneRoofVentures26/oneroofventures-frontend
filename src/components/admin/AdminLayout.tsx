@@ -4,6 +4,10 @@ import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAdminSession, logout } from "@/lib/admin-auth";
+import { listContactRequests } from "@/lib/api/admin";
+import { adminThemeClass, useAdminTheme } from "@/lib/admin-theme";
+import ThemeToggle from "@/components/admin/ThemeToggle";
+import { useAsync } from "@/lib/use-async";
 import { cn } from "@/lib/utils";
 import Logo from "@/components/Logo";
 
@@ -12,6 +16,7 @@ const NAV_ITEMS = [
   { href: "/admin/agencies", label: "Agencies" },
   { href: "/admin/import", label: "Import CSV" },
   { href: "/admin/leads", label: "Leads" },
+  { href: "/admin/contact-requests", label: "Contact requests" },
   { href: "/admin/cities", label: "Cities & localities" },
   { href: "/admin/services", label: "Services" },
 ];
@@ -21,6 +26,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const session = useAdminSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [theme, toggleTheme] = useAdminTheme();
+  // Contact messages aren't emailed, so the sidebar shows how many are new. Re-checked on every page change.
+  const newContacts = useAsync(() => listContactRequests({ status: "NEW", size: 1 }), pathname);
+  const badges: Record<string, number | undefined> = { "/admin/contact-requests": newContacts.data?.total };
 
   function handleLogout() {
     logout();
@@ -40,13 +49,21 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           href={item.href}
           onClick={() => setSidebarOpen(false)}
           className={cn(
-            "block rounded-lg border-l-2 px-3 py-2 text-sm font-medium transition",
+            "flex items-center justify-between gap-2 rounded-lg border-l-2 px-3 py-2 text-sm font-medium transition",
             isActive(item.href)
               ? "border-accent bg-surface text-text"
               : "border-transparent text-text-muted hover:bg-surface hover:text-text",
           )}
         >
           {item.label}
+          {!!badges[item.href] && (
+            <span
+              className="num rounded-full bg-accent px-1.5 py-0.5 text-[11px] font-semibold leading-none text-accent-fg"
+              aria-label={`${badges[item.href]} new`}
+            >
+              {badges[item.href]}
+            </span>
+          )}
         </Link>
       ))}
       <a
@@ -68,7 +85,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   );
 
   return (
-    <div className="admin-shell min-h-screen bg-bg">
+    <div className={cn("admin-shell min-h-screen bg-bg", adminThemeClass(theme))}>
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-surface px-4 sm:px-6">
         <div className="flex items-center gap-3">
           <button
@@ -86,6 +103,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         </div>
         <div className="flex min-w-0 items-center gap-3">
           <span className="min-w-0 truncate text-sm text-text-muted">{session?.username}</span>
+          <ThemeToggle theme={theme} onToggle={toggleTheme} />
         </div>
       </header>
 

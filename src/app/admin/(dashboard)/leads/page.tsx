@@ -3,7 +3,7 @@
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import type { AdminLeadFilters, EmailStatus, LeadResponse, LeadStatus } from "@/lib/api/types";
+import type { AdminLeadFilters, EmailStatus, LeadResponse, LeadStatus, RoutedAgency } from "@/lib/api/types";
 import { listCities, listLeads, resendLead, resetLeadRateLimit, updateLeadStatus } from "@/lib/api/admin";
 import { errorMessage } from "@/lib/api/http";
 import { useAsync } from "@/lib/use-async";
@@ -13,7 +13,9 @@ import { useToast } from "@/components/admin/Toast";
 import { ErrorBanner, linkButton, PageHeader, Pager, RefreshButton, selectClass, StatusBadge } from "@/components/admin/ui";
 
 const PAGE_SIZE = 20;
-const LEAD_STATUSES: LeadStatus[] = ["NEW", "SENT", "CONTACTED", "CLOSED", "SPAM"];
+/** Resends are sent in the background; the list shows the result a few seconds later. */
+const RESEND_REFRESH_MS = 5000;
+const LEAD_STATUSES: LeadStatus[] =["NEW", "SENT", "CONTACTED", "CLOSED", "SPAM"];
 
 const EMAIL_STATUS: Record<EmailStatus | "PENDING", { label: string; className: string }> = {
   SENT: { label: "Email sent", className: "text-primary-text" },
@@ -75,7 +77,8 @@ function LeadsInbox({ setQuery }: { setQuery: (next: URLSearchParams) => void })
     setBusy(lead.id);
     try {
       await resendLead(lead.id);
-      toast.show("Emails are being re-sent. Refresh in a minute to see the result.");
+      toast.show("Emails are being re-sent. Refreshing in a few seconds…");
+      window.setTimeout(leads.reload, RESEND_REFRESH_MS);
     } catch (err) {
       toast.show(errorMessage(err), "error");
     } finally {
@@ -260,17 +263,20 @@ function LeadsInbox({ setQuery }: { setQuery: (next: URLSearchParams) => void })
                             {lead.routedAgencies.map((r) => {
                               const s = EMAIL_STATUS[r.emailStatus ?? "PENDING"];
                               return (
-                                <li key={r.agencyId} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-[13px]">
-                                  <span className="font-medium text-text">
-                                    <Link href={`/admin/agencies/${r.agencyId}/edit`} className="hover:text-primary-text">
-                                      {r.agencyName}
-                                    </Link>
-                                    {r.agencyEmail && <span className="font-normal text-text-muted"> · {r.agencyEmail}</span>}
-                                  </span>
-                                  <span className={s.className}>
-                                    {s.label}
-                                    {r.sentAt ? ` · ${formatDateTime(r.sentAt)}` : ""}
-                                  </span>
+                                <li key={r.agencyId} className="px-3 py-2 text-[13px]">
+                                  <div className="flex flex-wrap items-center justify-between gap-2">
+                                    <span className="font-medium text-text">
+                                      <Link href={`/admin/agencies/${r.agencyId}/edit`} className="hover:text-primary-text">
+                                        {r.agencyName}
+                                      </Link>
+                                      {r.agencyEmail && <span className="font-normal text-text-muted"> · {r.agencyEmail}</span>}
+                                    </span>
+                                    <span className={s.className}>
+                                      {s.label}
+                                      {r.emailAttempts > 1 ? ` · ${r.emailAttempts} attempts` : ""}
+                                    </span>
+                                  </div>
+                                  {r.emailStatus !== "NO_EMAIL" && <SentEmail agency={r} />}
                                 </li>
                               );
                             })}
@@ -314,6 +320,47 @@ function LeadsInbox({ setQuery }: { setQuery: (next: URLSearchParams) => void })
 
       <RateLimitReset />
     </div>
+  );
+}
+
+/** What was emailed to one routed agency (last attempt), and why it failed if it did. */
+function SentEmail({ agency: r }: { agency: RoutedAgency }) {
+  return (
+    <details className="group mt-1.5">
+      <summary className="inline-flex cursor-pointer list-none items-center gap-1 text-primary-text hover:underline [&::-webkit-details-marker]:hidden">
+        Email to {r.agencyName}
+        <span aria-hidden="true" className="transition-transform group-open:rotate-180">⌄</span>
+      </summary>
+      <div className="mt-2 space-y-2">
+        <dl className="flex flex-wrap gap-x-6 gap-y-1 text-text-muted">
+          <div>
+            <dt className="inline font-semibold">Last successful send: </dt>
+            <dd className="inline text-text">{r.sentAt ? formatDateTime(r.sentAt) : "never"}</dd>
+          </div>
+          <div>
+            <dt className="inline font-semibold">Attempts: </dt>
+            <dd className="num inline text-text">{r.emailAttempts}</dd>
+          </div>
+        </dl>
+        {r.emailError && (
+          <p className="break-words rounded-lg bg-danger/10 px-3 py-2 text-danger">
+            <span className="font-semibold">Last attempt failed:</span> {r.emailError}
+          </p>
+        )}
+        {r.emailBody ? (
+          <div className="rounded-lg border border-border bg-bg">
+            {r.emailSubject && (
+              <p className="border-b border-border px-3 py-2 font-semibold text-text">{r.emailSubject}</p>
+            )}
+            <pre className="max-h-80 overflow-auto whitespace-pre-wrap break-words px-3 py-2 font-mono text-[12px] leading-5 text-text">
+              {r.emailBody}
+            </pre>
+          </div>
+        ) : (
+          <p className="text-text-muted">The text of this email wasn&apos;t saved (sent before 17 Oct 2026).</p>
+        )}
+      </div>
+    </details>
   );
 }
 

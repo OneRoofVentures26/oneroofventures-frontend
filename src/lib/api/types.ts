@@ -123,6 +123,8 @@ export interface AgencyListItem extends ScoreFields {
   googleRating: number | null;
   googleReviews: number | null;
   caseStudies: number | null;
+  /** Stored logo (Supabase Storage), or null: show initials. */
+  logoUrl: string | null;
 }
 
 export interface ListingParams {
@@ -166,6 +168,7 @@ export interface AgencyProfile extends ScoreDetailFields {
   /** Keyed by service code. */
   packages: Record<string, PackageView[]>;
   quality: PublicQuality;
+  logoUrl: string | null;
 }
 
 export interface CompareAgency extends ScoreDetailFields {
@@ -175,6 +178,7 @@ export interface CompareAgency extends ScoreDetailFields {
   pricingType: PricingType;
   verified: boolean;
   quality: PublicQuality;
+  logoUrl: string | null;
 }
 
 export interface TierCell {
@@ -252,6 +256,24 @@ export interface LeadCreated {
   sentTo: Array<{ id: number; name: string }>;
 }
 
+/** "Contact us" form. Saved for the admin inbox only; nothing is emailed. */
+export interface ContactRequest {
+  name: string;
+  businessName?: string;
+  email: string;
+  phone: string;
+  monthlyBudget?: number;
+  /** One comma separated string, e.g. "SEO, Social Media". Up to 10 items of 60 characters. */
+  servicesNeeded?: string;
+  aboutYou?: string;
+  captchaToken: string;
+}
+
+export interface ContactCreated {
+  id: number;
+  message: string;
+}
+
 // ---------------------------------------------------------------------------
 // Admin
 // ---------------------------------------------------------------------------
@@ -311,6 +333,19 @@ export interface AgencyResponse extends ScoreDetailFields {
   knownInputs: number | null;
   formulaVersion: string | null;
   computedAt: string | null;
+  logoUrl: string | null;
+  /** AUTO = fetched from the website; MANUAL = uploaded (never replaced automatically); null = no logo. */
+  logoSource: LogoSource | null;
+  /** Last automatic fetch attempt, found or not; null = never tried. */
+  logoCheckedAt: string | null;
+}
+
+export type LogoSource = "AUTO" | "MANUAL";
+
+export interface CityLogoFetchResult {
+  city: string;
+  queued: number;
+  skipped: number;
 }
 
 export interface ScoreRecomputeResult {
@@ -351,6 +386,16 @@ export interface AgencyPatchRequest {
   status?: AgencyStatus;
   verified?: boolean;
   lastCheckedOn?: string;
+}
+
+export interface AgencyBulkStatusResult {
+  status: AgencyStatus;
+  /** Ids whose status changed, in the order sent. */
+  updated: number[];
+  /** Ids that already had that status. */
+  unchanged: number[];
+  /** Publishing only: agencies the quality sheet flagged. They are published anyway. */
+  warnings: Array<{ agencyId: number; agencyName: string; message: string }>;
 }
 
 export interface PackageRequest {
@@ -441,8 +486,16 @@ export interface RoutedAgency {
   agencyId: number;
   agencyName: string;
   agencyEmail: string | null;
+  /** Time of the last successful send; a failed resend doesn't clear it. */
   sentAt: string | null;
   emailStatus: EmailStatus | null;
+  /** Subject and text of the last attempt. Null for NO_EMAIL and for leads before 2026-10-17. */
+  emailSubject: string | null;
+  emailBody: string | null;
+  /** Why the last attempt failed; null after a success. */
+  emailError: string | null;
+  /** First send plus every resend; 0 for NO_EMAIL. */
+  emailAttempts: number;
 }
 
 export interface LeadResponse {
@@ -464,6 +517,31 @@ export interface LeadResponse {
   userAgent: string | null;
   createdAt: string;
   routedAgencies: RoutedAgency[];
+}
+
+export type ContactStatus = "NEW" | "CONTACTED" | "CLOSED" | "SPAM";
+
+export interface ContactRequestResponse {
+  id: number;
+  name: string;
+  businessName: string | null;
+  /** Lower case. */
+  email: string;
+  /** 10 digits, no +91. */
+  phone: string;
+  monthlyBudget: number | null;
+  servicesNeeded: string[];
+  aboutYou: string | null;
+  status: ContactStatus;
+  ipAddress: string | null;
+  userAgent: string | null;
+  createdAt: string;
+}
+
+export interface AdminContactFilters {
+  status?: ContactStatus;
+  page?: number;
+  size?: number;
 }
 
 export interface AdminLeadFilters {

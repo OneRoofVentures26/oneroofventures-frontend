@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Container, Section } from "@/components/Container";
 import HeroPreview from "@/components/HeroPreview";
@@ -11,6 +12,10 @@ import { ctaButton, eyebrow, interactiveCard, card, secondaryButton, sectionTitl
 import { cn } from "@/lib/utils";
 
 export const revalidate = 300;
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 const STEPS = [
   {
@@ -281,12 +286,12 @@ export default async function Home() {
           </Reveal>
 
           <Reveal delay={0.08} className={cn(card, "p-5 sm:p-6")}>
-            <h2 className="text-lg font-semibold text-text sm:text-xl">Who&apos;s behind this?</h2>
+            <h2 className="text-lg font-semibold text-text sm:text-xl">Why we built this</h2>
             <p className="mt-2 text-base text-text-muted">
-              Meet the founders and the story behind OneRoof Ventures.
+              The story behind OneRoof Ventures, and how we keep the comparison fair.
             </p>
             <Link href="/about" className={cn(textLink, "mt-1 inline-flex min-h-11 items-center gap-1.5 text-sm")}>
-              Meet the team <ArrowRight />
+              Read our story <ArrowRight />
             </Link>
           </Reveal>
         </div>
@@ -300,11 +305,11 @@ export default async function Home() {
             request to all of them. Free for businesses, always.
           </p>
           <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-            <Link href="#quiz" className={ctaButton}>
-              Tell us what you need
+            <Link href="/quote" className={ctaButton}>
+              Get matched quotes
             </Link>
-            <Link href="/quote" className={secondaryButton}>
-              Get quotes
+            <Link href="#cities" className={secondaryButton}>
+              Browse cities
             </Link>
           </div>
         </Reveal>

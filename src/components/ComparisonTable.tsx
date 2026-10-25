@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { TIERS, type CityRange, type CompareAgency, type TierGrid } from "@/lib/api/types";
 import { formatPackagePrice, PRICING_TYPE_LABELS, TIER_LABELS } from "@/lib/utils";
+import AgencyLogo from "@/components/AgencyLogo";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import { CityRangeNote, GoogleRating, ScoreBadge } from "@/components/AgencyQuality";
 
@@ -30,7 +31,7 @@ export default function ComparisonTable({
   onRemove,
 }: ComparisonTableProps) {
   return (
-    <div className="overflow-x-auto border-t-2 border-text/80">
+    <div className="overflow-x-auto border-t-2 border-primary">
       <table className="w-full min-w-[640px] border-collapse text-sm">
         <thead>
           <tr>
@@ -41,6 +42,7 @@ export default function ComparisonTable({
               <th key={a.id} className="min-w-[200px] border-b border-border p-4 text-left align-top">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
+                    <AgencyLogo name={a.name} logoUrl={a.logoUrl} className="mb-2 h-10 w-10 rounded-xl" />
                     {citySlug ? (
                       <Link href={`/${citySlug}/${a.slug}`} className="font-display text-lg font-semibold text-text hover:text-primary-text">
                         {a.name}

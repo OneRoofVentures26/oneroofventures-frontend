@@ -8,6 +8,8 @@ import type {
   AgencyProfile,
   CityItem,
   CompareResponse,
+  ContactCreated,
+  ContactRequest,
   LeadCreated,
   LeadRequest,
   ListingParams,
@@ -102,6 +104,18 @@ export async function createLead(body: LeadRequest): Promise<LeadCreated> {
   });
   if (!res.ok) throw await toApiError(res);
   return readJson<LeadCreated>(res);
+}
+
+/** "Contact us" form. Call from the browser, for the same per-IP rate limit reason as createLead. */
+export async function createContactRequest(body: ContactRequest): Promise<ContactCreated> {
+  const res = await fetch(buildUrl("/api/v1/contact"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify(body),
+    cache: "no-store",
+  });
+  if (!res.ok) throw await toApiError(res);
+  return readJson<ContactCreated>(res);
 }
 
 let warmedUp = false;

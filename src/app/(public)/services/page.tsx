@@ -1,14 +1,11 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Container, Section } from "@/components/Container";
-import ServiceInquiryForm from "@/components/ServiceInquiryForm";
 import PackageCoverage from "@/components/PackageCoverage";
 import {
   ADD_ONS,
   CAPABILITIES,
   MIN_COMMITMENT,
-  PACKAGE_CONTACT,
   PACKAGES,
   RATE_CARD_VALID_FROM,
   TERMS,
@@ -19,6 +16,7 @@ import { cn, formatINR } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Marketing Packages & Pricing | OneRoof Ventures",
+  alternates: { canonical: "/services" },
   description:
     "OneRoof Ventures' managed digital marketing packages: Basic ₹12,999, Growth ₹29,999 and Premium ₹44,999 per month — Meta & Google Ads, creatives, social media, SEO, websites and reporting.",
 };
@@ -72,7 +70,7 @@ function PackageCard({ pkg }: { pkg: MarketingPackage }) {
 
       <div className="mt-auto pt-6">
         <p className="mb-3 text-[13px] text-text-muted">Minimum commitment: {MIN_COMMITMENT}.</p>
-        <Link href={`/services?package=${pkg.key}#talk`} className={cn(pkg.popular ? ctaButton : primaryButton, "w-full")}>
+        <Link href={`/contact?package=${pkg.key}`} className={cn(pkg.popular ? ctaButton : primaryButton, "w-full")}>
           Choose {pkg.name}
         </Link>
       </div>
@@ -113,9 +111,9 @@ export default function ServicesPage() {
             <a href="#packages" className={ctaButton}>
               See what&apos;s included
             </a>
-            <a href="#talk" className={secondaryButton}>
+            <Link href="/contact" className={secondaryButton}>
               Talk to our team
-            </a>
+            </Link>
           </div>
         </Container>
       </section>
@@ -195,41 +193,6 @@ export default function ServicesPage() {
             ))}
           </ul>
         </details>
-      </Section>
-
-      {/* Contact */}
-      <Section id="talk" flush className="scroll-mt-20" containerClassName="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12">
-        <div className="lg:col-span-4">
-          <h2 className={sectionTitle}>Talk to our team</h2>
-          <p className="mt-3 text-base text-text-muted">
-            Questions, or want something built to fit? Get in touch and we&apos;ll put a custom scope together.
-          </p>
-          <ul className="mt-6 space-y-1 text-sm">
-            {PACKAGE_CONTACT.phones.map((p, i) => (
-              <li key={p.e164}>
-                <a href={`tel:${p.e164}`} className="inline-flex min-h-11 items-center gap-2 font-medium text-text hover:text-primary-text">
-                  <span className="w-20 text-text-muted">{i === 0 ? "Phone" : ""}</span>
-                  {p.display}
-                </a>
-              </li>
-            ))}
-            <li>
-              <a href={`mailto:${PACKAGE_CONTACT.email}`} className="inline-flex min-h-11 items-center gap-2 break-all font-medium text-text hover:text-primary-text">
-                <span className="w-20 flex-shrink-0 text-text-muted">Email</span>
-                {PACKAGE_CONTACT.email}
-              </a>
-            </li>
-            <li className="inline-flex min-h-11 items-center gap-2 font-medium text-text">
-              <span className="w-20 text-text-muted">Based in</span>
-              {PACKAGE_CONTACT.location}
-            </li>
-          </ul>
-        </div>
-        <div className={cn(card, "p-5 sm:p-6 lg:col-span-8")}>
-          <Suspense fallback={<div className="h-80" />}>
-            <ServiceInquiryForm />
-          </Suspense>
-        </div>
       </Section>
     </div>
   );

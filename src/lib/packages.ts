@@ -39,7 +39,7 @@ export const PACKAGES: MarketingPackage[] = [
       "6 static creatives per month, plus ad copy variations",
       "Leads delivered to a Google Sheet with instant WhatsApp and email alerts",
       "Monthly performance report",
-      "Support over WhatsApp and email, 48-hour response",
+      "Support over email, 48-hour response",
     ],
     note: "Suggested ad spend ₹15,000–₹25,000 per month, paid by you directly to the platform.",
   },
@@ -191,7 +191,7 @@ export const COVERAGE: CoverageRow[] = [
   {
     group: "Reporting & support",
     label: "Support",
-    values: { basic: "WhatsApp & email, 48-hour response", growth: "Within 24 hours", premium: "Same-day priority" },
+    values: { basic: "Email, 48-hour response", growth: "Within 24 hours", premium: "Same-day priority" },
   },
   {
     group: "Reporting & support",
@@ -256,8 +256,6 @@ export const PACKAGE_CONTACT = {
     { display: "+91 84000 46056", e164: "+918400046056" },
     { display: "+91 96827 60167", e164: "+919682760167" },
   ],
-  /** wa.me number: country code + number, digits only. */
-  whatsapp: "918400046056",
   email: "oneroofventures26@gmail.com",
   location: "Lucknow",
 };

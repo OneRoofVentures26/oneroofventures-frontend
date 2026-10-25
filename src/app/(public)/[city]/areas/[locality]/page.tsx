@@ -4,6 +4,7 @@ import { getCities, getLocalities, getServices, getSitemapEntries, listAgencies 
 import { isNotFound } from "@/lib/api/http";
 import { gridParams } from "@/lib/grid";
 import CityListingLanding from "@/components/CityListingLanding";
+import { NOT_FOUND_METADATA } from "@/lib/seo";
 
 export const revalidate = 300;
 
@@ -27,10 +28,13 @@ async function load(citySlug: string, localitySlug: string) {
 
 export async function generateMetadata({ params }: PageProps<"/[city]/areas/[locality]">): Promise<Metadata> {
   const { city: citySlug, locality: localitySlug } = await params;
-  const { city, locality } = await load(citySlug, localitySlug).catch(() => ({ city: undefined, locality: undefined }));
-  if (!city || !locality) return {};
+  const loaded = await load(citySlug, localitySlug).catch(() => null);
+  if (!loaded) return {}; // API down: keep the default title
+  const { city, locality } = loaded;
+  if (!city || !locality) return NOT_FOUND_METADATA;
   return {
     title: `Marketing Agencies in ${locality.name}, ${city.name} | OneRoof Ventures`,
+    alternates: { canonical: `/${city.slug}/areas/${locality.slug}` },
     description: `Compare marketing agencies based in ${locality.name}, ${city.name} on published prices and packages. Request quotes for free.`,
   };
 }

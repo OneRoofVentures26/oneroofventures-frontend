@@ -5,7 +5,8 @@ import Link from "next/link";
 import type { AgencyListItem } from "@/lib/api/types";
 import { useCompare } from "@/lib/compare-context";
 import { card, secondaryButton, tag } from "@/lib/styles";
-import { cn, formatStartingPrice, initials, TIER_LABELS } from "@/lib/utils";
+import { cn, formatStartingPrice, TIER_LABELS } from "@/lib/utils";
+import AgencyLogo from "@/components/AgencyLogo";
 import CompareToggle from "@/components/CompareToggle";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import { GoogleRating, ScoreBadge } from "@/components/AgencyQuality";
@@ -25,7 +26,7 @@ export function AgencyCardGrid({ children, withSidebar = false }: { children: Re
 
 /**
  * Compact agency card:
- * 1. initials, name (wraps, never truncated), Verified
+ * 1. logo (or initials), name (wraps, never truncated), Verified
  * 2. area · team size
  * 3. One Roof Score and Google rating, when known
  * 4. up to 3 service chips on one row, then "+N"
@@ -74,9 +75,7 @@ export default function AgencyCard({
       )}
     >
       <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary/8 font-display text-sm font-bold text-primary-text">
-          {initials(agency.name)}
-        </span>
+        <AgencyLogo name={agency.name} logoUrl={agency.logoUrl} className="h-10 w-10 rounded-xl" />
         <div className="min-w-0 flex-1">
           <h3 className="break-words font-display text-base font-semibold leading-snug text-text">
             <Link href={href} className="hover:text-primary-text">

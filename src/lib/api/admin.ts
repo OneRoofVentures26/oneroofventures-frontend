@@ -5,12 +5,18 @@ import { ApiError, buildUrl, readJson, toApiError } from "@/lib/api/http";
 import { refreshPublicCache, type RefreshRequest } from "@/app/admin/actions";
 import type {
   AdminAgencyFilters,
+  AdminContactFilters,
   AdminLeadFilters,
+  AgencyBulkStatusResult,
   AgencyPatchRequest,
   AgencyRequest,
   AgencyResponse,
+  AgencyStatus,
+  CityLogoFetchResult,
   CityRequest,
   CityResponse,
+  ContactRequestResponse,
+  ContactStatus,
   ImportReport,
   LeadResponse,
   LeadStatus,
@@ -127,6 +133,11 @@ export function patchAgency(id: number, body: AgencyPatchRequest): Promise<Agenc
   return request("PATCH", `/agencies/${id}`, { json: body });
 }
 
+/** Sets one status on up to 200 agencies. All or nothing: an unknown id (404) changes none. */
+export function setAgenciesStatus(agencyIds: number[], status: AgencyStatus): Promise<AgencyBulkStatusResult> {
+  return request("PATCH", "/agencies/status", { json: { agencyIds, status } });
+}
+
 export function deleteAgency(id: number): Promise<void> {
   return request("DELETE", `/agencies/${id}`);
 }
@@ -138,6 +149,29 @@ export function deleteAgency(id: number): Promise<void> {
  */
 export function recomputeScores(city?: string): Promise<ScoreRecomputeResult[]> {
   return request("POST", "/scores/recompute", { query: { city } });
+}
+
+// Logos. Every endpoint gives 503 LOGO_STORAGE_NOT_CONFIGURED when the server has no storage set up.
+
+/** Fetches the logo from the agency's website now. 409 when the logo was uploaded by hand: resend with force. */
+export function fetchAgencyLogo(id: number, force = false): Promise<AgencyResponse> {
+  return request("POST", `/agencies/${id}/logo/fetch`, { query: { force: force || undefined } });
+}
+
+/** Queues logo fetches for every agency in a city (any status); they arrive over the next minutes. */
+export function fetchCityLogos(city: string, onlyMissing = true): Promise<CityLogoFetchResult> {
+  return request("POST", "/agencies/logos/fetch", { query: { city, onlyMissing } });
+}
+
+/** PNG, JPEG, WebP, SVG, ICO or GIF under 500 KB. Sets logoSource to MANUAL. */
+export function uploadAgencyLogo(id: number, file: File): Promise<AgencyResponse> {
+  const form = new FormData();
+  form.append("file", file);
+  return request("PUT", `/agencies/${id}/logo`, { form });
+}
+
+export function deleteAgencyLogo(id: number): Promise<void> {
+  return request("DELETE", `/agencies/${id}/logo`);
 }
 
 export function listPackages(agencyId: number): Promise<PackageResponse[]> {
@@ -249,4 +283,21 @@ export function resendLead(id: number): Promise<void> {
 
 export function resetLeadRateLimit(ip: string): Promise<RateLimitReset> {
   return request("DELETE", "/rate-limits/leads", { query: { ip } });
+}
+
+// ---------------------------------------------------------------------------
+// Contact requests ("Contact us" form; nothing is emailed, so this is the only place they show)
+// ---------------------------------------------------------------------------
+
+export function listContactRequests(filters: AdminContactFilters = {}): Promise<Page<ContactRequestResponse>> {
+  return request("GET", "/contact-requests", { query: { ...filters } });
+}
+
+export function updateContactRequestStatus(id: number, status: ContactStatus): Promise<ContactRequestResponse> {
+  return request("PATCH", `/contact-requests/${id}`, { json: { status } });
+}
+
+/** The contact form has its own limit, separate from quote requests. */
+export function resetContactRateLimit(ip: string): Promise<RateLimitReset> {
+  return request("DELETE", "/rate-limits/contact", { query: { ip } });
 }

@@ -8,7 +8,7 @@ import { ApiError, errorMessage } from "@/lib/api/http";
 import type { AgencyProfile, CompareAgency, CompareResponse, ServiceItem, Tier } from "@/lib/api/types";
 import { MAX_COMPARE, MIN_COMPARE, useCompare } from "@/lib/compare-context";
 import { cn } from "@/lib/utils";
-import { chip, ctaButton, primaryButton, secondaryButton, sectionTitle } from "@/lib/styles";
+import { chip, ctaButton, primaryButton, secondaryButton } from "@/lib/styles";
 import ComparisonTable from "@/components/ComparisonTable";
 
 interface Result {
@@ -172,8 +172,8 @@ export default function CompareClient({ services }: { services: ServiceItem[] })
     <div>
       <div className="mb-6 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
         <div>
-          <h1 className={sectionTitle}>Comparing {data.agencies.length} agencies</h1>
-          <p className="mt-2 text-base text-text-muted">Packages side by side by Starter, Growth and Pro tier.</p>
+          <h2 className="text-xl font-semibold text-text sm:text-2xl">Comparing {data.agencies.length} agencies</h2>
+          <p className="mt-1 text-base text-text-muted">Packages side by side by Starter, Growth and Pro tier.</p>
         </div>
         {quoteAll && (
           <Link

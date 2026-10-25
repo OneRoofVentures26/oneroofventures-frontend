@@ -29,6 +29,15 @@ interface GuidedQuizProps {
 const SELECT_PAUSE_MS = 180;
 const TOTAL_STEPS = 3;
 
+/** Equal-height rows (auto-rows-fr), so a one-line chip matches its two-line neighbours. */
+const chipGrid = "mt-4 grid auto-rows-fr grid-cols-2 gap-2 sm:grid-cols-3";
+
+/** A chip left alone on the last row stretches across it instead of sitting stranded. */
+function loneChipSpan(index: number, count: number): string | undefined {
+  if (index !== count - 1) return undefined;
+  return cn(count % 2 === 1 && "max-sm:col-span-2", count % 3 === 1 && "sm:col-span-3");
+}
+
 const backButton =
   "-ml-2 inline-flex min-h-11 items-center gap-1 rounded-lg px-2 text-sm font-medium text-text-muted transition-colors duration-200 hover:text-primary-text lg:min-h-9";
 
@@ -143,14 +152,14 @@ export default function GuidedQuiz({
               {services.length === 0 ? (
                 <p className="mt-4 text-sm text-text-muted">Services are loading — please refresh in a moment.</p>
               ) : (
-                <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
-                  {services.map((s) => (
+                <div className={chipGrid}>
+                  {services.map((s, i) => (
                     <button
                       key={s.slug}
                       type="button"
                       onClick={() => chooseService(s.slug)}
                       aria-pressed={service === s.slug}
-                      className={chip(service === s.slug, true)}
+                      className={cn(chip(service === s.slug, true), loneChipSpan(i, services.length))}
                     >
                       {s.name}
                     </button>
@@ -166,14 +175,14 @@ export default function GuidedQuiz({
                 <span aria-hidden="true">←</span> Back
               </button>
               <h2 className="mt-1 text-card font-semibold text-text sm:text-xl">What&apos;s your monthly budget?</h2>
-              <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {QUIZ_BUDGET_BANDS.map((b) => (
+              <div className={chipGrid}>
+                {QUIZ_BUDGET_BANDS.map((b, i) => (
                   <button
                     key={b.key}
                     type="button"
                     onClick={() => chooseBudget(b.key)}
                     aria-pressed={budgetBand === b.key}
-                    className={chip(budgetBand === b.key, true)}
+                    className={cn(chip(budgetBand === b.key, true), loneChipSpan(i, QUIZ_BUDGET_BANDS.length))}
                   >
                     {b.label}
                   </button>
@@ -191,14 +200,14 @@ export default function GuidedQuiz({
               {cities.length === 0 ? (
                 <p className="mt-4 text-sm text-text-muted">No cities are live yet — check back soon.</p>
               ) : (
-                <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
-                  {cities.map((c) => (
+                <div className={chipGrid}>
+                  {cities.map((c, i) => (
                     <button
                       key={c.slug}
                       type="button"
                       onClick={() => chooseCity(c.slug)}
                       aria-pressed={citySlug === c.slug}
-                      className={chip(citySlug === c.slug, true)}
+                      className={cn(chip(citySlug === c.slug, true), loneChipSpan(i, cities.length))}
                     >
                       {c.name}
                     </button>

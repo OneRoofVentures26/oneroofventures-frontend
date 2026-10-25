@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 /*
- * OneRoof design tokens. Every colour in a component comes from here; there is
- * one theme (no light/dark switch).
+ * OneRoof design tokens. Every colour in a component comes from here; the
+ * public site has one theme. Only the admin has a dark mode (`.admin-dark`).
  *
  * Brand palette:
  *   cream  #E8D5BF   orange #FE7522   navy #0E3655   ink #1F1F1F
@@ -66,6 +66,43 @@
   --shadow-raised: 0 16px 40px -20px rgb(31 31 31 / 0.22);
 
   --glass: rgb(244 234 223 / 0.82);
+}
+
+/*
+ * Admin dark mode (admin only; the public site has one theme). Applies to the
+ * whole page while an `.admin-dark` element is on it, so toasts, dialogs and
+ * the page background follow too. Navy and ink panels inside keep their own tokens.
+ */
+:root:has(.admin-dark) {
+  color-scheme: dark;
+
+  --bg: #0f141a;
+  --surface: #161d26;
+  --surface-raised: #1f2833;
+  --band: #131a22;
+  --border: rgb(232 213 191 / 0.13);
+  --text: #f1e8dd;
+  --text-muted: #b3a797;
+
+  /* Navy disappears on a dark canvas, so orange is the action colour, as in the navy panels. */
+  --primary: var(--brand-orange);
+  --primary-hover: var(--accent-hover);
+  --primary-text: #ff9a5c;
+  --primary-fg: var(--brand-ink);
+
+  --accent-text: #ff9a5c;
+  --logo-sub: #cdbba6;
+  --success: #4cc488;
+  --success-text: #6fd9a2;
+  --danger: #ff7a6e;
+  --ring: var(--brand-orange);
+
+  --gradient-text: linear-gradient(135deg, #ffb07a 0%, #fe7522 100%);
+
+  --shadow-card-hover: 0 16px 36px -16px rgb(0 0 0 / 0.5);
+  --shadow-raised: 0 16px 40px -16px rgb(0 0 0 / 0.5);
+
+  --glass: rgb(15 20 26 / 0.8);
 }
 
 /* Navy and ink panels: same tokens, re-pointed for a dark brand surface. */

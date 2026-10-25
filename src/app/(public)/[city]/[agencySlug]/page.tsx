@@ -4,10 +4,12 @@ import type { Metadata } from "next";
 import { getAgencyProfile, getSitemapEntries } from "@/lib/api/public";
 import { isNotFound } from "@/lib/api/http";
 import { TIERS, type AgencyProfile } from "@/lib/api/types";
-import { formatDate, formatPackagePrice, initials, PRICING_TYPE_LABELS, shortSentence, TIER_LABELS } from "@/lib/utils";
+import { cn, formatDate, formatPackagePrice, PRICING_TYPE_LABELS, shortSentence, TIER_LABELS } from "@/lib/utils";
 import { ctaButton, primaryButton, secondaryButton, sectionTitle } from "@/lib/styles";
 import { Container } from "@/components/Container";
 import PricingPackageCard from "@/components/PricingPackageCard";
+import AgencyLogo from "@/components/AgencyLogo";
+import { NOT_FOUND_METADATA } from "@/lib/seo";
 import CompareToggle from "@/components/CompareToggle";
 import CompareBar from "@/components/CompareBar";
 import StickyActionBar from "@/components/StickyActionBar";
@@ -34,10 +36,13 @@ async function loadProfile(citySlug: string, agencySlug: string): Promise<Agency
 
 export async function generateMetadata({ params }: PageProps<"/[city]/[agencySlug]">): Promise<Metadata> {
   const { city, agencySlug } = await params;
-  const agency = await loadProfile(city, agencySlug).catch(() => null);
-  if (!agency) return {};
+  // loadProfile gives null for a 404; any other failure keeps the default title.
+  const agency = await loadProfile(city, agencySlug).catch(() => undefined);
+  if (agency === undefined) return {};
+  if (agency === null) return NOT_FOUND_METADATA;
   return {
     title: `${agency.name} — ${agency.city.name} Prices & Packages | OneRoof Ventures`,
+    alternates: { canonical: `/${agency.city.slug}/${agency.slug}` },
     description:
       agency.description ??
       `${agency.name} in ${agency.city.name}: services, published packages and prices. Request a free quote.`,
@@ -69,13 +74,17 @@ export default async function AgencyProfilePage({ params }: PageProps<"/[city]/[
     }));
   const servicesWithoutPackages = agency.services.filter((s) => !packageGroups.some((g) => g.code === s.code));
 
-  const facts: Array<[string, string]> = [
-    ["Location", [agency.locality?.name, agency.city.name].filter(Boolean).join(", ")],
-    ["Team size", agency.teamSize ? `${agency.teamSize} people` : "—"],
-    ["Pricing", PRICING_TYPE_LABELS[agency.pricingType]],
-    // Research notes can be long and carry source labels; show one short sentence.
-    ["Works with", (agency.targetClients && shortSentence(agency.targetClients)) || "—"],
-  ];
+  // Unknown facts are left out rather than shown as a dash.
+  const facts = (
+    [
+      ["Location", [agency.locality?.name, agency.city.name].filter(Boolean).join(", ")],
+      ["Team size", agency.teamSize ? `${agency.teamSize} people` : null],
+      ["Pricing", PRICING_TYPE_LABELS[agency.pricingType]],
+      // Research notes can be long and carry source labels; show one short sentence.
+      ["Works with", agency.targetClients ? shortSentence(agency.targetClients) : null],
+    ] as Array<[string, string | null]>
+  ).filter((f): f is [string, string] => !!f[1]);
+  const factCols = ["sm:grid-cols-1", "sm:grid-cols-2", "sm:grid-cols-3", "sm:grid-cols-4"][facts.length - 1];
 
   return (
     <Container className="pb-12 pt-4 md:pb-16 md:pt-6 lg:pb-20">
@@ -85,9 +94,12 @@ export default async function AgencyProfilePage({ params }: PageProps<"/[city]/[
 
       <div className="mt-2 flex flex-col gap-5 border-b border-border pb-6 sm:flex-row sm:items-start sm:justify-between sm:gap-8 sm:pb-8">
         <div className="flex min-w-0 gap-4">
-          <span className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-primary/8 font-display text-lg font-bold text-primary-text sm:h-16 sm:w-16">
-            {initials(agency.name)}
-          </span>
+          <AgencyLogo
+            name={agency.name}
+            logoUrl={agency.logoUrl}
+            className="h-14 w-14 rounded-2xl sm:h-16 sm:w-16"
+            initialsClassName="text-lg"
+          />
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
               <h1 className="font-display text-[1.75rem] font-bold leading-tight tracking-[-0.02em] text-text sm:text-4xl">
@@ -130,8 +142,8 @@ export default async function AgencyProfilePage({ params }: PageProps<"/[city]/[
         </div>
       </div>
 
-      {/* Mobile: a list of label/value rows. From 640px: four columns. */}
-      <dl className="divide-y divide-border border-b border-border sm:grid sm:grid-cols-4 sm:divide-x sm:divide-y-0">
+      {/* Mobile: a list of label/value rows. From 640px: one column per known fact. */}
+      <dl className={cn("divide-y divide-border border-b border-border sm:grid sm:divide-x sm:divide-y-0", factCols)}>
         {facts.map(([label, value]) => (
           <div key={label} className="flex items-baseline justify-between gap-4 py-3 sm:block sm:px-4 sm:py-4 sm:first:pl-0">
             <dt className="flex-shrink-0 text-[13px] font-medium text-text-muted">{label}</dt>

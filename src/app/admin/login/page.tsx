@@ -4,7 +4,10 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { login, useAdminSession } from "@/lib/admin-auth";
 import { warmUpBackend } from "@/lib/api/public";
+import { adminThemeClass, useAdminTheme } from "@/lib/admin-theme";
+import { cn } from "@/lib/utils";
 import Logo from "@/components/Logo";
+import ThemeToggle from "@/components/admin/ThemeToggle";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -13,6 +16,7 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [theme, toggleTheme] = useAdminTheme();
 
   useEffect(() => {
     if (session) router.replace("/admin");
@@ -35,7 +39,8 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="admin-shell flex min-h-screen items-center justify-center bg-bg px-4">
+    <div className={cn("admin-shell relative flex min-h-screen items-center justify-center bg-bg px-4", adminThemeClass(theme))}>
+      <ThemeToggle theme={theme} onToggle={toggleTheme} className="absolute right-4 top-4" />
       <div className="w-full max-w-sm">
         <div className="mb-6 flex flex-col items-center gap-2">
           <Logo size={48} />

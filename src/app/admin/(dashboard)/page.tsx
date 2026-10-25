@@ -1,20 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { listAgencies, listLeads } from "@/lib/api/admin";
+import { listAgencies, listContactRequests, listLeads } from "@/lib/api/admin";
 import { useAsync } from "@/lib/use-async";
 import { formatDateTime } from "@/lib/utils";
 import StatCard, { StatCardSkeleton } from "@/components/admin/StatCard";
 import { ErrorBanner, PageHeader, StatusBadge } from "@/components/admin/ui";
 
 async function loadDashboard() {
-  const [all, published, drafts, missingPackages, newLeads, recentLeads] = await Promise.all([
+  const [all, published, drafts, missingPackages, newLeads, recentLeads, newContacts] = await Promise.all([
     listAgencies({ size: 1 }),
     listAgencies({ status: "PUBLISHED", size: 1 }),
     listAgencies({ status: "DRAFT", size: 1 }),
     listAgencies({ hasPackages: false, size: 1 }),
     listLeads({ status: "NEW", size: 1 }),
     listLeads({ size: 6 }),
+    listContactRequests({ status: "NEW", size: 1 }),
   ]);
   return {
     totalAgencies: all.total,
@@ -23,6 +24,7 @@ async function loadDashboard() {
     missingPackages: missingPackages.total,
     newLeads: newLeads.total,
     recentLeads: recentLeads.items,
+    newContacts: newContacts.total,
   };
 }
 
@@ -41,6 +43,12 @@ export default function AdminDashboardPage() {
           warn: stats.missingPackages > 0,
         },
         { label: "New leads", value: stats.newLeads, href: "/admin/leads?status=NEW", warn: stats.newLeads > 0 },
+        {
+          label: "New messages",
+          value: stats.newContacts,
+          href: "/admin/contact-requests?status=NEW",
+          warn: stats.newContacts > 0,
+        },
       ]
     : [];
 
@@ -60,9 +68,9 @@ export default function AdminDashboardPage() {
         <ErrorBanner error={error} onRetry={reload} />
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-5">
+      <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-6">
         {!stats
-          ? Array.from({ length: 5 }).map((_, i) => <StatCardSkeleton key={i} />)
+          ? Array.from({ length: 6 }).map((_, i) => <StatCardSkeleton key={i} />)
           : cards.map((card) => (
               <Link key={card.label} href={card.href} className="block transition hover:opacity-80">
                 <StatCard label={card.label} value={card.value} tone={card.warn ? "warning" : "default"} />

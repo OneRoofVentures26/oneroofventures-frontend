@@ -107,7 +107,8 @@ export default function Logo({ size = 32, variant = "full", className }: LogoPro
       <span
         aria-hidden="true"
         className="logo-sub mt-[0.35em] whitespace-nowrap font-sans font-semibold uppercase text-logo-sub"
-        style={{ fontSize: Math.max(8, nameSize * 0.32), letterSpacing: "0.42em", marginRight: "-0.42em" }}
+        // Big enough to read on phones (about 12px in the header), with tighter tracking so the width stays close.
+        style={{ fontSize: Math.max(11, nameSize * 0.38), letterSpacing: "0.3em", marginRight: "-0.3em" }}
       >
         Ventures
       </span>

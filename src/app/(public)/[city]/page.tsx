@@ -8,6 +8,7 @@ import { Container } from "@/components/Container";
 import CityListingLanding from "@/components/CityListingLanding";
 import { ctaButton, secondaryButton } from "@/lib/styles";
 import { formatDate } from "@/lib/utils";
+import { NOT_FOUND_METADATA } from "@/lib/seo";
 
 export const revalidate = 300;
 
@@ -33,10 +34,12 @@ async function findCity(slug: string) {
 
 export async function generateMetadata({ params }: PageProps<"/[city]">): Promise<Metadata> {
   const { city: citySlug } = await params;
-  const city = await findCity(citySlug).catch(() => undefined);
-  if (!city) return {};
+  const city = await findCity(citySlug).catch(() => null);
+  if (city === null) return {}; // API down: keep the default title
+  if (!city) return NOT_FOUND_METADATA;
   return {
     title: `Top Marketing Agencies in ${city.name} | OneRoof Ventures`,
+    alternates: { canonical: `/${city.slug}` },
     description: `Compare marketing agencies in ${city.name} on published prices, packages and services. Get quotes from your shortlist for free.`,
   };
 }

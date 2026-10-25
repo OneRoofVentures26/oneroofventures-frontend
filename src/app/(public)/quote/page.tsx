@@ -7,6 +7,7 @@ import { sectionTitle } from "@/lib/styles";
 
 export const metadata: Metadata = {
   title: "Request a Quote | OneRoof Ventures",
+  alternates: { canonical: "/quote" },
   description: "Send one quote request to your shortlisted marketing agencies, or let us match you with the right ones.",
 };
 

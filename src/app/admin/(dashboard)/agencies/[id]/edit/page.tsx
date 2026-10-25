@@ -12,6 +12,7 @@ import { useToast } from "@/components/admin/Toast";
 import AgencyForm from "@/components/admin/AgencyForm";
 import PackagesManager from "@/components/admin/PackagesManager";
 import AgencyScoreCard from "@/components/admin/AgencyScoreCard";
+import AgencyLogoCard from "@/components/admin/AgencyLogoCard";
 import { ErrorBanner, Loading, PageHeader, primaryButton, secondaryButton, StatusBadge } from "@/components/admin/ui";
 
 /** The backend rescores a few seconds after a change; a save's response still has the old score. */
@@ -162,6 +163,7 @@ export default function EditAgencyPage() {
           !agency.error && !options.error && <Loading />
         ) : (
           <>
+            <AgencyLogoCard agency={a} onChange={(logo) => agency.setData((prev) => ({ ...prev!, ...logo }))} />
             <AgencyScoreCard agency={a} />
             {/* Remount the form when the saved record changes so it shows server-normalised values. */}
             <AgencyForm

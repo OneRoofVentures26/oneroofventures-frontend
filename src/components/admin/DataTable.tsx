@@ -6,7 +6,7 @@ import { RefreshButton } from "@/components/admin/ui";
 
 export interface DataTableColumn<T> {
   key: string;
-  header: string;
+  header: ReactNode;
   render: (row: T) => ReactNode;
   sortValue?: (row: T) => string | number;
   className?: string;
