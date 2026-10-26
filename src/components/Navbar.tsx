@@ -18,6 +18,7 @@ const LINKS = [
   { href: "/#cities", label: "Cities" },
   { href: "/#how-it-works", label: "How it works" },
   { href: "/services", label: "Packages" },
+  { href: "/articles", label: "Articles" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact Us" },
 ];

@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { getCities, getServices, getSitemapEntries } from "@/lib/api/public";
 import type { SitemapEntry } from "@/lib/api/types";
 import { SITE_URL } from "@/lib/config";
+import { ARTICLES } from "@/content/articles";
 
 /*
  * /sitemap.xml, linked from robots.txt. Built from the backend's sitemap feed
@@ -21,6 +22,14 @@ const STATIC_PAGES: Sitemap = [
   { url: `${SITE_URL}/about`, changeFrequency: "monthly", priority: 0.5 },
   { url: `${SITE_URL}/contact`, changeFrequency: "monthly", priority: 0.5 },
   { url: `${SITE_URL}/compare`, changeFrequency: "monthly", priority: 0.4 },
+  { url: `${SITE_URL}/faq`, changeFrequency: "monthly", priority: 0.6 },
+  { url: `${SITE_URL}/articles`, changeFrequency: "weekly", priority: 0.7 },
+  ...ARTICLES.map((a) => ({
+    url: `${SITE_URL}/articles/${a.slug}`,
+    lastModified: new Date(a.updatedAt),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  })),
 ];
 
 function lastModified(entry: SitemapEntry): Date | undefined {

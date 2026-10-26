@@ -42,7 +42,7 @@ export default function ComparisonTable({
               <th key={a.id} className="min-w-[200px] border-b border-border p-4 text-left align-top">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <AgencyLogo name={a.name} logoUrl={a.logoUrl} className="mb-2 h-10 w-10 rounded-xl" />
+                    <AgencyLogo name={a.name} logoUrl={a.logoUrl} className="mb-2 h-10 w-[100px] rounded-lg" />
                     {citySlug ? (
                       <Link href={`/${citySlug}/${a.slug}`} className="font-display text-lg font-semibold text-text hover:text-primary-text">
                         {a.name}

@@ -4,10 +4,11 @@ import { useState } from "react";
 import { cn, initials } from "@/lib/utils";
 
 /**
- * An agency's logo in a fixed square box, or its initials when there is no
- * logo or it fails to load. Logos vary in shape (square icons, wide
- * wordmarks), so they're contained with padding on a white tile, never cropped.
- * `className` sets the size and corner radius, e.g. "h-10 w-10 rounded-xl".
+ * An agency's logo in a fixed wide box (about 2.5:1), or its initials in the
+ * same box when there is no logo or it fails to load. Logos are square icons
+ * or wide wordmarks, often dark on transparent, so they're contained with
+ * padding on a white tile (also in dark mode), never cropped.
+ * `className` sets the size and corner radius, e.g. "h-12 w-[120px] rounded-lg".
  */
 export default function AgencyLogo({
   name,

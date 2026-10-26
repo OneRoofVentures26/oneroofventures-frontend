@@ -75,7 +75,7 @@ export default function AgencyCard({
       )}
     >
       <div className="flex items-start gap-3">
-        <AgencyLogo name={agency.name} logoUrl={agency.logoUrl} className="h-10 w-10 rounded-xl" />
+        <AgencyLogo name={agency.name} logoUrl={agency.logoUrl} className="h-12 w-[120px] rounded-lg" />
         <div className="min-w-0 flex-1">
           <h3 className="break-words font-display text-base font-semibold leading-snug text-text">
             <Link href={href} className="hover:text-primary-text">

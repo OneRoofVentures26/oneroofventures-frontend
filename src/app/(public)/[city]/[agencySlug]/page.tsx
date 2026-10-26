@@ -93,11 +93,12 @@ export default async function AgencyProfilePage({ params }: PageProps<"/[city]/[
       </Link>
 
       <div className="mt-2 flex flex-col gap-5 border-b border-border pb-6 sm:flex-row sm:items-start sm:justify-between sm:gap-8 sm:pb-8">
-        <div className="flex min-w-0 gap-4">
+        {/* Logo stacks above the name on phones, where a 2.5:1 box beside it would squeeze the title. */}
+        <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:gap-4">
           <AgencyLogo
             name={agency.name}
             logoUrl={agency.logoUrl}
-            className="h-14 w-14 rounded-2xl sm:h-16 sm:w-16"
+            className="h-16 w-40 rounded-xl sm:h-20 sm:w-[200px]"
             initialsClassName="text-lg"
           />
           <div className="min-w-0">

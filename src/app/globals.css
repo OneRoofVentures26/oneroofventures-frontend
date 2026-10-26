@@ -261,13 +261,13 @@
 }
 
 /*
- * The one content column (used through <Container>): 1200px max, side padding
+ * The one content column (used through <Container>): 1600px max, side padding
  * 16px, 24px from 640px, 32px from 1024px. Nothing inside a section adds its
  * own horizontal padding, so every section shares the same left/right edge.
  */
 @utility container-page {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1600px;
   margin-inline: auto;
   padding-inline: 16px;
 

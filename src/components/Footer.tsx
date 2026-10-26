@@ -23,6 +23,14 @@ const LINK_GROUPS = [
     ],
   },
   {
+    title: "Resources",
+    links: [
+      { href: "/articles", label: "Guides & articles" },
+      { href: "/articles/digital-marketing-agency-cost-india", label: "Agency pricing guide" },
+      { href: "/faq", label: "FAQ" },
+    ],
+  },
+  {
     title: "Company",
     links: [
       { href: "/about", label: "About us" },
@@ -120,7 +128,7 @@ export default function Footer({ cities }: { cities: CityItem[] }) {
         </div>
 
         {/* Desktop: everything open in columns. */}
-        <div className="hidden lg:grid lg:grid-cols-[1.3fr_1.6fr_1fr_1fr_1.2fr] lg:gap-8">
+        <div className="hidden lg:grid lg:grid-cols-[1.3fr_1.6fr_1fr_1fr_1fr_1.2fr] lg:gap-8">
           <div>
             <Logo size={40} />
             <p className="mt-4 max-w-xs text-sm text-text-muted">

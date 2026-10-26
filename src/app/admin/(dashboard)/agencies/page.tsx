@@ -227,8 +227,8 @@ function AgenciesList({ setQuery }: { setQuery: (next: URLSearchParams) => void 
     {
       key: "logo",
       header: "",
-      className: "w-12",
-      render: (a) => <AgencyLogo name={a.name} logoUrl={a.logoUrl} className="h-9 w-9 rounded-lg" initialsClassName="text-[12px]" />,
+      className: "w-24",
+      render: (a) => <AgencyLogo name={a.name} logoUrl={a.logoUrl} className="h-8 w-20 rounded-md" initialsClassName="text-[12px]" />,
     },
     {
       key: "name",
@@ -320,7 +320,7 @@ function AgenciesList({ setQuery }: { setQuery: (next: URLSearchParams) => void 
                 type="button"
                 disabled={fetchingLogos}
                 onClick={handleFetchLogos}
-                title={`Fetch logos from the website for every ${cityName(filters.city)} agency that has none`}
+                title={`Fetch logos for every ${cityName(filters.city)} agency that has none. Also finds logos in agency site headers, so agencies without a logo are worth fetching again.`}
                 className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-text hover:bg-surface-raised disabled:opacity-50"
               >
                 {fetchingLogos ? "Queueing…" : "Fetch missing logos"}

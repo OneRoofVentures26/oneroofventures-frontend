@@ -96,7 +96,7 @@ export default function AgencyLogoCard({
         <AgencyLogo
           name={agency.name}
           logoUrl={agency.logoUrl}
-          className="h-20 w-20 rounded-2xl"
+          className="h-24 w-60 rounded-xl"
           initialsClassName="text-xl"
         />
         <div className="min-w-0 flex-1">
@@ -157,7 +157,9 @@ export default function AgencyLogoCard({
             <p className="mt-2 text-[13px] text-danger">{fileError}</p>
           ) : (
             <p className="mt-2 text-[13px] text-text-muted">
-              PNG, JPEG, WebP, SVG, ICO or GIF, under 500 KB. PNG, JPEG and GIF need to be at least 48×48 px.
+              PNG, JPEG, WebP, SVG, ICO or GIF, under 500 KB. PNG, JPEG and GIF need to be at least 48×48 px; for a
+              wide wordmark use one at least 48 px high, or an SVG. If an automatic logo shows as a blank box (a
+              white logo made for a dark header), upload the right file.
             </p>
           )}
         </div>

@@ -22,7 +22,7 @@ export default function StickyActionBar({ children }: { children: React.ReactNod
         hidden && "pointer-events-none translate-y-full",
       )}
     >
-      <div className="mx-auto grid max-w-[1200px] grid-cols-2 gap-2 [&>*]:w-full">{children}</div>
+      <div className="mx-auto grid max-w-[1600px] grid-cols-2 gap-2 [&>*]:w-full">{children}</div>
     </div>
   );
 }
