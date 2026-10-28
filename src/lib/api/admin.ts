@@ -10,6 +10,7 @@ import type {
   AgencyBulkStatusResult,
   AgencyPatchRequest,
   AgencyRequest,
+  AgencyRatingsRequest,
   AgencyResponse,
   AgencyStatus,
   CityLogoFetchResult,
@@ -136,6 +137,25 @@ export function patchAgency(id: number, body: AgencyPatchRequest): Promise<Agenc
 /** Sets one status on up to 200 agencies. All or nothing: an unknown id (404) changes none. */
 export function setAgenciesStatus(agencyIds: number[], status: AgencyStatus): Promise<AgencyBulkStatusResult> {
   return request("PATCH", "/agencies/status", { json: { agencyIds, status } });
+}
+
+/**
+ * FIXED and RANGE agencies promise prices, so the backend refuses to publish
+ * them (400 on `fields.status` / `fields.agencyIds`) until they have a package.
+ */
+export function needsPackageToPublish(a: Pick<AgencyResponse, "pricingType" | "packageCount">): boolean {
+  return a.pricingType !== "QUOTE_ONLY" && a.packageCount === 0;
+}
+
+export const NEEDS_PACKAGE_HINT = "Add a package first, or set the pricing type to Quote only.";
+
+/**
+ * Replaces all six rating values, like a row of the quality sheet: null clears
+ * one. The score is recomputed a few seconds later, so the response still has
+ * the old one. A later quality CSV upload overwrites these.
+ */
+export function updateAgencyRatings(id: number, body: AgencyRatingsRequest): Promise<AgencyResponse> {
+  return request("PUT", `/agencies/${id}/ratings`, { json: body });
 }
 
 export function deleteAgency(id: number): Promise<void> {

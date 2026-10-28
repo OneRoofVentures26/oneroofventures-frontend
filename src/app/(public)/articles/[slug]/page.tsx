@@ -101,23 +101,7 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
         </ol>
       </nav>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-12 xl:grid-cols-[240px_minmax(0,1fr)_300px]">
-        {/* Table of contents: desktop only, sticky beside the text. */}
-        <aside className="hidden xl:block">
-          <nav aria-label="On this page" className="sticky top-24">
-            <p className="text-sm font-semibold text-text">On this page</p>
-            <ol className="mt-3 space-y-1 border-l border-border">
-              {toc.map((t) => (
-                <li key={t.id}>
-                  <a href={`#${t.id}`} className="-ml-px block border-l border-transparent py-1 pl-3 text-sm text-text-muted hover:border-primary hover:text-primary-text">
-                    {t.label}
-                  </a>
-                </li>
-              ))}
-            </ol>
-          </nav>
-        </aside>
-
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-12">
         <article className="min-w-0">
           <header>
             <span className={tag}>{article.category}</span>
@@ -148,8 +132,8 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
             </ul>
           </section>
 
-          {/* Table of contents on phones and tablets. */}
-          <details className="mt-6 rounded-xl border border-border bg-surface xl:hidden">
+          {/* Table of contents, collapsed so the answer and takeaways stay first. */}
+          <details className="mt-6 rounded-xl border border-border bg-surface">
             <summary className="flex min-h-12 cursor-pointer items-center px-4 text-sm font-semibold text-text">On this page</summary>
             <ol className="space-y-1 px-4 pb-3">
               {toc.map((t) => (

@@ -100,7 +100,7 @@ export default function ArticlesPage() {
               <h2 id={`${CATEGORY_IDS[category]}-title`} className={sectionTitle}>
                 {category}
               </h2>
-              <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+              <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {items.map((a) => (
                   <ArticleCard key={a.slug} article={a} />
                 ))}

@@ -353,7 +353,10 @@ export interface ScoreRecomputeResult {
   agenciesScored: number;
 }
 
-/** Read-only: set only by the quality CSV import (POST /admin/import/agency-quality). */
+/**
+ * Set by the quality CSV import (POST /admin/import/agency-quality). The six
+ * rating fields can also be edited by hand (PUT /admin/agencies/{id}/ratings).
+ */
 export interface AgencyQuality {
   siteLive: boolean | null;
   googleRating: number | null;
@@ -370,6 +373,12 @@ export interface AgencyQuality {
   excludeReason: string | null;
   qualityNotes: string | null;
 }
+
+/** PUT /admin/agencies/{id}/ratings. Ratings 0.0–5.0 (one decimal), reviews 0 or more; null clears. */
+export type AgencyRatingsRequest = Pick<
+  AgencyQuality,
+  "googleRating" | "googleReviews" | "clutchRating" | "clutchReviews" | "goodFirmsRating" | "goodFirmsReviews"
+>;
 
 export interface AdminAgencyFilters {
   city?: string;

@@ -4,7 +4,17 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import type { AgencyRequest, AgencyStatus } from "@/lib/api/types";
-import { agencyTags, getAgency, listCities, listServices, patchAgency, refreshPublic, updateAgency } from "@/lib/api/admin";
+import {
+  agencyTags,
+  getAgency,
+  listCities,
+  listServices,
+  NEEDS_PACKAGE_HINT,
+  needsPackageToPublish,
+  patchAgency,
+  refreshPublic,
+  updateAgency,
+} from "@/lib/api/admin";
 import { ApiError, errorMessage } from "@/lib/api/http";
 import { useAsync } from "@/lib/use-async";
 import { formatDate } from "@/lib/utils";
@@ -13,6 +23,7 @@ import AgencyForm from "@/components/admin/AgencyForm";
 import PackagesManager from "@/components/admin/PackagesManager";
 import AgencyScoreCard from "@/components/admin/AgencyScoreCard";
 import AgencyLogoCard from "@/components/admin/AgencyLogoCard";
+import AgencyRatingsCard from "@/components/admin/AgencyRatingsCard";
 import { ErrorBanner, Loading, PageHeader, primaryButton, secondaryButton, StatusBadge } from "@/components/admin/ui";
 
 /** The backend rescores a few seconds after a change; a save's response still has the old score. */
@@ -122,6 +133,11 @@ export default function EditAgencyPage() {
                 <span className="text-text-muted">
                   · Last checked {a.lastCheckedOn ? formatDate(a.lastCheckedOn) : "never"}
                 </span>
+                {a.status !== "PUBLISHED" && needsPackageToPublish(a) && (
+                  <a href="#packages" className="font-medium text-danger hover:underline">
+                    · Can&apos;t publish yet: {NEEDS_PACKAGE_HINT.toLowerCase()}
+                  </a>
+                )}
               </span>
             )
           }
@@ -143,9 +159,13 @@ export default function EditAgencyPage() {
                 ) : (
                   <button
                     type="button"
-                    disabled={publishing}
+                    disabled={publishing || needsPackageToPublish(a)}
                     onClick={() => changeStatus("PUBLISHED", "published")}
-                    title="Publishes the last saved version. Save any changes first."
+                    title={
+                      needsPackageToPublish(a)
+                        ? NEEDS_PACKAGE_HINT
+                        : "Publishes the last saved version. Save any changes first."
+                    }
                     className={primaryButton}
                   >
                     {publishing ? "Publishing…" : "Publish"}
@@ -165,6 +185,14 @@ export default function EditAgencyPage() {
           <>
             <AgencyLogoCard agency={a} onChange={(logo) => agency.setData((prev) => ({ ...prev!, ...logo }))} />
             <AgencyScoreCard agency={a} />
+            <AgencyRatingsCard
+              agency={a}
+              onSaved={(updated) => {
+                void refreshPublic({ tags: agencyTags(a, updated) });
+                agency.setData(() => updated);
+                refreshScoreSoon();
+              }}
+            />
             {/* Remount the form when the saved record changes so it shows server-normalised values. */}
             <AgencyForm
               key={a.updatedAt}
@@ -176,6 +204,7 @@ export default function EditAgencyPage() {
             />
             <PackagesManager
               agencyId={a.id}
+              keepOnePackage={a.status === "PUBLISHED" && a.pricingType !== "QUOTE_ONLY"}
               services={options.data[1]}
               onChanged={() => {
                 agency.reload();

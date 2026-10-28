@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { TIERS, type PackageResponse, type ServiceResponse } from "@/lib/api/types";
 import { createPackage, deletePackage, listPackages, refreshPublic, updatePackage } from "@/lib/api/admin";
-import { errorMessage } from "@/lib/api/http";
+import { ApiError, errorMessage } from "@/lib/api/http";
 import { useAsync } from "@/lib/use-async";
 import { formatPackagePrice, TIER_LABELS } from "@/lib/utils";
 import ConfirmDialog from "@/components/admin/ConfirmDialog";
@@ -14,10 +14,16 @@ import { dangerLinkButton, ErrorBanner, linkButton, RefreshButton, secondaryButt
 
 export default function PackagesManager({
   agencyId,
+  keepOnePackage = false,
   services,
   onChanged,
 }: {
   agencyId: number;
+  /**
+   * A published FIXED / RANGE agency must keep at least one package (the
+   * backend answers 409 otherwise), so Delete is disabled on the last one.
+   */
+  keepOnePackage?: boolean;
   services: ServiceResponse[];
   /** Called after packages change (saving a package can also add a service to the agency). */
   onChanged: () => void;
@@ -27,6 +33,8 @@ export default function PackagesManager({
   const [editing, setEditing] = useState<"new" | number | null>(null);
   const [suggesting, setSuggesting] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<PackageResponse | null>(null);
+
+  const lastPackageLocked = keepOnePackage && packages.data?.length === 1;
 
   const serviceName = (code: string) => services.find((s) => s.code === code)?.name ?? code;
 
@@ -51,12 +59,13 @@ export default function PackagesManager({
       toast.show(`“${target.name}” deleted`);
       refresh();
     } catch (err) {
-      toast.show(errorMessage(err), "error");
+      // 409: the last package of a published FIXED / RANGE agency; the message says what to do.
+      toast.show(err instanceof ApiError && err.status === 409 ? err.message : errorMessage(err), "error");
     }
   }
 
   return (
-    <section className="rounded-lg border border-border bg-surface p-5">
+    <section id="packages" className="scroll-mt-20 rounded-lg border border-border bg-surface p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 className="text-lg text-text">Packages</h2>
@@ -169,7 +178,17 @@ export default function PackagesManager({
                         >
                           Edit
                         </button>
-                        <button type="button" onClick={() => setPendingDelete(p)} className={dangerLinkButton}>
+                        <button
+                          type="button"
+                          disabled={lastPackageLocked}
+                          onClick={() => setPendingDelete(p)}
+                          title={
+                            lastPackageLocked
+                              ? "A published agency with fixed or range pricing needs at least one package. Hide it or set the pricing type to Quote only first."
+                              : undefined
+                          }
+                          className={dangerLinkButton}
+                        >
                           Delete
                         </button>
                       </div>

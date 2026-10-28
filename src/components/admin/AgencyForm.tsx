@@ -12,7 +12,7 @@ import type {
   PricingType,
   ServiceResponse,
 } from "@/lib/api/types";
-import { listLocalities } from "@/lib/api/admin";
+import { listLocalities, NEEDS_PACKAGE_HINT, needsPackageToPublish } from "@/lib/api/admin";
 import { ApiError, errorMessage } from "@/lib/api/http";
 import { useAsync } from "@/lib/use-async";
 import { cn, formatDateTime, PRICING_TYPE_LABELS } from "@/lib/utils";
@@ -161,7 +161,16 @@ export default function AgencyForm({ initialData: a, cities, services, onSubmit,
               ))}
             </select>
           </Field>
-          <Field label="Status" htmlFor="a-status" error={errors.status} hint="Only published agencies appear on the site">
+          <Field
+            label="Status"
+            htmlFor="a-status"
+            error={errors.status}
+            hint={
+              status === "PUBLISHED" && needsPackageToPublish({ pricingType, packageCount: a?.packageCount ?? 0 })
+                ? `Fixed and range pricing need a package before publishing. ${NEEDS_PACKAGE_HINT}`
+                : "Only published agencies appear on the site"
+            }
+          >
             <select id="a-status" value={status} onChange={(e) => setStatus(e.target.value as AgencyStatus)} className={input("status")}>
               <option value="DRAFT">Draft</option>
               <option value="PUBLISHED">Published</option>
@@ -367,21 +376,12 @@ function yesNo(v: boolean | null): string | null {
   return v === null ? null : v ? "Yes" : "No";
 }
 
-function rating(score: number | null, reviews: number | null): string | null {
-  if (score === null && reviews === null) return null;
-  const parts = [score !== null ? `${score.toFixed(1)} / 5` : null, reviews !== null ? `${reviews.toLocaleString("en-IN")} reviews` : null];
-  return parts.filter(Boolean).join(" · ");
-}
-
-/** Read-only: quality data can only be set by the quality CSV import. */
+/** Read-only: set by the quality CSV import. Ratings are edited in their own card (AgencyRatingsCard). */
 function QualitySection({ quality: q }: { quality: AgencyQuality | null | undefined }) {
   if (!q) return null;
   const rows: Array<[string, ReactNode, boolean?]> = [
     ["Site live", yesNo(q.siteLive)],
     ["Founded", q.foundedYear],
-    ["Google", rating(q.googleRating, q.googleReviews)],
-    ["Clutch", rating(q.clutchRating, q.clutchReviews)],
-    ["GoodFirms", rating(q.goodFirmsRating, q.goodFirmsReviews)],
     ["Results shown", yesNo(q.resultsShown)],
     ["Case studies", q.caseStudies],
     [
@@ -401,7 +401,7 @@ function QualitySection({ quality: q }: { quality: AgencyQuality | null | undefi
     <section className={sectionClass}>
       <h2 className={sectionTitle}>Quality (from quality sheet)</h2>
       <p className="mt-1 text-[13px] text-text-muted">
-        Read-only. Update it by uploading the quality sheet on the{" "}
+        Read-only (ratings are edited in the Ratings card above). Update it by uploading the quality sheet on the{" "}
         <Link href="/admin/import" className="font-medium text-primary-text hover:underline">
           Import
         </Link>{" "}

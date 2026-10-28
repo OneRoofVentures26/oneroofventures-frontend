@@ -10,6 +10,8 @@ import {
   fetchCityLogos,
   listAgencies,
   listCities,
+  NEEDS_PACKAGE_HINT,
+  needsPackageToPublish,
   patchAgency,
   recomputeScores,
   refreshPublic,
@@ -200,6 +202,10 @@ function AgenciesList({ setQuery }: { setQuery: (next: URLSearchParams) => void 
 
   const pageIds = agencies.data?.items.map((a) => a.id) ?? [];
   const allSelected = pageIds.length > 0 && pageIds.every((id) => selectedIds.includes(id));
+  // Bulk publish is all or nothing on the backend, so rows it would refuse are left out up front.
+  const selectedRows = agencies.data?.items.filter((a) => selectedIds.includes(a.id)) ?? [];
+  const blockedSelected = selectedRows.filter((a) => a.status !== "PUBLISHED" && needsPackageToPublish(a));
+  const publishableIds = selectedIds.filter((id) => !blockedSelected.some((a) => a.id === id));
 
   const columns: DataTableColumn<AgencyResponse>[] = [
     {
@@ -422,11 +428,12 @@ function AgenciesList({ setQuery }: { setQuery: (next: URLSearchParams) => void 
           <span className="mx-1 h-4 w-px bg-border" aria-hidden="true" />
           <button
             type="button"
-            disabled={bulkBusy}
-            onClick={() => bulkSetStatus(selectedIds, "PUBLISHED")}
+            disabled={bulkBusy || publishableIds.length === 0}
+            onClick={() => bulkSetStatus(publishableIds, "PUBLISHED")}
+            title={blockedSelected.length > 0 ? `Skips ${blockedSelected.length} without a package` : undefined}
             className="rounded-lg bg-primary px-3 py-1.5 text-sm font-semibold text-primary-fg hover:bg-primary-hover disabled:opacity-50"
           >
-            Publish
+            {blockedSelected.length > 0 ? `Publish ${publishableIds.length}` : "Publish"}
           </button>
           <button
             type="button"
@@ -451,6 +458,21 @@ function AgenciesList({ setQuery }: { setQuery: (next: URLSearchParams) => void 
           >
             Clear selection
           </button>
+          {blockedSelected.length > 0 && (
+            <p className="w-full text-[13px] text-text-muted">
+              {blockedSelected.length} selected agenc{blockedSelected.length === 1 ? "y has" : "ies have"} fixed or range
+              pricing but no package, so {blockedSelected.length === 1 ? "it" : "they"} can&apos;t be published:{" "}
+              {blockedSelected.map((a, i) => (
+                <span key={a.id}>
+                  {i > 0 && ", "}
+                  <Link href={`/admin/agencies/${a.id}/edit#packages`} className="font-medium text-primary-text hover:underline">
+                    {a.name}
+                  </Link>
+                </span>
+              ))}
+              . {NEEDS_PACKAGE_HINT}
+            </p>
+          )}
         </div>
       )}
 
@@ -521,6 +543,10 @@ function AgenciesList({ setQuery }: { setQuery: (next: URLSearchParams) => void 
                     >
                       Hide
                     </button>
+                  ) : needsPackageToPublish(a) ? (
+                    <Link href={`/admin/agencies/${a.id}/edit#packages`} title={NEEDS_PACKAGE_HINT} className={linkButton}>
+                      Add a package first
+                    </Link>
                   ) : (
                     <button
                       type="button"

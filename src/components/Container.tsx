@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 /**
- * The single content column for the whole site: 1600px max, 16 / 24 / 32px
+ * The single content column for the whole site: 1200px max, 16 / 24 / 32px
  * side padding. Header, footer and every section use it, and nothing inside
  * adds its own horizontal padding, so all content shares one left/right edge.
  */
